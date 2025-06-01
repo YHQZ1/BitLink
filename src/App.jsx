@@ -6,6 +6,7 @@ import Link from './pages/Link'
 import Redirect from './pages/Redirect'
 import Auth from './pages/Auth'
 import LandingPage from './pages/LandingPage'
+import URLProvider from './context';
 
 
 const router = createBrowserRouter([
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
 function App() {
   return(
     <URLProvider>
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </URLProvider>
   );
 }
