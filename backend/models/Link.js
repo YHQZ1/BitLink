@@ -51,7 +51,7 @@ const linkSchema = new mongoose.Schema(
 // Generate full shortUrl before saving (if not set)
 linkSchema.pre("save", function (next) {
   if (!this.shortUrl) {
-    const baseUrl = process.env.BASE_URL || "http://localhost:4000";
+    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     this.shortUrl = `${baseUrl}/${this.shortCode}`;
   }
   next();
