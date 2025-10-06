@@ -14,7 +14,8 @@ import {
   Calendar,
   X,
   Save,
-  Menu,
+  CheckCircle,
+  AlertCircle,
   Filter,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -46,6 +47,12 @@ export default function Home() {
   const [editOriginalUrl, setEditOriginalUrl] = useState("");
   const [editCustomAlias, setEditCustomAlias] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: "success", // 'success' or 'error'
+    title: "",
+    message: "",
+  });
   const navigate = useNavigate();
 
   // Fetch user data and links from backend
@@ -187,7 +194,7 @@ export default function Home() {
 
   const handleShorten = async () => {
     if (!url) {
-      alert("Please enter a URL");
+      showModal("error", "Missing URL", "Please enter a URL to shorten");
       return;
     }
 
@@ -231,10 +238,14 @@ export default function Home() {
       setCustomAlias("");
       setLinksLoading(false);
       fetchUserStats();
-      alert("Link shortened successfully!");
+      showModal("success", "Success", "Link shortened successfully!");
     } catch (error) {
       console.error("Error creating short link:", error);
-      alert(error.response?.data?.error || "Failed to create short link");
+      showModal(
+        "error",
+        "Error",
+        error.response?.data?.error || "Failed to create short link"
+      );
       setLinksLoading(false);
     }
   };
@@ -287,10 +298,14 @@ export default function Home() {
       setEditOriginalUrl("");
       setEditCustomAlias("");
       fetchUserStats();
-      alert("Link updated successfully!");
+      showModal("success", "Success", "Link updated successfully!");
     } catch (error) {
       console.error("Error updating link:", error);
-      alert(error.response?.data?.error || "Failed to update link");
+      showModal(
+        "error",
+        "Error",
+        error.response?.data?.error || "Failed to update link"
+      );
     }
   };
 
@@ -302,7 +317,7 @@ export default function Home() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
+    showModal("success", "Copied", "Link copied to clipboard!");
   };
 
   const deleteLink = async (id) => {
@@ -323,10 +338,14 @@ export default function Home() {
 
       setLinks(links.filter((link) => link.id !== id));
       fetchUserStats();
-      alert("Link deleted successfully!");
+      showModal("success", "Deleted", "Link deleted successfully!");
     } catch (error) {
       console.error("Error deleting link:", error);
-      alert(error.response?.data?.error || "Failed to delete link");
+      showModal(
+        "error",
+        "Error",
+        error.response?.data?.error || "Failed to delete link"
+      );
     }
   };
 
@@ -376,13 +395,58 @@ export default function Home() {
     );
   }
 
+  // Add this function BEFORE the return statement
+  const showModal = (type, title, message) => {
+    setModal({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
+
+  // Add this component BEFORE the return statement
+  const Modal = () => {
+    if (!modal.isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
+          <div className="flex items-center space-x-3 mb-4">
+            <div
+              className={`p-2 rounded-full ${
+                modal.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
+              }`}
+            >
+              {modal.type === "success" ? (
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              ) : (
+                <AlertCircle className="w-6 h-6 text-red-400" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">{modal.title}</h3>
+              <p className="text-gray-400 text-sm">{modal.message}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setModal({ ...modal, isOpen: false })}
+            className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
       <Navbar
         userName={currentUser.name}
         profileImage={currentUser.profileImage}
       />
-
+      <Modal />
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 pt-20">
         {/* Welcome Section */}
@@ -591,12 +655,12 @@ export default function Home() {
                     key={link.id}
                     className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200"
                   >
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       {/* Link Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                           <a
-                            href={link.shortUrl} // This keeps the actual functional URL
+                            href={link.shortUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
@@ -607,7 +671,7 @@ export default function Home() {
                             <ExternalLink className="w-3 h-3 flex-shrink-0" />
                           </a>
                           <button
-                            onClick={() => copyToClipboard(link.shortUrl)} // This copies the actual working URL
+                            onClick={() => copyToClipboard(link.shortUrl)}
                             className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
                           >
                             <Copy className="w-3 h-3" />
@@ -651,7 +715,7 @@ export default function Home() {
                       </div>
 
                       {/* Stats and Actions */}
-                      <div className="flex items-center justify-between sm:justify-end gap-4">
+                      <div className="flex items-center gap-4">
                         <div className="text-center min-w-[60px]">
                           <div className="text-lg font-bold text-white">
                             {link.clicks}

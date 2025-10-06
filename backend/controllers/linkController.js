@@ -513,3 +513,195 @@ export const getUserStats = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get global analytics for all user links
+export const getGlobalAnalytics = async (req, res) => {
+  try {
+    const { range = "30d" } = req.query;
+    const userId = req.user.userId;
+
+    // Calculate date range
+    let startDate;
+    const endDate = new Date();
+
+    switch (range) {
+      case "7d":
+        startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "30d":
+        startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case "90d":
+        startDate = new Date(endDate.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(0); // All time
+    }
+
+    // Build query for analytics data
+    const analyticsQuery = {
+      timestamp: { $gte: startDate, $lte: endDate },
+    };
+
+    // Get all user links to filter analytics
+    const userLinks = await Link.find({ user: userId });
+    const linkIds = userLinks.map((link) => link._id);
+
+    analyticsQuery.link = { $in: linkIds };
+
+    // Get analytics data for all user links
+    const analyticsData = await Analytics.find(analyticsQuery);
+
+    // Get basic stats from links
+    const totalLinks = userLinks.length;
+    const totalClicks = userLinks.reduce((sum, link) => sum + link.clicks, 0);
+    const avgClicks = totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
+
+    // Calculate active links (last 30 days)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const activeLinks = userLinks.filter(
+      (link) => link.lastActivity && new Date(link.lastActivity) > thirtyDaysAgo
+    ).length;
+
+    // Get top 5 performing links
+    const topPerformingLinks = userLinks
+      .sort((a, b) => b.clicks - a.clicks)
+      .slice(0, 5)
+      .map((link) => ({
+        id: link._id,
+        shortUrl: link.shortUrl,
+        shortCode: link.shortCode,
+        originalUrl: link.originalUrl,
+        clicks: link.clicks,
+        createdAt: link.createdAt,
+      }));
+
+    // Process analytics data for global stats
+    const trafficSources = getGlobalTrafficSources(analyticsData);
+    const geographicData = getGlobalGeographicData(analyticsData);
+    const deviceDistribution = getGlobalDeviceDistribution(analyticsData);
+    const growthData = getGlobalGrowthData(analyticsData, range);
+
+    const globalAnalytics = {
+      totalLinks,
+      totalClicks,
+      avgClicks,
+      activeLinks,
+      topLinks: topPerformingLinks,
+      trafficSources,
+      geographicData,
+      deviceDistribution,
+      growthData,
+    };
+
+    res.json(globalAnalytics);
+  } catch (error) {
+    console.error("Error fetching global analytics:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Helper functions for global analytics
+const getGlobalTrafficSources = (data) => {
+  const referrers = {};
+  data.forEach((entry) => {
+    const source = categorizeReferrer(entry.referrer);
+    referrers[source] = (referrers[source] || 0) + 1;
+  });
+
+  const total = data.length;
+
+  return Object.entries(referrers)
+    .map(([source, count]) => ({
+      source,
+      count,
+      percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count);
+};
+
+const getGlobalGeographicData = (data) => {
+  const countries = {};
+  data.forEach((entry) => {
+    const country = entry.country || "Unknown";
+    countries[country] = (countries[country] || 0) + 1;
+  });
+
+  const total = data.length;
+
+  return Object.entries(countries)
+    .map(([country, count]) => ({
+      country,
+      count,
+      percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .filter(
+      (countryData) =>
+        countryData.country !== "Local Network" &&
+        countryData.country !== "Localhost" &&
+        countryData.country !== "Unknown"
+    )
+    .slice(0, 5); // Top 5 countries
+};
+
+const getGlobalDeviceDistribution = (data) => {
+  const devices = {};
+  data.forEach((entry) => {
+    const device = entry.deviceType || "Unknown";
+    devices[device] = (devices[device] || 0) + 1;
+  });
+
+  const total = data.length;
+
+  return Object.entries(devices)
+    .map(([device, count]) => ({
+      device,
+      count,
+      percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count);
+};
+
+const getGlobalGrowthData = (data, range) => {
+  const format = range === "7d" ? "hour" : range === "30d" ? "day" : "month";
+  const grouped = {};
+
+  data.forEach((entry) => {
+    const date = new Date(entry.timestamp);
+    let key;
+
+    if (format === "hour") {
+      key = date.toISOString().slice(0, 13) + ":00"; // Group by hour
+    } else if (format === "day") {
+      key = date.toISOString().split("T")[0]; // Group by date
+    } else {
+      key = date.toISOString().slice(0, 7); // Group by month (YYYY-MM)
+    }
+
+    grouped[key] = (grouped[key] || 0) + 1;
+  });
+
+  return Object.entries(grouped)
+    .map(([period, clicks]) => ({
+      period: formatPeriod(period, format),
+      clicks,
+    }))
+    .sort((a, b) => a.period.localeCompare(b.period));
+};
+
+const formatPeriod = (period, format) => {
+  if (format === "hour") {
+    return period.slice(11, 16); // "HH:00"
+  } else if (format === "day") {
+    return new Date(period).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  } else {
+    return new Date(period + "-01").toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+  }
+};

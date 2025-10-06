@@ -63,174 +63,22 @@ export default function Analytics() {
         throw new Error("Please login to view analytics");
       }
 
-      // Fetch all user links first
-      const linksResponse = await axios.get(`${BASE_URL}/api/links/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // Fetch global analytics from backend
+      const response = await axios.get(
+        `${BASE_URL}/api/links/global-analytics?range=${timeRange}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      const links = linksResponse.data.links;
-
-      // Calculate global stats
-      const totalLinks = links.length;
-      const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
-      const avgClicks =
-        totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
-
-      // Get top 5 performing links
-      const topPerformingLinks = links
-        .sort((a, b) => b.clicks - a.clicks)
-        .slice(0, 5)
-        .map((link) => ({
-          id: link._id,
-          shortUrl: link.shortUrl,
-          shortCode: link.shortCode,
-          originalUrl: link.originalUrl,
-          clicks: link.clicks,
-          createdAt: link.createdAt,
-        }));
-
-      // Calculate active links (last 30 days)
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const activeLinks = links.filter(
-        (link) =>
-          link.lastAccessed && new Date(link.lastAccessed) > thirtyDaysAgo
-      ).length;
-
-      // Mock global analytics data (you can enhance this with real backend analytics)
-      const globalAnalytics = {
-        totalLinks,
-        totalClicks,
-        avgClicks,
-        activeLinks,
-        topLinks: topPerformingLinks,
-        trafficSources: calculateGlobalTrafficSources(links),
-        geographicData: calculateGlobalGeographicData(links),
-        deviceDistribution: calculateGlobalDeviceDistribution(links),
-        growthData: calculateGrowthData(links, timeRange),
-      };
-
-      setGlobalStats(globalAnalytics);
-      setTopLinks(topPerformingLinks);
+      setGlobalStats(response.data);
+      setTopLinks(response.data.topLinks || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching global analytics:", error);
       setError(error.message);
       setIsLoading(false);
     }
-  };
-
-  // Helper functions for global analytics
-  const calculateGlobalTrafficSources = (links) => {
-    // This would come from your backend analytics aggregation
-    return [
-      {
-        source: "Direct",
-        percentage: 45,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.45
-        ),
-      },
-      {
-        source: "Social Media",
-        percentage: 30,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.3
-        ),
-      },
-      {
-        source: "Email",
-        percentage: 15,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.15
-        ),
-      },
-      {
-        source: "Search",
-        percentage: 10,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
-        ),
-      },
-    ];
-  };
-
-  const calculateGlobalGeographicData = (links) => {
-    return [
-      {
-        country: "United States",
-        percentage: 40,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.4
-        ),
-      },
-      {
-        country: "India",
-        percentage: 25,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.25
-        ),
-      },
-      {
-        country: "United Kingdom",
-        percentage: 15,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.15
-        ),
-      },
-      {
-        country: "Germany",
-        percentage: 10,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
-        ),
-      },
-      {
-        country: "Other",
-        percentage: 10,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
-        ),
-      },
-    ];
-  };
-
-  const calculateGlobalDeviceDistribution = (links) => {
-    return [
-      {
-        device: "Mobile",
-        percentage: 60,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.6
-        ),
-      },
-      {
-        device: "Desktop",
-        percentage: 35,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.35
-        ),
-      },
-      {
-        device: "Tablet",
-        percentage: 5,
-        count: Math.floor(
-          links.reduce((sum, link) => sum + link.clicks, 0) * 0.05
-        ),
-      },
-    ];
-  };
-
-  const calculateGrowthData = (links, range) => {
-    // Mock growth data - in real app, this would come from time-based analytics
-    const baseClicks = links.reduce((sum, link) => sum + link.clicks, 0);
-    return [
-      { period: "Jan", clicks: Math.floor(baseClicks * 0.1) },
-      { period: "Feb", clicks: Math.floor(baseClicks * 0.15) },
-      { period: "Mar", clicks: Math.floor(baseClicks * 0.2) },
-      { period: "Apr", clicks: Math.floor(baseClicks * 0.25) },
-      { period: "May", clicks: Math.floor(baseClicks * 0.3) },
-      { period: "Jun", clicks: Math.floor(baseClicks * 0.35) },
-    ];
   };
 
   const handleBack = () => {
