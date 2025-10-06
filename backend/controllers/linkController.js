@@ -366,6 +366,14 @@ const getBrowsers = (data) => {
 
 const getPeakHours = (data) => {
   const hours = {};
+
+  // Initialize all 24 hours with 0 clicks
+  for (let i = 0; i < 24; i++) {
+    const hourStr = `${i.toString().padStart(2, "0")}:00`;
+    hours[hourStr] = 0;
+  }
+
+  // Count actual clicks
   data.forEach((entry) => {
     const hour = new Date(entry.timestamp).getHours();
     const hourStr = `${hour.toString().padStart(2, "0")}:00`;
@@ -374,8 +382,12 @@ const getPeakHours = (data) => {
 
   return Object.entries(hours)
     .map(([hour, clicks]) => ({ hour, clicks }))
-    .sort((a, b) => b.clicks - a.clicks)
-    .slice(0, 5); // Top 5 hours
+    .sort((a, b) => {
+      // Sort by hour (0-23) instead of click count
+      const hourA = parseInt(a.hour.split(":")[0]);
+      const hourB = parseInt(b.hour.split(":")[0]);
+      return hourA - hourB;
+    });
 };
 
 // Update a link

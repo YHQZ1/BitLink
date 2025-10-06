@@ -137,7 +137,7 @@ export default function Analytics() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors"
+          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Dashboard</span>
@@ -161,7 +161,7 @@ export default function Analytics() {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer duration-200 ${
                     timeRange === range
                       ? "bg-[#7ed957] text-black"
                       : "bg-gray-800 text-gray-300 hover:bg-gray-700"
