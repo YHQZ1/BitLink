@@ -13,6 +13,8 @@ dotenv.config();
 
 const app = express();
 
+CLIENT_URL = process.env.PROD_URL || "http://localhost:5173";
+
 // Middleware
 app.use(express.json());
 app.use(
