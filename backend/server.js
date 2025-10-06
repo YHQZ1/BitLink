@@ -32,14 +32,15 @@ app.use(cors({
   credentials: true
 }));
 
-app.options("*", cors()); // ✅ handle preflight requests
-
 app.use(express.json());
 
 // ✅ MongoDB connection
 mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Routes
