@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +34,7 @@ export default function Auth() {
     try {
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
 
-      const response = await fetch(`http://localhost:3000${endpoint}`, {
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
