@@ -373,9 +373,16 @@ const getPeakHours = (data) => {
     hours[hourStr] = 0;
   }
 
-  // Count actual clicks
+  // Count clicks using IST timezone (UTC+5:30)
   data.forEach((entry) => {
-    const hour = new Date(entry.timestamp).getHours();
+    const date = new Date(entry.timestamp);
+
+    // Convert UTC to IST (UTC+5:30)
+    const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+    const istTime = new Date(date.getTime() + istOffset);
+
+    // ✅ FIX: Use getHours() instead of getUTCHours() to get local IST time
+    const hour = istTime.getHours(); 
     const hourStr = `${hour.toString().padStart(2, "0")}:00`;
     hours[hourStr] = (hours[hourStr] || 0) + 1;
   });
@@ -383,7 +390,6 @@ const getPeakHours = (data) => {
   return Object.entries(hours)
     .map(([hour, clicks]) => ({ hour, clicks }))
     .sort((a, b) => {
-      // Sort by hour (0-23) instead of click count
       const hourA = parseInt(a.hour.split(":")[0]);
       const hourB = parseInt(b.hour.split(":")[0]);
       return hourA - hourB;
