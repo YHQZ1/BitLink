@@ -78,28 +78,47 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile Menu */}
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-[#0a0a0a] border-t border-gray-800">
             <div className="px-4 py-4 space-y-3">
               <a
                 href="#features"
                 className="block text-gray-300 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </a>
               <a
                 href="#pricing"
                 className="block text-gray-300 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </a>
-              <a href="#docs" className="block text-gray-300 hover:text-white">
+              <a
+                href="#docs"
+                className="block text-gray-300 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 Docs
               </a>
-              <button className="block w-full text-left text-gray-300 hover:text-white">
+              <button
+                className="block w-full text-left text-gray-300 hover:text-white py-2"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  redirectToAuth();
+                }}
+              >
                 Sign In
               </button>
-              <button className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold">
+              <button
+                className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold text-center"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  redirectToAuth();
+                }}
+              >
                 Get Started
               </button>
             </div>
