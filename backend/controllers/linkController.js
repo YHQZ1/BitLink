@@ -367,12 +367,6 @@ const getBrowsers = (data) => {
 const getPeakHours = (data) => {
   const hours = {};
 
-  // Initialize all 24 hours with 0 clicks
-  for (let i = 0; i < 24; i++) {
-    const hourStr = `${i.toString().padStart(2, "0")}:00`;
-    hours[hourStr] = 0;
-  }
-
   // Count clicks using IST timezone (UTC+5:30)
   data.forEach((entry) => {
     const date = new Date(entry.timestamp);
@@ -382,18 +376,15 @@ const getPeakHours = (data) => {
     const istTime = new Date(date.getTime() + istOffset);
 
     // ✅ FIX: Use getHours() instead of getUTCHours() to get local IST time
-    const hour = istTime.getHours(); 
+    const hour = istTime.getHours();
     const hourStr = `${hour.toString().padStart(2, "0")}:00`;
     hours[hourStr] = (hours[hourStr] || 0) + 1;
   });
 
   return Object.entries(hours)
     .map(([hour, clicks]) => ({ hour, clicks }))
-    .sort((a, b) => {
-      const hourA = parseInt(a.hour.split(":")[0]);
-      const hourB = parseInt(b.hour.split(":")[0]);
-      return hourA - hourB;
-    });
+    .sort((a, b) => b.clicks - a.clicks) // Sort by clicks descending (most clicks first)
+    .slice(0, 5); // 🎯 RETURN ONLY TOP 5 HOURS!
 };
 
 // Update a link
