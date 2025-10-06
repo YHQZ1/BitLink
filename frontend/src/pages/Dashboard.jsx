@@ -1,6 +1,12 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
-import { LayoutDashboard, Sparkles } from "lucide-react";
+import {
+  LayoutDashboard,
+  Sparkles,
+  TrendingUp,
+  BarChart3,
+  FileText,
+} from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
@@ -41,59 +47,81 @@ export default function Dashboard() {
         profileImage={currentUser.profileImage}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 pt-24 sm:pt-28">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 pt-32">
         <div className="text-center">
           {/* Icon Container */}
-          <div className="relative inline-block mb-6 sm:mb-8">
+          <div className="relative inline-block mb-8 sm:mb-12">
             <div className="absolute inset-0 bg-[#7ed957] blur-3xl opacity-20 rounded-full"></div>
-            <div className="relative bg-gray-900/50 border border-gray-800 rounded-full p-6 sm:p-8 inline-block">
-              <LayoutDashboard className="w-12 h-12 sm:w-16 sm:h-16 text-[#7ed957]" />
+            <div className="relative bg-gray-900/50 border border-gray-800 rounded-full p-8 sm:p-10 inline-block">
+              <LayoutDashboard className="w-16 h-16 sm:w-20 sm:h-20 text-[#7ed957]" />
             </div>
-          </div>
-
-          {/* Coming Soon Badge */}
-          <div className="inline-flex items-center space-x-2 bg-[#7ed957]/10 border border-[#7ed957]/30 rounded-full px-4 py-2 mb-4 sm:mb-6">
-            <Sparkles className="w-4 h-4 text-[#7ed957]" />
-            <span className="text-[#7ed957] text-xs sm:text-sm font-semibold uppercase tracking-wider">
-              Coming Soon
-            </span>
           </div>
 
           {/* Heading */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
-            Dashboard
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
+            Data Analytics
           </h1>
 
           {/* Description */}
-          <p className="text-gray-400 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-4">
-            Your comprehensive analytics dashboard is on its way. Get ready for powerful insights and data visualization!
+          <p className="text-gray-400 text-lg sm:text-xl lg:text-2xl max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed px-4">
+            Advanced analytics and insights platform is under development. Get
+            ready for comprehensive data visualization and performance metrics.
           </p>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 text-left">
-            <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">📊</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-16 text-left">
+            <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 sm:p-8 hover:border-gray-700 transition-all duration-300 group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#7ed957]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#7ed957]/20 transition-colors">
+                <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-[#7ed957]" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Real-time Stats</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Live tracking of all your links and clicks</p>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Real-time Analytics
+              </h3>
+              <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                Live tracking and monitoring of all your links with real-time
+                click data and performance metrics
+              </p>
             </div>
 
-            <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">📈</span>
+            <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 sm:p-8 hover:border-gray-700 transition-all duration-300 group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#7ed957]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#7ed957]/20 transition-colors">
+                <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-[#7ed957]" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Advanced Analytics</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Deep dive into your link performance</p>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Advanced Insights
+              </h3>
+              <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                Deep dive into performance analytics with detailed reports and
+                actionable insights
+              </p>
             </div>
 
-            <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300 sm:col-span-2 lg:col-span-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">🎯</span>
+            <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 sm:p-8 hover:border-gray-700 transition-all duration-300 group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#7ed957]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#7ed957]/20 transition-colors">
+                <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-[#7ed957]" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Custom Reports</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Generate and export detailed reports</p>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Custom Reports
+              </h3>
+              <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                Generate comprehensive reports with customizable metrics and
+                export capabilities
+              </p>
             </div>
+          </div>
+
+          {/* Additional Info */}
+          <div className="mt-12 sm:mt-16 bg-gray-900/20 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-2xl mx-auto">
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-3">
+              What to Expect
+            </h3>
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+              Our analytics dashboard will provide comprehensive insights into
+              your link performance, including geographic data, device
+              analytics, traffic sources, and detailed click patterns. Stay
+              tuned for powerful data visualization tools and advanced reporting
+              features.
+            </p>
           </div>
         </div>
       </div>

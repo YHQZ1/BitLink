@@ -189,7 +189,7 @@ export default function QRCode() {
                 <button
                   onClick={downloadQRCode}
                   disabled={!link?.qrCode}
-                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Download className="w-5 h-5" />
                   <span>Download QR</span>
@@ -272,7 +272,7 @@ export default function QRCode() {
                       className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Copy className="w-4 h-4" />
-                      <span>Copy QR Code</span>
+                      <span>Copy Address</span>
                     </button>
                   </div>
                 </div>

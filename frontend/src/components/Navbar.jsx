@@ -93,12 +93,12 @@ const Navbar = ({ userName = "User" }) => {
             >
               Analytics
             </button>
-            <button
+            {/* <button
               onClick={() => navigate("/settings")}
               className="text-gray-300 hover:text-white transition-colors cursor-pointer"
             >
               Settings
-            </button>
+            </button> */}
             
             {/* User Dropdown */}
             <div className="relative" ref={userDropdownRef}>
@@ -176,12 +176,12 @@ const Navbar = ({ userName = "User" }) => {
             >
               Analytics
             </button>
-            <button
+            {/* <button
               onClick={() => handleNavigation("/settings")}
               className="block text-gray-300 hover:text-white w-full text-left cursor-pointer"
             >
               Settings
-            </button>
+            </button> */}
             
             {/* User Section in Mobile Menu */}
             <div className="pt-2 border-t border-gray-800">

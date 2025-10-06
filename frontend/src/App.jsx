@@ -49,14 +49,14 @@ export default function App() {
             </ProtectedRoutes>
           }
         />
-        <Route
+        {/* <Route
           path="/settings"
           element={
             <ProtectedRoutes>
               <Settings />
             </ProtectedRoutes>
           }
-        />
+        /> */}
         <Route
           path="/dashboard"
           element={

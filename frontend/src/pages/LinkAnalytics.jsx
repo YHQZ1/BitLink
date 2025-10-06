@@ -311,7 +311,8 @@ export default function LinkAnalytics() {
         </div>
 
         {/* Analytics Sections - Responsive Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        {/* Analytics Sections - Responsive Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
           {/* Referrers */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
@@ -419,38 +420,37 @@ export default function LinkAnalytics() {
               )}
             </div>
           </div>
+        </div>
 
-          {/* Peak Hours - Full Width on Mobile */}
-          {/* Peak Hours - Top 5 Hours Only */}
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
-              Peak Hours (Top 5)
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-              {getPeakHours().length > 0 ? (
-                getPeakHours().map((hour, index) => (
-                  <div
-                    key={index}
-                    className="text-center bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700/50"
-                  >
-                    <div className="text-[#7ed957] font-bold text-lg sm:text-xl mb-1">
-                      {hour.clicks}
-                    </div>
-                    <div className="text-gray-300 text-sm sm:text-base font-medium">
-                      {hour.hour}
-                    </div>
-                    <div className="text-gray-500 text-xs mt-1">
-                      {index === 0 ? "Peak" : `#${index + 1}`}
-                    </div>
+        {/* Peak Hours - Full Width Section */}
+        <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
+            Peak Hours (Top 5)
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+            {getPeakHours().length > 0 ? (
+              getPeakHours().map((hour, index) => (
+                <div
+                  key={index}
+                  className="text-center bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700/50"
+                >
+                  <div className="text-[#7ed957] font-bold text-lg sm:text-xl mb-1">
+                    {hour.clicks}
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm col-span-full text-center py-4">
-                  No peak hours data available
-                </p>
-              )}
-            </div>
+                  <div className="text-gray-300 text-sm sm:text-base font-medium">
+                    {hour.hour}
+                  </div>
+                  <div className="text-gray-500 text-xs mt-1">
+                    {index === 0 ? "Peak" : `#${index + 1}`}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm col-span-full text-center py-4">
+                No peak hours data available
+              </p>
+            )}
           </div>
         </div>
       </div>
