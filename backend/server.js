@@ -13,16 +13,16 @@ dotenv.config();
 
 const app = express();
 
-CLIENT_URL = process.env.PROD_URL || "http://localhost:5173";
+// CLIENT_URL = process.env.PROD_URL || "http://localhost:5173";
 
 // Middleware
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL,
+//     credentials: true,
+//   })
+// );
 
 // Connect to MongoDB
 mongoose
