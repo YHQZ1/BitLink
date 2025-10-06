@@ -2,6 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
+import QRCode from "./pages/QRCode";
+import LinkAnalytics from "./pages/LinkAnalytics";
+import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
+import Dashboard from "./pages/Dashboard";
+
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
 export default function App() {
@@ -10,13 +16,53 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
-        <Route 
-          path="/home" 
+        <Route
+          path="/home"
           element={
             <ProtectedRoutes>
               <Home />
             </ProtectedRoutes>
-          } 
+          }
+        />
+        <Route
+          path="/qr/:linkId"
+          element={
+            <ProtectedRoutes>
+              <QRCode />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/analytics/:linkId"
+          element={
+            <ProtectedRoutes>
+              <LinkAnalytics />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoutes>
+              <Analytics />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoutes>
+              <Settings />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoutes>
+              <Dashboard />
+            </ProtectedRoutes>
+          }
         />
       </Routes>
     </Router>

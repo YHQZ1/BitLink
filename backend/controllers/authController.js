@@ -1,8 +1,9 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// src/controllers/authController.js
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -22,6 +23,7 @@ const signup = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
+
     res.status(201).json({
       message: "User created successfully",
       token,
@@ -32,7 +34,7 @@ const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -55,5 +57,3 @@ const login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-module.exports = { signup, login };

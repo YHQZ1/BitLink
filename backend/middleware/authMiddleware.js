@@ -1,15 +1,26 @@
-const jwt = require("jsonwebtoken");
+// src/middleware/authMiddleware.js
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer "))
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "Unauthorized" });
+    }
 
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Verify user still exists in database
+    const user = await User.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
     req.user = decoded;
+    req.userId = decoded.userId; 
 
     next();
   } catch (error) {
@@ -17,4 +28,4 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = protect;
+export default protect;

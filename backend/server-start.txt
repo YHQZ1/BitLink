@@ -1,0 +1,6 @@
+open terminal
+
+run this command:-
+sudo mongod --dbpath /Users/uttkarshruparel/data/db
+
+open mongodb compass for gui and connection

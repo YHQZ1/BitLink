@@ -1,12 +1,12 @@
-// src/pages/Dashboard.jsx
+// src/pages/Settings.jsx
 import React, { useState, useEffect } from "react";
-import { LayoutDashboard, Sparkles } from "lucide-react";
+import { Settings as SettingsIcon, Sparkles } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
 const BASE_URL = "http://localhost:3000";
 
-export default function Dashboard() {
+export default function Settings() {
   const [currentUser, setCurrentUser] = useState({
     name: "",
     profileImage: null,
@@ -47,7 +47,7 @@ export default function Dashboard() {
           <div className="relative inline-block mb-6 sm:mb-8">
             <div className="absolute inset-0 bg-[#7ed957] blur-3xl opacity-20 rounded-full"></div>
             <div className="relative bg-gray-900/50 border border-gray-800 rounded-full p-6 sm:p-8 inline-block">
-              <LayoutDashboard className="w-12 h-12 sm:w-16 sm:h-16 text-[#7ed957]" />
+              <SettingsIcon className="w-12 h-12 sm:w-16 sm:h-16 text-[#7ed957] animate-spin-slow" style={{ animationDuration: '8s' }} />
             </div>
           </div>
 
@@ -61,38 +61,38 @@ export default function Dashboard() {
 
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
-            Dashboard
+            Settings
           </h1>
 
           {/* Description */}
           <p className="text-gray-400 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-4">
-            Your comprehensive analytics dashboard is on its way. Get ready for powerful insights and data visualization!
+            We're crafting an amazing settings experience for you. Soon you'll be able to customize your account, manage preferences, and more!
           </p>
 
           {/* Feature Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 text-left">
             <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">📊</span>
+                <span className="text-xl sm:text-2xl">👤</span>
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Real-time Stats</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Live tracking of all your links and clicks</p>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Profile Settings</h3>
+              <p className="text-xs sm:text-sm text-gray-400">Update your personal information and avatar</p>
             </div>
 
             <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">📈</span>
+                <span className="text-xl sm:text-2xl">🔐</span>
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Advanced Analytics</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Deep dive into your link performance</p>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Security</h3>
+              <p className="text-xs sm:text-sm text-gray-400">Manage passwords and security options</p>
             </div>
 
             <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-gray-700 transition-all duration-300 sm:col-span-2 lg:col-span-1">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                <span className="text-xl sm:text-2xl">🎯</span>
+                <span className="text-xl sm:text-2xl">🔔</span>
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Custom Reports</h3>
-              <p className="text-xs sm:text-sm text-gray-400">Generate and export detailed reports</p>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Notifications</h3>
+              <p className="text-xs sm:text-sm text-gray-400">Control your notification preferences</p>
             </div>
           </div>
         </div>
