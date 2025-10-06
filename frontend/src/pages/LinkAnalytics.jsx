@@ -65,13 +65,6 @@ export default function LinkAnalytics() {
         throw new Error("Please login to view analytics");
       }
 
-      console.log(
-        "🔍 Fetching analytics for link:",
-        linkId,
-        "with range:",
-        timeRange
-      );
-
       const response = await axios.get(
         `${BASE_URL}/api/links/analytics/${linkId}?range=${timeRange}`,
         {
@@ -80,8 +73,6 @@ export default function LinkAnalytics() {
           },
         }
       );
-
-      console.log("✅ Analytics API Response:", response.data);
 
       setAnalyticsData(response.data);
       setIsLoading(false);
@@ -213,7 +204,9 @@ export default function LinkAnalytics() {
                   rel="noopener noreferrer"
                   className="text-[#7ed957] text-sm sm:text-base font-medium hover:underline flex items-center space-x-1 break-all"
                 >
-                  <span className="truncate max-w-[200px] sm:max-w-none">{link.shortUrl}</span>
+                  <span className="truncate max-w-[200px] sm:max-w-none">
+                    bit.lk/{link.shortCode}
+                  </span>
                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 </a>
                 <button
@@ -262,7 +255,9 @@ export default function LinkAnalytics() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">Total Clicks</span>
+              <span className="text-gray-400 text-xs sm:text-sm">
+                Total Clicks
+              </span>
               <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
             </div>
             <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
@@ -278,9 +273,9 @@ export default function LinkAnalytics() {
             <div className="text-sm sm:text-base lg:text-lg font-bold text-white leading-tight">
               {link.createdAt
                 ? new Date(link.createdAt).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: window.innerWidth < 640 ? '2-digit' : 'numeric'
+                    month: "short",
+                    day: "numeric",
+                    year: window.innerWidth < 640 ? "2-digit" : "numeric",
                   })
                 : "N/A"}
             </div>
@@ -288,12 +283,15 @@ export default function LinkAnalytics() {
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">Top Country</span>
+              <span className="text-gray-400 text-xs sm:text-sm">
+                Top Country
+              </span>
               <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-bold text-white truncate">
-              {getCountries()[0]?.country === "Unknown" ||
-              getCountries()[0]?.country === "Local Network"
+              {getCountries()[0]?.country === "Local Network" ||
+              getCountries()[0]?.country === "Unknown" ||
+              getCountries()[0]?.country === "Localhost"
                 ? "Not Available"
                 : getCountries()[0]?.country || "N/A"}
             </div>
@@ -301,7 +299,9 @@ export default function LinkAnalytics() {
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">Top Device</span>
+              <span className="text-gray-400 text-xs sm:text-sm">
+                Top Device
+              </span>
               <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-bold text-white truncate">
@@ -321,7 +321,10 @@ export default function LinkAnalytics() {
             <div className="space-y-2 sm:space-y-3">
               {getReferrers().length > 0 ? (
                 getReferrers().map((ref, index) => (
-                  <div key={index} className="flex items-center justify-between gap-2">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
                     <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
                       {ref.source}
                     </span>
@@ -345,7 +348,10 @@ export default function LinkAnalytics() {
             <div className="space-y-2 sm:space-y-3">
               {getCountries().length > 0 ? (
                 getCountries().map((country, index) => (
-                  <div key={index} className="flex items-center justify-between gap-2">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
                     <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
                       {country.country}
                     </span>
@@ -369,7 +375,10 @@ export default function LinkAnalytics() {
             <div className="space-y-2 sm:space-y-3">
               {getDevices().length > 0 ? (
                 getDevices().map((device, index) => (
-                  <div key={index} className="flex items-center justify-between gap-2">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
                     <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
                       {device.device}
                     </span>
@@ -393,7 +402,10 @@ export default function LinkAnalytics() {
             <div className="space-y-2 sm:space-y-3">
               {getBrowsers().length > 0 ? (
                 getBrowsers().map((browser, index) => (
-                  <div key={index} className="flex items-center justify-between gap-2">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
                     <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
                       {browser.browser}
                     </span>
@@ -430,7 +442,9 @@ export default function LinkAnalytics() {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-sm col-span-full">No data available</p>
+                <p className="text-gray-500 text-sm col-span-full">
+                  No data available
+                </p>
               )}
             </div>
           </div>

@@ -22,7 +22,10 @@ export default function Analytics() {
   const navigate = useNavigate();
   const [globalStats, setGlobalStats] = useState(null);
   const [topLinks, setTopLinks] = useState([]);
-  const [currentUser, setCurrentUser] = useState({ name: "", profileImage: null });
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    profileImage: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("30d");
@@ -34,7 +37,8 @@ export default function Analytics() {
 
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem("token") || localStorage.getItem("jwtToken");
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("jwtToken");
       if (!token) return;
 
       const response = await axios.get(`${BASE_URL}/api/user/profile`, {
@@ -52,8 +56,9 @@ export default function Analytics() {
   const fetchGlobalAnalytics = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token") || localStorage.getItem("jwtToken");
-      
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("jwtToken");
+
       if (!token) {
         throw new Error("Please login to view analytics");
       }
@@ -68,15 +73,17 @@ export default function Analytics() {
       // Calculate global stats
       const totalLinks = links.length;
       const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
-      const avgClicks = totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
+      const avgClicks =
+        totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
 
       // Get top 5 performing links
       const topPerformingLinks = links
         .sort((a, b) => b.clicks - a.clicks)
         .slice(0, 5)
-        .map(link => ({
+        .map((link) => ({
           id: link._id,
           shortUrl: link.shortUrl,
+          shortCode: link.shortCode,
           originalUrl: link.originalUrl,
           clicks: link.clicks,
           createdAt: link.createdAt,
@@ -84,8 +91,9 @@ export default function Analytics() {
 
       // Calculate active links (last 30 days)
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const activeLinks = links.filter(link => 
-        link.lastAccessed && new Date(link.lastAccessed) > thirtyDaysAgo
+      const activeLinks = links.filter(
+        (link) =>
+          link.lastAccessed && new Date(link.lastAccessed) > thirtyDaysAgo
       ).length;
 
       // Mock global analytics data (you can enhance this with real backend analytics)
@@ -115,28 +123,100 @@ export default function Analytics() {
   const calculateGlobalTrafficSources = (links) => {
     // This would come from your backend analytics aggregation
     return [
-      { source: 'Direct', percentage: 45, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.45) },
-      { source: 'Social Media', percentage: 30, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.3) },
-      { source: 'Email', percentage: 15, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.15) },
-      { source: 'Search', percentage: 10, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.1) },
+      {
+        source: "Direct",
+        percentage: 45,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.45
+        ),
+      },
+      {
+        source: "Social Media",
+        percentage: 30,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.3
+        ),
+      },
+      {
+        source: "Email",
+        percentage: 15,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.15
+        ),
+      },
+      {
+        source: "Search",
+        percentage: 10,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
+        ),
+      },
     ];
   };
 
   const calculateGlobalGeographicData = (links) => {
     return [
-      { country: 'United States', percentage: 40, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.4) },
-      { country: 'India', percentage: 25, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.25) },
-      { country: 'United Kingdom', percentage: 15, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.15) },
-      { country: 'Germany', percentage: 10, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.1) },
-      { country: 'Other', percentage: 10, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.1) },
+      {
+        country: "United States",
+        percentage: 40,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.4
+        ),
+      },
+      {
+        country: "India",
+        percentage: 25,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.25
+        ),
+      },
+      {
+        country: "United Kingdom",
+        percentage: 15,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.15
+        ),
+      },
+      {
+        country: "Germany",
+        percentage: 10,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
+        ),
+      },
+      {
+        country: "Other",
+        percentage: 10,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.1
+        ),
+      },
     ];
   };
 
   const calculateGlobalDeviceDistribution = (links) => {
     return [
-      { device: 'Mobile', percentage: 60, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.6) },
-      { device: 'Desktop', percentage: 35, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.35) },
-      { device: 'Tablet', percentage: 5, count: Math.floor(links.reduce((sum, link) => sum + link.clicks, 0) * 0.05) },
+      {
+        device: "Mobile",
+        percentage: 60,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.6
+        ),
+      },
+      {
+        device: "Desktop",
+        percentage: 35,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.35
+        ),
+      },
+      {
+        device: "Tablet",
+        percentage: 5,
+        count: Math.floor(
+          links.reduce((sum, link) => sum + link.clicks, 0) * 0.05
+        ),
+      },
     ];
   };
 
@@ -144,12 +224,12 @@ export default function Analytics() {
     // Mock growth data - in real app, this would come from time-based analytics
     const baseClicks = links.reduce((sum, link) => sum + link.clicks, 0);
     return [
-      { period: 'Jan', clicks: Math.floor(baseClicks * 0.1) },
-      { period: 'Feb', clicks: Math.floor(baseClicks * 0.15) },
-      { period: 'Mar', clicks: Math.floor(baseClicks * 0.2) },
-      { period: 'Apr', clicks: Math.floor(baseClicks * 0.25) },
-      { period: 'May', clicks: Math.floor(baseClicks * 0.3) },
-      { period: 'Jun', clicks: Math.floor(baseClicks * 0.35) },
+      { period: "Jan", clicks: Math.floor(baseClicks * 0.1) },
+      { period: "Feb", clicks: Math.floor(baseClicks * 0.15) },
+      { period: "Mar", clicks: Math.floor(baseClicks * 0.2) },
+      { period: "Apr", clicks: Math.floor(baseClicks * 0.25) },
+      { period: "May", clicks: Math.floor(baseClicks * 0.3) },
+      { period: "Jun", clicks: Math.floor(baseClicks * 0.35) },
     ];
   };
 
@@ -160,7 +240,10 @@ export default function Analytics() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar userName={currentUser.name} profileImage={currentUser.profileImage} />
+        <Navbar
+          userName={currentUser.name}
+          profileImage={currentUser.profileImage}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
@@ -174,7 +257,10 @@ export default function Analytics() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar userName={currentUser.name} profileImage={currentUser.profileImage} />
+        <Navbar
+          userName={currentUser.name}
+          profileImage={currentUser.profileImage}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 max-w-md mx-auto">
@@ -194,7 +280,10 @@ export default function Analytics() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar userName={currentUser.name} profileImage={currentUser.profileImage} />
+      <Navbar
+        userName={currentUser.name}
+        profileImage={currentUser.profileImage}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* Back Button */}
@@ -210,7 +299,9 @@ export default function Analytics() {
         <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white mb-2">Global Analytics</h1>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Global Analytics
+              </h1>
               <p className="text-gray-400">
                 Overview of all your links and their combined performance
               </p>
@@ -228,7 +319,13 @@ export default function Analytics() {
                       : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                   }`}
                 >
-                  {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : range === "90d" ? "90 Days" : "All Time"}
+                  {range === "7d"
+                    ? "7 Days"
+                    : range === "30d"
+                    ? "30 Days"
+                    : range === "90d"
+                    ? "90 Days"
+                    : "All Time"}
                 </button>
               ))}
             </div>
@@ -242,7 +339,9 @@ export default function Analytics() {
               <span className="text-gray-400 text-sm">Total Links</span>
               <Link2 className="w-5 h-5 text-[#7ed957]" />
             </div>
-            <div className="text-3xl font-bold text-white">{globalStats?.totalLinks || 0}</div>
+            <div className="text-3xl font-bold text-white">
+              {globalStats?.totalLinks || 0}
+            </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
@@ -250,7 +349,9 @@ export default function Analytics() {
               <span className="text-gray-400 text-sm">Total Clicks</span>
               <MousePointerClick className="w-5 h-5 text-[#7ed957]" />
             </div>
-            <div className="text-3xl font-bold text-white">{globalStats?.totalClicks?.toLocaleString() || 0}</div>
+            <div className="text-3xl font-bold text-white">
+              {globalStats?.totalClicks?.toLocaleString() || 0}
+            </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
@@ -258,7 +359,9 @@ export default function Analytics() {
               <span className="text-gray-400 text-sm">Avg per Link</span>
               <TrendingUp className="w-5 h-5 text-[#7ed957]" />
             </div>
-            <div className="text-3xl font-bold text-white">{globalStats?.avgClicks || 0}</div>
+            <div className="text-3xl font-bold text-white">
+              {globalStats?.avgClicks || 0}
+            </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
@@ -266,7 +369,9 @@ export default function Analytics() {
               <span className="text-gray-400 text-sm">Active Links</span>
               <BarChart3 className="w-5 h-5 text-[#7ed957]" />
             </div>
-            <div className="text-3xl font-bold text-white">{globalStats?.activeLinks || 0}</div>
+            <div className="text-3xl font-bold text-white">
+              {globalStats?.activeLinks || 0}
+            </div>
             <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
           </div>
         </div>
@@ -280,10 +385,15 @@ export default function Analytics() {
             </h3>
             <div className="space-y-4">
               {topLinks.map((link, index) => (
-                <div key={link.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                <div
+                  key={link.id}
+                  className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
+                >
                   <div className="flex items-center space-x-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-8 h-8 bg-[#7ed957]/20 rounded-full flex items-center justify-center">
-                      <span className="text-[#7ed957] font-bold text-sm">{index + 1}</span>
+                      <span className="text-[#7ed957] font-bold text-sm">
+                        {index + 1}
+                      </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <a
@@ -292,14 +402,20 @@ export default function Analytics() {
                         rel="noopener noreferrer"
                         className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm"
                       >
-                        <span className="truncate">{link.shortUrl}</span>
+                        <span className="truncate">
+                          bit.lk/{link.shortCode}
+                        </span>
                         <ExternalLink className="w-3 h-3 flex-shrink-0" />
                       </a>
-                      <p className="text-xs text-gray-400 truncate">{link.originalUrl}</p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {link.originalUrl}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-white">{link.clicks}</div>
+                    <div className="text-lg font-bold text-white">
+                      {link.clicks}
+                    </div>
                     <div className="text-xs text-gray-500">clicks</div>
                   </div>
                 </div>
@@ -318,8 +434,12 @@ export default function Analytics() {
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-gray-300">{source.source}</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">{source.count}</span>
-                    <span className="text-gray-400 text-sm w-12 text-right">{source.percentage}%</span>
+                    <span className="text-[#7ed957] font-semibold">
+                      {source.count}
+                    </span>
+                    <span className="text-gray-400 text-sm w-12 text-right">
+                      {source.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}
@@ -339,8 +459,12 @@ export default function Analytics() {
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-gray-300">{country.country}</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">{country.count}</span>
-                    <span className="text-gray-400 text-sm w-12 text-right">{country.percentage}%</span>
+                    <span className="text-[#7ed957] font-semibold">
+                      {country.count}
+                    </span>
+                    <span className="text-gray-400 text-sm w-12 text-right">
+                      {country.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}
@@ -358,8 +482,12 @@ export default function Analytics() {
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-gray-300">{device.device}</span>
                   <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">{device.count}</span>
-                    <span className="text-gray-400 text-sm w-12 text-right">{device.percentage}%</span>
+                    <span className="text-[#7ed957] font-semibold">
+                      {device.count}
+                    </span>
+                    <span className="text-gray-400 text-sm w-12 text-right">
+                      {device.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}

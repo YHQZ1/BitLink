@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, LogOut, User, Settings } from "lucide-react";
 
@@ -6,19 +6,65 @@ const Navbar = ({ userName = "User" }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  
+  // Refs for dropdown and mobile menu
+  const userDropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const userButtonRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Close user dropdown if clicked outside
+      if (
+        userDropdownOpen &&
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(event.target) &&
+        userButtonRef.current &&
+        !userButtonRef.current.contains(event.target)
+      ) {
+        setUserDropdownOpen(false);
+      }
+
+      // Close mobile menu if clicked outside
+      if (
+        mobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        mobileMenuButtonRef.current &&
+        !mobileMenuButtonRef.current.contains(event.target)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userDropdownOpen, mobileMenuOpen]);
 
   const handleLogout = () => {
-    // Remove token from localStorage
     localStorage.removeItem("jwtToken");
-    
-    // Navigate to home page
     navigate("/");
   };
 
   const handleEditProfile = () => {
-    // Add edit profile logic here
-    console.log("Edit profile clicked");
     navigate("/profile");
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const handleSettings = () => {
+    navigate("/settings");
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -33,30 +79,31 @@ const Navbar = ({ userName = "User" }) => {
             <span className="text-xl font-bold text-[#7ed957]">BitLink</span>
           </div>
 
-          {/* Desktop Menu - Homepage Oriented */}
+          {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="/dashboard"
-              className="text-gray-300 hover:text-white transition-colors"
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
             >
               Dashboard
-            </a>
-            <a
-              href="/analytics"
-              className="text-gray-300 hover:text-white transition-colors"
+            </button>
+            <button
+              onClick={() => navigate("/analytics")}
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
             >
               Analytics
-            </a>
-            <a
-              href="/settings"
-              className="text-gray-300 hover:text-white transition-colors"
+            </button>
+            <button
+              onClick={() => navigate("/settings")}
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
             >
               Settings
-            </a>
+            </button>
             
             {/* User Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={userDropdownRef}>
               <button
+                ref={userButtonRef}
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center space-x-3 p-1 rounded-lg transition-colors cursor-pointer"
               >
@@ -81,14 +128,6 @@ const Navbar = ({ userName = "User" }) => {
                     <span className="text-sm">Edit Profile</span>
                   </button>
                   
-                  <button
-                    onClick={() => navigate("/settings")}
-                    className="w-full flex items-center space-x-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors cursor-pointer"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span className="text-sm">Settings</span>
-                  </button>
-                  
                   <div className="border-t border-gray-700"></div>
                   
                   <button
@@ -105,7 +144,8 @@ const Navbar = ({ userName = "User" }) => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-300"
+            ref={mobileMenuButtonRef}
+            className="md:hidden text-gray-300 cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -117,28 +157,33 @@ const Navbar = ({ userName = "User" }) => {
         </div>
       </div>
 
-      {/* Mobile Menu - Homepage Oriented */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0a0a0a] border-t border-gray-800">
+        <div 
+          ref={mobileMenuRef}
+          className="md:hidden bg-[#0a0a0a] border-t border-gray-800"
+        >
           <div className="px-4 py-4 space-y-3">
-            <a
-              href="/dashboard"
-              className="block text-gray-300 hover:text-white"
+            <button
+              onClick={() => handleNavigation("/dashboard")}
+              className="block text-gray-300 hover:text-white w-full text-left cursor-pointer"
             >
               Dashboard
-            </a>
-            <a
-              href="/analytics"
-              className="block text-gray-300 hover:text-white"
+            </button>
+            <button
+              onClick={() => handleNavigation("/analytics")}
+              className="block text-gray-300 hover:text-white w-full text-left cursor-pointer"
             >
               Analytics
-            </a>
-            <a
-              href="/settings"
-              className="block text-gray-300 hover:text-white"
+            </button>
+            <button
+              onClick={() => handleNavigation("/settings")}
+              className="block text-gray-300 hover:text-white w-full text-left cursor-pointer"
             >
               Settings
-            </a>
+            </button>
+            
+            {/* User Section in Mobile Menu */}
             <div className="pt-2 border-t border-gray-800">
               <div className="flex items-center space-x-3 py-2">
                 <div className="w-8 h-8 bg-[#7ed957] rounded-full flex items-center justify-center text-black font-semibold text-sm">
@@ -146,20 +191,25 @@ const Navbar = ({ userName = "User" }) => {
                 </div>
                 <span className="text-gray-300">{userName}</span>
               </div>
-              <button
-                onClick={handleEditProfile}
-                className="w-full flex items-center space-x-3 text-gray-300 hover:text-white transition-colors py-2 px-1 rounded-lg cursor-pointer"
-              >
-                <User className="w-4 h-4" />
-                <span>Edit Profile</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center space-x-3 text-red-400 hover:text-red-300 transition-colors py-2 px-1 rounded-lg cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+              
+              {/* User Dropdown in Mobile - Same as Desktop */}
+              <div className="space-y-1">
+                <button
+                  onClick={handleEditProfile}
+                  className="w-full flex items-center space-x-3 text-gray-300 hover:text-white transition-colors py-2 px-1 rounded-lg cursor-pointer"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Edit Profile</span>
+                </button>
+                
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 text-red-400 hover:text-red-300 transition-colors py-2 px-1 rounded-lg cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

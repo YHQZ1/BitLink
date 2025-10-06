@@ -7,6 +7,7 @@ import LinkAnalytics from "./pages/LinkAnalytics";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
@@ -61,6 +62,14 @@ export default function App() {
           element={
             <ProtectedRoutes>
               <Dashboard />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoutes>
+              <Profile/>
             </ProtectedRoutes>
           }
         />

@@ -61,9 +61,6 @@ export default function Auth() {
           localStorage.setItem("jwtToken", data.token);
           setMessage("Login successful! Redirecting...");
           navigate("/home");
-          // Here you can redirect to dashboard or main app
-          console.log("User data:", data.user);
-          console.log("JWT Token:", data.token);
         }
       } else {
         setMessage(data.error || "Something went wrong!");

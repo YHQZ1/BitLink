@@ -104,15 +104,6 @@ export default function LandingPage() {
                 Docs
               </a>
               <button
-                className="block w-full text-left text-gray-300 hover:text-white py-2"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  redirectToAuth();
-                }}
-              >
-                Sign In
-              </button>
-              <button
                 className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold text-center"
                 onClick={() => {
                   setMobileMenuOpen(false);

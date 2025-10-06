@@ -104,20 +104,32 @@ const trackAnalytics = async (link, req) => {
       ipAddress = ipAddress.split(":").pop();
     }
 
-    // Get country from IP
+    // Get country from IP - FIXED LOGIC
     let country = "Unknown";
     let city = "Unknown";
 
-    if (ipAddress && ipAddress !== "::1" && ipAddress !== "127.0.0.1") {
+    // Check if it's a local IP address
+    const isLocalIP =
+      !ipAddress ||
+      ipAddress === "::1" ||
+      ipAddress === "127.0.0.1" ||
+      ipAddress.startsWith("192.168.") ||
+      ipAddress.startsWith("10.") ||
+      ipAddress.startsWith("172.") ||
+      ipAddress.startsWith("fc00:") ||
+      ipAddress.startsWith("fe80:");
+
+    if (isLocalIP) {
+      // For local/testing environments, use "Local Network" instead of "Localhost"
+      country = "Local Network";
+      city = "Local";
+    } else {
+      // For real IP addresses, try to geolocate
       const geo = geoip.lookup(ipAddress);
       if (geo) {
         country = geo.country || "Unknown";
         city = geo.city || "Unknown";
       }
-    } else {
-      // For localhost, you might want to set a default or test value
-      country = "Localhost";
-      city = "Local";
     }
 
     const analytics = new Analytics({
@@ -313,6 +325,12 @@ const getCountries = (data) => {
       count,
     }))
     .sort((a, b) => b.count - a.count)
+    .filter(
+      (countryData) =>
+        countryData.country !== "Local Network" &&
+        countryData.country !== "Localhost" &&
+        countryData.country !== "Unknown"
+    )
     .slice(0, 5); // Top 5 countries
 };
 

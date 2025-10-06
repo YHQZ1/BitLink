@@ -14,6 +14,8 @@ import {
   Calendar,
   X,
   Save,
+  Menu,
+  Filter,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -43,6 +45,7 @@ export default function Home() {
   const [editingLink, setEditingLink] = useState(null);
   const [editOriginalUrl, setEditOriginalUrl] = useState("");
   const [editCustomAlias, setEditCustomAlias] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Fetch user data and links from backend
@@ -114,13 +117,11 @@ export default function Home() {
         lastAccessed: formatLastAccessed(link.lastAccessed),
         qrCode: link.qrCode,
         rawLastAccessed: link.lastAccessed,
-        rawCreatedAt: link.createdAt, // Add this for proper sorting
+        rawCreatedAt: link.createdAt,
       }));
 
       setLinks(transformedLinks);
       setLinksLoading(false);
-
-      // Refresh stats after loading links
       fetchUserStats();
     } catch (error) {
       console.error("Error fetching links:", error);
@@ -146,7 +147,6 @@ export default function Home() {
       setStats(response.data);
     } catch (error) {
       console.error("Error fetching stats:", error);
-      // Fallback to calculated stats
       setStats({
         totalLinks: links.length,
         totalClicks: links.reduce((sum, link) => sum + link.clicks, 0),
@@ -230,10 +230,7 @@ export default function Home() {
       setUrl("");
       setCustomAlias("");
       setLinksLoading(false);
-
-      // Refresh stats after creating new link
       fetchUserStats();
-
       alert("Link shortened successfully!");
     } catch (error) {
       console.error("Error creating short link:", error);
@@ -289,10 +286,7 @@ export default function Home() {
       setEditingLink(null);
       setEditOriginalUrl("");
       setEditCustomAlias("");
-
-      // Refresh stats after edit
       fetchUserStats();
-
       alert("Link updated successfully!");
     } catch (error) {
       console.error("Error updating link:", error);
@@ -328,10 +322,7 @@ export default function Home() {
       });
 
       setLinks(links.filter((link) => link.id !== id));
-
-      // Refresh stats after delete
       fetchUserStats();
-
       alert("Link deleted successfully!");
     } catch (error) {
       console.error("Error deleting link:", error);
@@ -352,7 +343,6 @@ export default function Home() {
   const sortedLinks = [...filteredLinks].sort((a, b) => {
     switch (filterBy) {
       case "recent":
-        // Use raw creation dates for accurate sorting
         const dateA = a.rawCreatedAt
           ? new Date(a.rawCreatedAt)
           : new Date(a.createdAt);
@@ -375,7 +365,6 @@ export default function Home() {
     }
   });
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center">
@@ -395,20 +384,20 @@ export default function Home() {
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 pt-20">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2">
+        <div className="mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Welcome back, {currentUser.name}
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-400 text-sm sm:text-base">
             Manage your links and track performance
           </p>
         </div>
 
         {/* Quick Action Card */}
-        <div className="bg-gradient-to-br from-[#7ed957]/10 to-transparent border border-[#7ed957]/20 rounded-xl p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="bg-gradient-to-br from-[#7ed957]/10 to-transparent border border-[#7ed957]/20 rounded-xl p-4 sm:p-6 mb-6">
+          <div className="flex flex-col gap-4">
             <div className="flex-1">
               <h2 className="text-lg font-semibold text-white mb-2">
                 Create Short Link
@@ -417,28 +406,35 @@ export default function Home() {
                 Shorten URLs instantly with custom aliases
               </p>
             </div>
-            <div className="flex flex-col gap-3 flex-1 max-w-md">
+            <div className="flex flex-col gap-3">
               <input
                 type="url"
                 placeholder="Paste your URL here"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors"
+                className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
               />
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   placeholder="Custom alias (optional)"
                   value={customAlias}
                   onChange={(e) => setCustomAlias(e.target.value)}
-                  className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors"
+                  className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
                 />
                 <button
                   onClick={handleShorten}
                   disabled={linksLoading}
-                  className="bg-[#7ed957] text-black px-6 py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
                 >
-                  {linksLoading ? "Shortening..." : "Shorten"}
+                  {linksLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                      Shortening...
+                    </>
+                  ) : (
+                    "Shorten"
+                  )}
                 </button>
               </div>
             </div>
@@ -446,80 +442,123 @@ export default function Home() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Total Links</span>
-              <Link2 className="w-4 h-4 text-[#7ed957]" />
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          {[
+            { key: "totalLinks", label: "Total Links", icon: Link2 },
+            {
+              key: "totalClicks",
+              label: "Total Clicks",
+              icon: MousePointerClick,
+            },
+            { key: "avgClicks", label: "Avg per Link", icon: TrendingUp },
+            { key: "activeLinks", label: "Active Links", icon: BarChart3 },
+          ].map((stat) => (
+            <div
+              key={stat.key}
+              className="bg-gray-900/50 border border-gray-800 rounded-xl p-3 sm:p-4 hover:border-gray-700 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-xs sm:text-sm">
+                  {stat.label}
+                </span>
+                <stat.icon className="w-3 h-3 sm:w-4 sm:h-4 text-[#7ed957]" />
+              </div>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
+                {stat.key === "totalClicks"
+                  ? stats[stat.key].toLocaleString()
+                  : stats[stat.key]}
+              </div>
+              {stat.key === "activeLinks" && (
+                <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
+              )}
             </div>
-            <div className="text-2xl font-bold text-white">
-              {stats.totalLinks}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Total Clicks</span>
-              <MousePointerClick className="w-4 h-4 text-[#7ed957]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {stats.totalClicks.toLocaleString()}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Avg per Link</span>
-              <TrendingUp className="w-4 h-4 text-[#7ed957]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {stats.avgClicks}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Active Links</span>
-              <BarChart3 className="w-4 h-4 text-[#7ed957]" />
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {stats.activeLinks}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
-          </div>
+          ))}
         </div>
 
         {/* Links Management Section */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-xl">
           {/* Header with Search and Filters */}
-          <div className="p-6 border-b border-gray-800">
+          <div className="p-4 sm:p-6 border-b border-gray-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-lg font-semibold text-white">Your Links</h2>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search links..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full sm:w-64 transition-colors"
-                  />
+                {/* Mobile Search and Filter Toggle */}
+                <div className="sm:hidden flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="Search links..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full text-sm"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="p-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white cursor-pointer"
+                  >
+                    <Filter className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="relative inline-block">
+                {/* Desktop Search and Filter */}
+                <div className="hidden sm:flex gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="Search links..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full sm:w-64 text-sm"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <select
+                      value={filterBy}
+                      onChange={(e) => setFilterBy(e.target.value)}
+                      className="appearance-none bg-gray-900/50 border border-gray-700 rounded-lg px-4 pr-10 py-2 text-white focus:border-[#7ed957] focus:outline-none transition-colors cursor-pointer text-sm min-w-[140px]"
+                    >
+                      <option value="all">All Links</option>
+                      <option value="recent">Most Recent</option>
+                      <option value="recent-activity">Recent Activity</option>
+                      <option value="popular">Most Clicks</option>
+                    </select>
+                    <svg
+                      className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Filter Dropdown */}
+            {isMobileMenuOpen && (
+              <div className="sm:hidden mt-4">
+                <div className="relative">
                   <select
                     value={filterBy}
                     onChange={(e) => setFilterBy(e.target.value)}
-                    className="appearance-none bg-gray-900/50 border border-gray-700 rounded-lg px-4 pr-10 py-2 text-white focus:border-[#7ed957] focus:outline-none transition-colors cursor-pointer"
+                    className="appearance-none bg-gray-900/50 border border-gray-700 rounded-lg px-4 pr-10 py-2 text-white focus:border-[#7ed957] focus:outline-none transition-colors cursor-pointer text-sm w-full"
                   >
                     <option value="all">All Links</option>
                     <option value="recent">Most Recent</option>
                     <option value="recent-activity">Recent Activity</option>
                     <option value="popular">Most Clicks</option>
                   </select>
-
                   <svg
                     className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
                     fill="none"
@@ -535,15 +574,15 @@ export default function Home() {
                   </svg>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Links List */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {linksLoading ? (
-              <div className="text-center py-12">
+              <div className="text-center py-8 sm:py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7ed957] mx-auto"></div>
-                <p className="mt-4 text-gray-400">Loading links...</p>
+                <p className="mt-4 text-gray-400 text-sm">Loading links...</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -552,22 +591,24 @@ export default function Home() {
                     key={link.id}
                     className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div className="flex flex-col gap-4">
                       {/* Link Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                           <a
-                            href={link.shortUrl}
+                            href={link.shortUrl} // This keeps the actual functional URL
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm"
+                            className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
                           >
-                            <span>{link.shortUrl}</span>
-                            <ExternalLink className="w-3 h-3" />
+                            <span className="break-all">
+                              bit.lk/{link.shortCode}
+                            </span>
+                            <ExternalLink className="w-3 h-3 flex-shrink-0" />
                           </a>
                           <button
-                            onClick={() => copyToClipboard(link.shortUrl)}
-                            className="text-gray-400 hover:text-white transition-colors p-1"
+                            onClick={() => copyToClipboard(link.shortUrl)} // This copies the actual working URL
+                            className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
                           >
                             <Copy className="w-3 h-3" />
                           </button>
@@ -581,7 +622,7 @@ export default function Home() {
                               onChange={(e) =>
                                 setEditOriginalUrl(e.target.value)
                               }
-                              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1 text-white text-xs focus:border-[#7ed957] focus:outline-none"
+                              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-[#7ed957] focus:outline-none"
                               placeholder="Original URL"
                             />
                             <input
@@ -590,17 +631,17 @@ export default function Home() {
                               onChange={(e) =>
                                 setEditCustomAlias(e.target.value)
                               }
-                              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1 text-white text-xs focus:border-[#7ed957] focus:outline-none"
+                              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-[#7ed957] focus:outline-none"
                               placeholder="Custom alias"
                             />
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-400 truncate mb-2">
+                          <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
                             {link.originalUrl}
                           </p>
                         )}
 
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center space-x-1">
                             <Calendar className="w-3 h-3" />
                             <span>{link.createdAt}</span>
@@ -610,24 +651,26 @@ export default function Home() {
                       </div>
 
                       {/* Stats and Actions */}
-                      <div className="flex items-center gap-4">
-                        <div className="text-center">
+                      <div className="flex items-center justify-between sm:justify-end gap-4">
+                        <div className="text-center min-w-[60px]">
                           <div className="text-lg font-bold text-white">
                             {link.clicks}
                           </div>
                           <div className="text-xs text-gray-500">Clicks</div>
                         </div>
 
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-1">
                           <button
                             onClick={() => navigate(`/qr/${link.id}`)}
                             className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group cursor-pointer"
+                            title="QR Code"
                           >
                             <QrCode className="w-4 h-4 text-gray-400 group-hover:text-white" />
                           </button>
                           <button
                             onClick={() => navigate(`/analytics/${link.id}`)}
                             className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group cursor-pointer"
+                            title="Analytics"
                           >
                             <BarChart3 className="w-4 h-4 text-gray-400 group-hover:text-white" />
                           </button>
@@ -636,12 +679,14 @@ export default function Home() {
                               <button
                                 onClick={() => handleSaveEdit(link.id)}
                                 className="p-2 bg-gray-800 hover:bg-green-900/50 rounded-lg transition-colors duration-200 group cursor-pointer"
+                                title="Save"
                               >
                                 <Save className="w-4 h-4 text-gray-400 group-hover:text-green-400" />
                               </button>
                               <button
                                 onClick={cancelEdit}
                                 className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group cursor-pointer"
+                                title="Cancel"
                               >
                                 <X className="w-4 h-4 text-gray-400 group-hover:text-white" />
                               </button>
@@ -650,6 +695,7 @@ export default function Home() {
                             <button
                               onClick={() => handleEdit(link)}
                               className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group cursor-pointer"
+                              title="Edit"
                             >
                               <Edit2 className="w-4 h-4 text-gray-400 group-hover:text-white" />
                             </button>
@@ -657,6 +703,7 @@ export default function Home() {
                           <button
                             onClick={() => deleteLink(link.id)}
                             className="p-2 bg-gray-800 hover:bg-red-900/50 rounded-lg transition-colors duration-200 group cursor-pointer"
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-400" />
                           </button>
@@ -669,8 +716,8 @@ export default function Home() {
             )}
 
             {!linksLoading && sortedLinks.length === 0 && (
-              <div className="text-center py-12">
-                <Link2 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <div className="text-center py-8 sm:py-12">
+                <Link2 className="w-8 h-8 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-3" />
                 <p className="text-gray-500 text-sm">No links created yet</p>
                 <p className="text-gray-400 text-xs mt-1">
                   Create your first short link above
