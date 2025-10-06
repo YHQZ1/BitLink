@@ -18,7 +18,7 @@ import {
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function Home() {
   const [url, setUrl] = useState("");

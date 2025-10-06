@@ -4,7 +4,8 @@ import { Settings as SettingsIcon, Sparkles } from "lucide-react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 
 export default function Settings() {
   const [currentUser, setCurrentUser] = useState({
