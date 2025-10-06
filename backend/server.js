@@ -13,34 +13,48 @@ dotenv.config();
 
 const app = express();
 
-// CLIENT_URL = process.env.PROD_URL || "http://localhost:5173";
+// ✅ Configure CORS properly for both prod + dev
+const allowedOrigins = [
+  "https://bitlink-flame.vercel.app", // your Vercel frontend
+  "http://localhost:5173" // for local development
+];
 
-// Middleware
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
+
+app.options("*", cors()); // ✅ handle preflight requests
+
 app.use(express.json());
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_URL,
-//     credentials: true,
-//   })
-// );
 
-// Connect to MongoDB
+// ✅ MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/links", linkRoutes);
 app.use("/api/user", userRoutes);
 
+// ✅ Redirect route (should be last)
 app.get("/:code", redirectToOriginal);
 
-// Health check
+// ✅ Health check
 app.get("/", (req, res) => {
   res.json({ message: "BitLink API is working!" });
 });
 
+// ✅ Port config
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
