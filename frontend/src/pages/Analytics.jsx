@@ -297,25 +297,36 @@ export default function Analytics() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Geographic Distribution */}
+          {/* Geographic Distribution */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Globe className="w-5 h-5 mr-2 text-[#7ed957]" />
               Top Countries
             </h3>
             <div className="space-y-3">
-              {globalStats?.geographicData?.map((country, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-gray-300">{country.country}</span>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">
-                      {country.count}
-                    </span>
-                    <span className="text-gray-400 text-sm w-12 text-right">
-                      {country.percentage}%
-                    </span>
+              {globalStats?.geographicData?.length > 0 ? (
+                globalStats.geographicData.map((country, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-gray-300">{country.country}</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-[#7ed957] font-semibold">
+                        {country.count}
+                      </span>
+                      <span className="text-gray-400 text-sm w-12 text-right">
+                        {country.percentage}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm text-center py-4">
+                  Geographic data will appear as your links get clicks from
+                  around the world
+                </p>
+              )}
             </div>
           </div>
 
