@@ -8,8 +8,7 @@ import {
   getLinkAnalytics,
   getUserStats,
   getGlobalAnalytics,
-  createGuestLink,  
-  migrateGuestLinks
+  createGuestLink, 
 } from "../controllers/linkController.js";
 import protect from "../middleware/authMiddleware.js";
 
@@ -26,7 +25,6 @@ router.get("/stats", protect, getUserStats);
 
 // ADD THESE NEW ROUTES:
 router.post("/guest/shorten", createGuestLink); // Public route for guest shortening
-router.post("/migrate-guest-links", protect, migrateGuestLinks); // Migrate after signup
 
 // Public redirect route
 router.get("/:code", redirectToOriginal);

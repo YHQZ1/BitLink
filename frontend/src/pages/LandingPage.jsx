@@ -35,10 +35,10 @@ export default function LandingPage() {
 
   // Generate or retrieve guest session ID
   useEffect(() => {
-    let sessionId = localStorage.getItem('guestSessionId');
+    let sessionId = localStorage.getItem("guestSessionId");
     if (!sessionId) {
-      sessionId = 'guest_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('guestSessionId', sessionId);
+      sessionId = "guest_" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("guestSessionId", sessionId);
     }
     setGuestSessionId(sessionId);
   }, []);
@@ -53,13 +53,17 @@ export default function LandingPage() {
     try {
       new URL(url);
     } catch (error) {
-      showModal("error", "Invalid URL", "Please enter a valid URL including http:// or https://");
+      showModal(
+        "error",
+        "Invalid URL",
+        "Please enter a valid URL including http:// or https://"
+      );
       return;
     }
 
     try {
       setIsLoading(true);
-      
+
       const response = await fetch(`${BASE_URL}/api/links/guest/shorten`, {
         method: "POST",
         headers: {
@@ -67,7 +71,7 @@ export default function LandingPage() {
         },
         body: JSON.stringify({
           originalUrl: url,
-          sessionId: guestSessionId
+          sessionId: guestSessionId,
         }),
       });
 
@@ -77,8 +81,8 @@ export default function LandingPage() {
         if (data.requiresAuth) {
           // Guest has already used their free link
           showModal(
-            "error", 
-            "Limit Reached", 
+            "error",
+            "Limit Reached",
             "You've used your free link! Sign up to create unlimited short links with analytics."
           );
           // Redirect to auth after a delay
@@ -93,7 +97,6 @@ export default function LandingPage() {
       setShortenedUrl(data.link);
       setUrl("");
       showModal("success", "Success!", "Your link has been shortened!");
-      
     } catch (error) {
       console.error("Error shortening URL:", error);
       showModal("error", "Error", error.message);
@@ -173,14 +176,10 @@ export default function LandingPage() {
               >
                 Features
               </a>
-              <a
-                className="text-gray-300 hover:text-white transition-colors cursor-pointer"
-              >
+              <a className="text-gray-300 hover:text-white transition-colors cursor-pointer">
                 Pricing
               </a>
-              <a
-                className="text-gray-300 hover:text-white transition-colors cursor-pointer"
-              >
+              <a className="text-gray-300 hover:text-white transition-colors cursor-pointer">
                 Docs
               </a>
               <button
@@ -267,7 +266,6 @@ export default function LandingPage() {
                 <h3 className="text-white text-lg font-semibold mb-4 text-center">
                   Try it out - No signup required!
                 </h3>
-                
                 <div className="flex flex-col sm:flex-row gap-3 mb-4">
                   <input
                     type="url"
@@ -294,8 +292,8 @@ export default function LandingPage() {
                     )}
                   </button>
                 </div>
-
                 {/* Result Display */}
+                // In the result display section, remove the QR code part:
                 {shortenedUrl && (
                   <div className="bg-gray-800/50 border border-[#7ed957]/30 rounded-lg p-4 animate-fade-in">
                     <div className="flex items-center justify-between mb-2">
@@ -312,28 +310,15 @@ export default function LandingPage() {
                       href={shortenedUrl.shortUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#7ed957] font-medium hover:underline break-all block mb-3"
+                      className="text-[#7ed957] font-medium hover:underline break-all block"
                     >
                       {shortenedUrl.shortUrl}
                     </a>
-                    
-                    {/* QR Code Preview */}
-                    {shortenedUrl.qrCode && (
-                      <div className="text-center border-t border-gray-700 pt-3">
-                        <p className="text-gray-400 text-sm mb-2">QR Code:</p>
-                        <img 
-                          src={shortenedUrl.qrCode} 
-                          alt="QR Code" 
-                          className="w-24 h-24 mx-auto rounded-lg border border-gray-600"
-                        />
-                      </div>
-                    )}
                   </div>
                 )}
-
                 <p className="text-xs text-gray-500 mt-4 text-center">
-                  💡 <strong>Free trial:</strong> Create one link without signing up. 
-                  Sign up for unlimited links with analytics!
+                  💡 <strong>Free trial:</strong> Create one link without
+                  signing up. Sign up for unlimited links with analytics!
                 </p>
               </div>
             </div>
@@ -447,8 +432,9 @@ export default function LandingPage() {
               Ready to supercharge your links?
             </h2>
             <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-              Join thousands of users who trust BitLink for their link management needs. 
-              Get unlimited links, advanced analytics, and custom domains.
+              Join thousands of users who trust BitLink for their link
+              management needs. Get unlimited links, advanced analytics, and
+              custom domains.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -459,7 +445,11 @@ export default function LandingPage() {
                 <span>Get Started Free</span>
               </button>
               <button
-                onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document
+                    .getElementById("features")
+                    .scrollIntoView({ behavior: "smooth" })
+                }
                 className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all"
               >
                 Learn More
