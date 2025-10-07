@@ -63,14 +63,13 @@ export const login = async (req, res) => {
 
 // ------------------- GITHUB LOGIN -------------------
 export const githubLogin = (req, res) => {
-  const redirectUri = "http://localhost:3000/api/auth/github/callback";
+  const redirectUri = `${process.env.BASE_URL}/api/auth/github/callback`;
   const clientId = process.env.GITHUB_CLIENT_ID;
 
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email`;
 
   res.redirect(githubAuthUrl);
 };
-
 // ------------------- GITHUB CALLBACK -------------------
 export const githubCallback = async (req, res) => {
   const code = req.query.code;
