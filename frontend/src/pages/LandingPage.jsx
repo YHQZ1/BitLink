@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Link2,
@@ -11,17 +11,143 @@ import {
   Menu,
   X,
   Globe,
+  UserPlus,
+  Copy,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
+
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [shortenedUrl, setShortenedUrl] = useState(null);
+  const [guestSessionId, setGuestSessionId] = useState("");
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
   const navigate = useNavigate();
 
-  const handleShorten = () => {
-    if (url) {
-      alert("Shortening feature coming soon!");
+  // Generate or retrieve guest session ID
+  useEffect(() => {
+    let sessionId = localStorage.getItem('guestSessionId');
+    if (!sessionId) {
+      sessionId = 'guest_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('guestSessionId', sessionId);
     }
+    setGuestSessionId(sessionId);
+  }, []);
+
+  const handleShorten = async () => {
+    if (!url) {
+      showModal("error", "Missing URL", "Please enter a URL to shorten");
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(url);
+    } catch (error) {
+      showModal("error", "Invalid URL", "Please enter a valid URL including http:// or https://");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      const response = await fetch(`${BASE_URL}/api/links/guest/shorten`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          originalUrl: url,
+          sessionId: guestSessionId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.requiresAuth) {
+          // Guest has already used their free link
+          showModal(
+            "error", 
+            "Limit Reached", 
+            "You've used your free link! Sign up to create unlimited short links with analytics."
+          );
+          // Redirect to auth after a delay
+          setTimeout(() => navigate("/auth"), 3000);
+        } else {
+          throw new Error(data.error || "Failed to shorten URL");
+        }
+        return;
+      }
+
+      // Success - show the shortened URL
+      setShortenedUrl(data.link);
+      setUrl("");
+      showModal("success", "Success!", "Your link has been shortened!");
+      
+    } catch (error) {
+      console.error("Error shortening URL:", error);
+      showModal("error", "Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    showModal("success", "Copied!", "Link copied to clipboard!");
+  };
+
+  const showModal = (type, title, message) => {
+    setModal({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
+
+  const Modal = () => {
+    if (!modal.isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
+          <div className="flex items-center space-x-3 mb-4">
+            <div
+              className={`p-2 rounded-full ${
+                modal.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
+              }`}
+            >
+              {modal.type === "success" ? (
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              ) : (
+                <AlertCircle className="w-6 h-6 text-red-400" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">{modal.title}</h3>
+              <p className="text-gray-400 text-sm">{modal.message}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setModal({ ...modal, isOpen: false })}
+            className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const redirectToAuth = () => {
@@ -48,13 +174,11 @@ export default function LandingPage() {
                 Features
               </a>
               <a
-                // href="#pricing"
                 className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               >
                 Pricing
               </a>
               <a
-                // href="#docs"
                 className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               >
                 Docs
@@ -78,7 +202,6 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile Menu */}
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-[#0a0a0a] border-t border-gray-800">
             <div className="px-4 py-4 space-y-3">
@@ -90,14 +213,12 @@ export default function LandingPage() {
                 Features
               </a>
               <a
-                href="#pricing"
                 className="block text-gray-300 hover:text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </a>
               <a
-                href="#docs"
                 className="block text-gray-300 hover:text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -142,21 +263,78 @@ export default function LandingPage() {
 
             {/* URL Shortener Input */}
             <div className="max-w-2xl mx-auto mb-8">
-              <div className="flex flex-col sm:flex-row gap-3 bg-gray-900/50 border border-gray-700 rounded-xl p-3 backdrop-blur-sm">
-                <input
-                  type="url"
-                  placeholder="Enter your long URL here..."
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none px-4 py-3"
-                />
-                <button
-                  onClick={handleShorten}
-                  className="bg-[#7ed957] text-black px-8 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2"
-                >
-                  <span>Shorten</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+              <div className="bg-gray-900/50 border border-gray-700 rounded-xl p-6 backdrop-blur-sm">
+                <h3 className="text-white text-lg font-semibold mb-4 text-center">
+                  Try it out - No signup required!
+                </h3>
+                
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <input
+                    type="url"
+                    placeholder="https://example.com/very-long-url..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors"
+                  />
+                  <button
+                    onClick={handleShorten}
+                    disabled={isLoading}
+                    className="bg-[#7ed957] text-black px-8 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                        <span>Shortening...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Shorten</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Result Display */}
+                {shortenedUrl && (
+                  <div className="bg-gray-800/50 border border-[#7ed957]/30 rounded-lg p-4 animate-fade-in">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-gray-400 text-sm">Short URL:</span>
+                      <button
+                        onClick={() => copyToClipboard(shortenedUrl.shortUrl)}
+                        className="text-[#7ed957] hover:text-[#8ee367] transition-colors flex items-center space-x-1 text-sm"
+                      >
+                        <Copy className="w-4 h-4" />
+                        <span>Copy</span>
+                      </button>
+                    </div>
+                    <a
+                      href={shortenedUrl.shortUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#7ed957] font-medium hover:underline break-all block mb-3"
+                    >
+                      {shortenedUrl.shortUrl}
+                    </a>
+                    
+                    {/* QR Code Preview */}
+                    {shortenedUrl.qrCode && (
+                      <div className="text-center border-t border-gray-700 pt-3">
+                        <p className="text-gray-400 text-sm mb-2">QR Code:</p>
+                        <img 
+                          src={shortenedUrl.qrCode} 
+                          alt="QR Code" 
+                          className="w-24 h-24 mx-auto rounded-lg border border-gray-600"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-500 mt-4 text-center">
+                  💡 <strong>Free trial:</strong> Create one link without signing up. 
+                  Sign up for unlimited links with analytics!
+                </p>
               </div>
             </div>
 
@@ -261,6 +439,36 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900/20 to-gray-900/50">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-gradient-to-r from-[#7ed957]/10 to-[#7ed957]/5 border border-[#7ed957]/20 rounded-2xl p-8 sm:p-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Ready to supercharge your links?
+            </h2>
+            <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+              Join thousands of users who trust BitLink for their link management needs. 
+              Get unlimited links, advanced analytics, and custom domains.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={redirectToAuth}
+                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2"
+              >
+                <UserPlus className="w-5 h-5" />
+                <span>Get Started Free</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -314,6 +522,8 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <Modal />
     </div>
   );
 }

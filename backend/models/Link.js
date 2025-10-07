@@ -26,15 +26,15 @@ const linkSchema = new mongoose.Schema(
       default: null,
     },
     qrCode: {
-      type: String, // store QR as a data URL or file path
+      type: String,
     },
     expiresAt: {
-      type: Date, // optional – for link expiry
+      type: Date,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     isActive: {
       type: Boolean,
@@ -43,6 +43,14 @@ const linkSchema = new mongoose.Schema(
     lastActivity: {
       type: Date,
       default: null,
+    },
+    sessionId: {
+      type: String,
+      sparse: true,
+    },
+    isGuestLink: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

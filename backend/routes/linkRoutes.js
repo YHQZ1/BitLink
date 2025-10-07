@@ -1,4 +1,3 @@
-// src/routes/linkRoutes.js
 import express from "express";
 import { 
   createLink, 
@@ -8,7 +7,9 @@ import {
   updateLink,
   getLinkAnalytics,
   getUserStats,
-  getGlobalAnalytics
+  getGlobalAnalytics,
+  createGuestLink,  
+  migrateGuestLinks
 } from "../controllers/linkController.js";
 import protect from "../middleware/authMiddleware.js";
 
@@ -23,6 +24,9 @@ router.put("/:id", protect, updateLink);
 router.delete("/:id", protect, deleteLink);
 router.get("/stats", protect, getUserStats);
 
+// ADD THESE NEW ROUTES:
+router.post("/guest/shorten", createGuestLink); // Public route for guest shortening
+router.post("/migrate-guest-links", protect, migrateGuestLinks); // Migrate after signup
 
 // Public redirect route
 router.get("/:code", redirectToOriginal);
