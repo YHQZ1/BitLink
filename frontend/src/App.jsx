@@ -8,6 +8,7 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import AuthSuccess from "./pages/AuthSuccess";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
@@ -17,6 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/success" element={<AuthSuccess />} />
         <Route
           path="/home"
           element={
