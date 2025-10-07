@@ -15,7 +15,7 @@ const app = express();
 
 // ✅ Configure CORS properly for both prod + dev
 const allowedOrigins = [
-  "https://bitlink-flame.vercel.app", // your Vercel frontend
+  "https://btlink.vercel.app", // your Vercel frontend
   "http://localhost:5173" // for local development
 ];
 
