@@ -15,6 +15,9 @@ import {
   Copy,
   CheckCircle,
   AlertCircle,
+  ExternalLink,
+  Calendar,
+  MousePointerClick,
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -22,6 +25,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [customAlias, setCustomAlias] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shortenedUrl, setShortenedUrl] = useState(null);
   const [guestSessionId, setGuestSessionId] = useState("");
@@ -71,9 +75,18 @@ export default function LandingPage() {
         },
         body: JSON.stringify({
           originalUrl: url,
+          customAlias: customAlias || undefined,
           sessionId: guestSessionId,
         }),
       });
+
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(
+          "Server returned an invalid response. Please try again."
+        );
+      }
 
       const data = await response.json();
 
@@ -96,6 +109,7 @@ export default function LandingPage() {
       // Success - show the shortened URL
       setShortenedUrl(data.link);
       setUrl("");
+      setCustomAlias("");
       showModal("success", "Success!", "Your link has been shortened!");
     } catch (error) {
       console.error("Error shortening URL:", error);
@@ -164,8 +178,8 @@ export default function LandingPage() {
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-16">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
-              <span className="text-xl font-bold text-[#7ed957]">BitLink</span>
+              <img src="/logo.png" alt="BitLink" className="w-12 h-12" />
+              <span className="text-2xl font-bold text-[#7ed957]">BitLink</span>
             </div>
 
             {/* Desktop Menu */}
@@ -262,65 +276,105 @@ export default function LandingPage() {
 
             {/* URL Shortener Input */}
             <div className="max-w-2xl mx-auto mb-8">
-              <div className="bg-gray-900/50 border border-gray-700 rounded-xl p-6 backdrop-blur-sm">
-                <h3 className="text-white text-lg font-semibold mb-4 text-center">
-                  Try it out - No signup required!
-                </h3>
-                <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                  <input
-                    type="url"
-                    placeholder="https://example.com/very-long-url..."
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors"
-                  />
-                  <button
-                    onClick={handleShorten}
-                    disabled={isLoading}
-                    className="bg-[#7ed957] text-black px-8 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                        <span>Shortening...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Shorten</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </div>
-                {/* Result Display */}
-                // In the result display section, remove the QR code part:
-                {shortenedUrl && (
-                  <div className="bg-gray-800/50 border border-[#7ed957]/30 rounded-lg p-4 animate-fade-in">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-400 text-sm">Short URL:</span>
+              <div className="border border-[#7ed957]/20 rounded-xl p-6 mb-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-white mb-2 text-center">
+                      Create Short Link
+                    </h2>
+                    <p className="text-gray-400 text-sm text-center">
+                      Shorten URLs instantly with custom aliases
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="url"
+                        placeholder="Paste your URL here"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
+                      />
                       <button
-                        onClick={() => copyToClipboard(shortenedUrl.shortUrl)}
-                        className="text-[#7ed957] hover:text-[#8ee367] transition-colors flex items-center space-x-1 text-sm"
+                        onClick={handleShorten}
+                        disabled={isLoading}
+                        className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
                       >
-                        <Copy className="w-4 h-4" />
-                        <span>Copy</span>
+                        {isLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                            Shortening...
+                          </>
+                        ) : (
+                          "Shorten"
+                        )}
                       </button>
                     </div>
-                    <a
-                      href={shortenedUrl.shortUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#7ed957] font-medium hover:underline break-all block"
-                    >
-                      {shortenedUrl.shortUrl}
-                    </a>
                   </div>
-                )}
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                  💡 <strong>Free trial:</strong> Create one link without
-                  signing up. Sign up for unlimited links with analytics!
-                </p>
+                </div>
               </div>
+
+              {/* Result Display - Using Home Page Style */}
+              {shortenedUrl && (
+                <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200 mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    {/* Link Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                        <a
+                          href={shortenedUrl.shortUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
+                        >
+                          <span className="break-all">
+                            {shortenedUrl.shortUrl}
+                          </span>
+                          <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        </a>
+                        <button
+                          onClick={() => copyToClipboard(shortenedUrl.shortUrl)}
+                          className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
+                        {shortenedUrl.originalUrl}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                        <span className="flex items-center space-x-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>
+                            {new Date(
+                              shortenedUrl.createdAt
+                            ).toLocaleDateString()}
+                          </span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <MousePointerClick className="w-3 h-3" />
+                          <span>{shortenedUrl.clicks || 0} clicks</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Stats and Actions */}
+                    <div className="flex items-center gap-4">
+                      <div className="text-center min-w-[60px]">
+                        <div className="text-lg font-bold text-white">
+                          {shortenedUrl.clicks || 0}
+                        </div>
+                        <div className="text-xs text-gray-500">Clicks</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500 text-center">
+                💡 <strong>Free trial:</strong> Create one link without signing
+                up. Sign up for unlimited links with analytics!
+              </p>
             </div>
 
             <p className="text-sm text-gray-500">
@@ -439,7 +493,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={redirectToAuth}
-                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2"
+                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center cursor-pointer justify-center space-x-2"
               >
                 <UserPlus className="w-5 h-5" />
                 <span>Get Started Free</span>
@@ -450,7 +504,7 @@ export default function LandingPage() {
                     .getElementById("features")
                     .scrollIntoView({ behavior: "smooth" })
                 }
-                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all"
+                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all cursor-pointer"
               >
                 Learn More
               </button>
@@ -465,7 +519,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+                <img src="/logo.png" alt="BitLink" className="w-12 h-12" />
                 <span className="text-xl font-bold text-white">BitLink</span>
               </div>
               <p className="text-gray-500 text-sm">
