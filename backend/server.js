@@ -48,13 +48,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/links", linkRoutes);
 app.use("/api/user", userRoutes);
 
-// ✅ Redirect route (should be last)
-app.get("/:code", redirectToOriginal);
-
 // ✅ Health check
 app.get("/", (req, res) => {
   res.json({ message: "BitLink API is working!" });
 });
+
+// ✅ Redirect route (should be last)
+app.get("/:code", redirectToOriginal);
 
 // ✅ Port config
 const PORT = process.env.PORT || 3000;
