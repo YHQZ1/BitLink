@@ -21,6 +21,24 @@ export const login = async (req, res) => {
   }
 };
 
+export const healthCheck = (req, res) => {
+  res.json({
+    status: "alive",
+    backend: "Render",
+    time: new Date().toISOString(),
+    environment: {
+      BASE_URL: process.env.BASE_URL || "NOT SET",
+      CLIENT_URL: process.env.CLIENT_URL || "NOT SET",
+      NODE_ENV: process.env.NODE_ENV || "NOT SET",
+      HAS_GITHUB_ID: !!process.env.GITHUB_CLIENT_ID,
+      HAS_GITHUB_SECRET: !!process.env.GITHUB_CLIENT_SECRET,
+      HAS_GOOGLE_ID: !!process.env.GOOGLE_CLIENT_ID,
+      HAS_GOOGLE_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
+      HAS_MONGO: !!process.env.MONGODB_URI,
+    },
+  });
+};
+
 export const githubLogin = (req, res) => {
   const redirectUri = `${process.env.BASE_URL}/api/auth/github/callback`;
   const url =

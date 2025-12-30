@@ -19,4 +19,6 @@ router.get("/github/callback", githubCallback);
 router.get("/google", googleLogin);
 router.get("/google/callback", googleCallback);
 
+router.get("/health", healthCheck);
+
 export default router;
