@@ -58,16 +58,26 @@ export const oauthLogin = async ({
   name,
   avatar,
 }) => {
+  const normalizedEmail = email?.toLowerCase();
+
   let user = await User.findOne({
     authProviders: { $elemMatch: { provider, providerId } },
   });
 
   let isNewUser = false;
 
-  if (!user && email) {
-    user = await User.findOne({ email });
+  if (!user && normalizedEmail) {
+    user = await User.findOne({ email: normalizedEmail });
+
     if (user) {
-      user.authProviders.push({ provider, providerId });
+      if (
+        !user.authProviders.some(
+          (p) => p.provider === provider && p.providerId === providerId
+        )
+      ) {
+        user.authProviders.push({ provider, providerId });
+      }
+
       if (avatar) user.avatar = avatar;
       await user.save();
     }
@@ -75,7 +85,7 @@ export const oauthLogin = async ({
 
   if (!user) {
     user = await User.create({
-      email,
+      email: normalizedEmail,
       name,
       avatar,
       authProviders: [{ provider, providerId }],
