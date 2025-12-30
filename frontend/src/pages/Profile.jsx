@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,6 +15,102 @@ import {
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+
+const ProfileSection = ({
+  title,
+  icon: Icon,
+  isEditing,
+  onStartEdit,
+  onCancelEdit,
+  children,
+}) => (
+  <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-lg font-semibold text-white flex items-center">
+        <Icon className="w-5 h-5 mr-2 text-[#7ed957]" />
+        {title}
+      </h2>
+      {!isEditing ? (
+        <button
+          type="button"
+          onClick={onStartEdit}
+          className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm"
+        >
+          <Edit className="w-4 h-4" />
+          <span>{title === "Password" ? "Change" : "Edit"}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onCancelEdit}
+          className="flex items-center space-x-2 bg-gray-700 text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm"
+        >
+          <X className="w-4 h-4" />
+          <span>Cancel</span>
+        </button>
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+const PasswordInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  showPassword,
+  onToggleShow,
+  placeholder,
+}) => (
+  <div>
+    <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
+      {label}
+    </label>
+    <div className="relative">
+      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+      <input
+        type={showPassword ? "text" : "password"}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 sm:pl-12 pr-12 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-sm sm:text-base"
+        placeholder={placeholder}
+      />
+      <button
+        type="button"
+        onClick={onToggleShow}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400"
+      >
+        {showPassword ? (
+          <EyeOff className="w-4 h-4" />
+        ) : (
+          <Eye className="w-4 h-4" />
+        )}
+      </button>
+    </div>
+  </div>
+);
+
+const SubmitButton = ({ isSaving, label, disabled }) => (
+  <button
+    type="submit"
+    disabled={disabled || isSaving}
+    className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+  >
+    {isSaving ? (
+      <>
+        <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-black"></div>
+        <span>Updating...</span>
+      </>
+    ) : (
+      <>
+        <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span>{label}</span>
+      </>
+    )}
+  </button>
+);
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -39,16 +136,12 @@ export default function Profile() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [editingSection, setEditingSection] = useState(null);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get("/api/user/profile");
-
       const userData = response.data;
+
       setCurrentUser({
         name: userData.name || "",
         email: userData.email || "",
@@ -56,20 +149,22 @@ export default function Profile() {
         id: userData.id || "",
       });
 
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         name: userData.name || "",
         email: userData.email || "",
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
-      setIsLoading(false);
+      }));
     } catch {
       localStorage.removeItem("jwtToken");
       navigate("/auth");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -115,20 +210,16 @@ export default function Profile() {
       }
 
       const updateData = {};
-
-      if (editingSection === "name") {
-        if (formData.name !== currentUser.name) {
-          updateData.name = formData.name;
-        }
-      } else if (editingSection === "email") {
-        if (formData.email !== currentUser.email) {
-          updateData.email = formData.email;
-        }
-      } else if (editingSection === "password") {
-        if (formData.newPassword) {
-          updateData.currentPassword = formData.currentPassword;
-          updateData.newPassword = formData.newPassword;
-        }
+      if (editingSection === "name" && formData.name !== currentUser.name) {
+        updateData.name = formData.name;
+      } else if (
+        editingSection === "email" &&
+        formData.email !== currentUser.email
+      ) {
+        updateData.email = formData.email;
+      } else if (editingSection === "password" && formData.newPassword) {
+        updateData.currentPassword = formData.currentPassword;
+        updateData.newPassword = formData.newPassword;
       }
 
       if (Object.keys(updateData).length === 0) {
@@ -138,8 +229,8 @@ export default function Profile() {
       }
 
       const response = await api.put("/api/user", updateData);
-
       const updatedUser = response.data;
+
       setCurrentUser((prev) => ({
         ...prev,
         name: updatedUser.name || prev.name,
@@ -147,7 +238,6 @@ export default function Profile() {
       }));
 
       setSuccess("Profile updated successfully!");
-
       setFormData((prev) => ({
         ...prev,
         currentPassword: "",
@@ -155,8 +245,8 @@ export default function Profile() {
         confirmPassword: "",
       }));
       setEditingSection(null);
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to update profile");
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -186,7 +276,7 @@ export default function Profile() {
         <div className="mb-4 sm:mb-6 lg:mb-8">
           <button
             onClick={handleBack}
-            className="flex items-center space-x-2 cursor-pointer text-gray-400 hover:text-white transition-colors touch-manipulation"
+            className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="text-sm sm:text-base">Back to Dashboard</span>
@@ -215,33 +305,13 @@ export default function Profile() {
             </div>
           )}
 
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center">
-                <User className="w-5 h-5 mr-2 text-[#7ed957]" />
-                Name
-              </h2>
-              {editingSection !== "name" ? (
-                <button
-                  type="button"
-                  onClick={() => startEditing("name")}
-                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
-                >
-                  <Edit className="w-4 h-4" />
-                  <span>Edit</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  className="flex items-center space-x-2 bg-gray-700 text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                  <span>Cancel</span>
-                </button>
-              )}
-            </div>
-
+          <ProfileSection
+            title="Name"
+            icon={User}
+            isEditing={editingSection === "name"}
+            onStartEdit={() => startEditing("name")}
+            onCancelEdit={cancelEditing}
+          >
             {editingSection === "name" ? (
               <div className="space-y-4">
                 <div>
@@ -249,7 +319,7 @@ export default function Profile() {
                     New Name
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                     <input
                       type="text"
                       name="name"
@@ -260,23 +330,11 @@ export default function Profile() {
                     />
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSaving || formData.name === currentUser.name}
-                  className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base cursor-pointer"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-black"></div>
-                      <span>Updating Name...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Update Name</span>
-                    </>
-                  )}
-                </button>
+                <SubmitButton
+                  isSaving={isSaving}
+                  label="Update Name"
+                  disabled={formData.name === currentUser.name}
+                />
               </div>
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
@@ -290,35 +348,15 @@ export default function Profile() {
                 </div>
               </div>
             )}
-          </div>
+          </ProfileSection>
 
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center">
-                <Mail className="w-5 h-5 mr-2 text-[#7ed957]" />
-                Email Address
-              </h2>
-              {editingSection !== "email" ? (
-                <button
-                  type="button"
-                  onClick={() => startEditing("email")}
-                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
-                >
-                  <Edit className="w-4 h-4" />
-                  <span>Edit</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  className="flex items-center space-x-2 bg-gray-700 text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                  <span>Cancel</span>
-                </button>
-              )}
-            </div>
-
+          <ProfileSection
+            title="Email Address"
+            icon={Mail}
+            isEditing={editingSection === "email"}
+            onStartEdit={() => startEditing("email")}
+            onCancelEdit={cancelEditing}
+          >
             {editingSection === "email" ? (
               <div className="space-y-4">
                 <div>
@@ -326,7 +364,7 @@ export default function Profile() {
                     New Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                     <input
                       type="email"
                       name="email"
@@ -337,23 +375,11 @@ export default function Profile() {
                     />
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSaving || formData.email === currentUser.email}
-                  className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base cursor-pointer"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-black"></div>
-                      <span>Updating Email...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Update Email</span>
-                    </>
-                  )}
-                </button>
+                <SubmitButton
+                  isSaving={isSaving}
+                  label="Update Email"
+                  disabled={formData.email === currentUser.email}
+                />
               </div>
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
@@ -367,158 +393,71 @@ export default function Profile() {
                 </div>
               </div>
             )}
-          </div>
+          </ProfileSection>
 
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center">
-                <Lock className="w-5 h-5 mr-2 text-[#7ed957]" />
-                Password
-              </h2>
-              {editingSection !== "password" ? (
-                <button
-                  type="button"
-                  onClick={() => startEditing("password")}
-                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
-                >
-                  <Edit className="w-4 h-4" />
-                  <span>Change</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  className="flex items-center space-x-2 bg-gray-700 text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                  <span>Cancel</span>
-                </button>
-              )}
-            </div>
-
+          <ProfileSection
+            title="Password"
+            icon={Lock}
+            isEditing={editingSection === "password"}
+            onStartEdit={() => startEditing("password")}
+            onCancelEdit={cancelEditing}
+          >
             {editingSection === "password" ? (
               <div className="space-y-4">
-                <div>
-                  <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
-                    Current Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-                    <input
-                      type={showCurrentPassword ? "text" : "password"}
-                      name="currentPassword"
-                      value={formData.currentPassword}
-                      onChange={handleInputChange}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 sm:pl-12 pr-12 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-sm sm:text-base"
-                      placeholder="Enter current password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowCurrentPassword(!showCurrentPassword)
-                      }
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
-                    >
-                      {showCurrentPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <PasswordInput
+                  label="Current Password"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleInputChange}
+                  showPassword={showCurrentPassword}
+                  onToggleShow={() =>
+                    setShowCurrentPassword(!showCurrentPassword)
+                  }
+                  placeholder="Enter current password"
+                />
 
-                <div>
-                  <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      name="newPassword"
-                      value={formData.newPassword}
-                      onChange={handleInputChange}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 sm:pl-12 pr-12 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-sm sm:text-base"
-                      placeholder="Enter new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
-                    >
-                      {showNewPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                  {formData.newPassword && formData.newPassword.length < 6 && (
-                    <p className="text-yellow-500 text-xs mt-1">
-                      Password must be at least 6 characters
+                <PasswordInput
+                  label="New Password"
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                  showPassword={showNewPassword}
+                  onToggleShow={() => setShowNewPassword(!showNewPassword)}
+                  placeholder="Enter new password"
+                />
+                {formData.newPassword && formData.newPassword.length < 6 && (
+                  <p className="text-yellow-500 text-xs mt-1">
+                    Password must be at least 6 characters
+                  </p>
+                )}
+
+                <PasswordInput
+                  label="Confirm New Password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  showPassword={showConfirmPassword}
+                  onToggleShow={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  placeholder="Confirm new password"
+                />
+                {formData.confirmPassword &&
+                  formData.newPassword !== formData.confirmPassword && (
+                    <p className="text-red-500 text-xs mt-1">
+                      Passwords do not match
                     </p>
                   )}
-                </div>
 
-                <div>
-                  <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
-                    Confirm New Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 sm:pl-12 pr-12 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-sm sm:text-base"
-                      placeholder="Confirm new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                  {formData.confirmPassword &&
-                    formData.newPassword !== formData.confirmPassword && (
-                      <p className="text-red-500 text-xs mt-1">
-                        Passwords do not match
-                      </p>
-                    )}
-                </div>
-
-                <button
-                  type="submit"
+                <SubmitButton
+                  isSaving={isSaving}
+                  label="Update Password"
                   disabled={
-                    isSaving ||
                     !formData.newPassword ||
                     formData.newPassword.length < 6 ||
                     formData.newPassword !== formData.confirmPassword
                   }
-                  className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base cursor-pointer"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-black"></div>
-                      <span>Updating Password...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Update Password</span>
-                    </>
-                  )}
-                </button>
+                />
               </div>
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
@@ -532,7 +471,7 @@ export default function Profile() {
                 </div>
               </div>
             )}
-          </div>
+          </ProfileSection>
 
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">

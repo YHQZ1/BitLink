@@ -11,9 +11,11 @@ export default function AuthSuccess() {
   useEffect(() => {
     if (token) {
       localStorage.setItem("jwtToken", token);
-      setTimeout(() => {
+      const redirectTimer = setTimeout(() => {
         navigate("/home");
       }, 1500);
+
+      return () => clearTimeout(redirectTimer);
     } else {
       navigate("/auth");
     }

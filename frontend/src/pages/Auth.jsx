@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useState } from "react";
 import {
   Mail,
   Lock,
@@ -12,6 +13,61 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+const OAuthButton = ({ provider, icon: Icon, label, onClick }) => (
+  <button
+    onClick={() => onClick(provider)}
+    className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group"
+  >
+    <Icon className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+    <span className="font-medium">Continue with {label}</span>
+  </button>
+);
+
+const InputField = ({
+  label,
+  type,
+  name,
+  value,
+  onChange,
+  placeholder,
+  required,
+  icon: Icon,
+  showPasswordToggle,
+  onTogglePassword,
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-2">
+      {label}
+    </label>
+    <div className="relative">
+      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
+        placeholder={placeholder}
+        required={required}
+        minLength={type === "password" ? "6" : undefined}
+      />
+      {showPasswordToggle && (
+        <button
+          type="button"
+          onClick={onTogglePassword}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+        >
+          {type === "password" ? (
+            <Eye className="w-5 h-5" />
+          ) : (
+            <EyeOff className="w-5 h-5" />
+          )}
+        </button>
+      )}
+    </div>
+  </div>
+);
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -32,20 +88,14 @@ export default function Auth() {
 
     try {
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
+      const payload = isSignUp
+        ? formData
+        : { email: formData.email, password: formData.password };
 
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          isSignUp
-            ? formData
-            : {
-                email: formData.email,
-                password: formData.password,
-              }
-        ),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -67,10 +117,12 @@ export default function Auth() {
   };
 
   const handleOAuth = (provider) => {
-    if (provider === "GitHub") {
-      window.location.href = `${BASE_URL}/api/auth/github`;
-    } else if (provider === "Google") {
-      window.location.href = `${BASE_URL}/api/auth/google`;
+    const urls = {
+      GitHub: `${BASE_URL}/api/auth/github`,
+      Google: `${BASE_URL}/api/auth/google`,
+    };
+    if (urls[provider]) {
+      window.location.href = urls[provider];
     }
   };
 
@@ -80,6 +132,13 @@ export default function Auth() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setMessage("");
+  };
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -122,21 +181,18 @@ export default function Auth() {
           )}
 
           <div className="space-y-3 mb-6">
-            <button
-              onClick={() => handleOAuth("GitHub")}
-              className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
-            >
-              <Github className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
-              <span className="font-medium">Continue with GitHub</span>
-            </button>
-
-            <button
-              onClick={() => handleOAuth("Google")}
-              className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
-            >
-              <Chrome className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
-              <span className="font-medium">Continue with Google</span>
-            </button>
+            <OAuthButton
+              provider="GitHub"
+              icon={Github}
+              label="GitHub"
+              onClick={handleOAuth}
+            />
+            <OAuthButton
+              provider="Google"
+              icon={Chrome}
+              label="Google"
+              onClick={handleOAuth}
+            />
           </div>
 
           <div className="flex items-center my-6">
@@ -149,77 +205,46 @@ export default function Auth() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-              </div>
+              <InputField
+                label="Full Name"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter your full name"
+                required
+                icon={User}
+              />
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-            </div>
+            <InputField
+              label="Email Address"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Enter your email"
+              required
+              icon={Mail}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-12 py-3 text-white placeholder-gray-500 outline-none transition-all"
-                  placeholder="Enter your password"
-                  required
-                  minLength="6"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5 cursor-pointer" />
-                  ) : (
-                    <Eye className="w-5 h-5 cursor-pointer" />
-                  )}
-                </button>
-              </div>
-            </div>
+            <InputField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="Enter your password"
+              required
+              icon={Lock}
+              showPasswordToggle
+              onTogglePassword={togglePasswordVisibility}
+            />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#7ed957] hover:bg-[#8ee367] disabled:bg-gray-600 text-black font-semibold rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-2 group cursor-pointer disabled:cursor-not-allowed"
+              className="w-full bg-[#7ed957] hover:bg-[#8ee367] disabled:bg-gray-600 text-black font-semibold rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-2 group disabled:cursor-not-allowed"
             >
               <span>
                 {loading
@@ -239,11 +264,8 @@ export default function Auth() {
               {isSignUp ? "Already have an account?" : "Don't have an account?"}
             </span>{" "}
             <button
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setMessage("");
-              }}
-              className="text-[#7ed957] hover:text-[#8ee367] font-medium transition-colors cursor-pointer"
+              onClick={toggleAuthMode}
+              className="text-[#7ed957] hover:text-[#8ee367] font-medium transition-colors"
             >
               {isSignUp ? "Sign in" : "Sign up"}
             </button>

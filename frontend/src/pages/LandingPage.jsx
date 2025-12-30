@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Link2,
@@ -6,8 +6,6 @@ import {
   BarChart3,
   QrCode,
   Shield,
-  ArrowRight,
-  Check,
   Menu,
   X,
   Globe,
@@ -18,9 +16,155 @@ import {
   ExternalLink,
   Calendar,
   MousePointerClick,
+  Check,
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+const Modal = ({ isOpen, type, title, message, onClose }) => {
+  if (!isOpen) return null;
+
+  const Icon = type === "success" ? CheckCircle : AlertCircle;
+  const bgColor = type === "success" ? "bg-green-500/20" : "bg-red-500/20";
+  const iconColor = type === "success" ? "text-green-400" : "text-red-400";
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className={`p-2 rounded-full ${bgColor}`}>
+            <Icon className={`w-6 h-6 ${iconColor}`} />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold">{title}</h3>
+            <p className="text-gray-400 text-sm">{message}</p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const FeatureCard = ({ icon, title, description }) => (
+  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-[#7ed957]/30 transition-all hover:scale-105">
+    <div className="w-12 h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center text-[#7ed957] mb-4">
+      {icon}
+    </div>
+    <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+    <p className="text-gray-400">{description}</p>
+  </div>
+);
+
+const ShortenedUrlDisplay = ({ url, onCopy }) => (
+  <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200 mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+          <a
+            href={url.shortUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
+          >
+            <span className="break-all">{url.shortUrl}</span>
+            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+          </a>
+          <button
+            onClick={() => onCopy(url.shortUrl)}
+            className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
+          {url.originalUrl}
+        </p>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+          <span className="flex items-center space-x-1">
+            <Calendar className="w-3 h-3" />
+            <span>{new Date(url.createdAt).toLocaleDateString()}</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <MousePointerClick className="w-3 h-3" />
+            <span>{url.clicks || 0} clicks</span>
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="text-center min-w-[60px]">
+          <div className="text-lg font-bold text-white">{url.clicks || 0}</div>
+          <div className="text-xs text-gray-500">Clicks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const features = [
+  {
+    icon: <Link2 className="w-6 h-6" />,
+    title: "Custom Short Links",
+    description:
+      "Create branded, memorable links with custom aliases that represent your brand.",
+  },
+  {
+    icon: <QrCode className="w-6 h-6" />,
+    title: "QR Code Generation",
+    description:
+      "Instantly generate QR codes for any link. Perfect for print, events, and mobile.",
+  },
+  {
+    icon: <BarChart3 className="w-6 h-6" />,
+    title: "Real-time Analytics",
+    description:
+      "Track clicks, referrers, devices, and locations with detailed analytics dashboards.",
+  },
+  {
+    icon: <Zap className="w-6 h-6" />,
+    title: "Lightning Fast",
+    description:
+      "Redirects happen in milliseconds with our globally distributed infrastructure.",
+  },
+  {
+    icon: <Shield className="w-6 h-6" />,
+    title: "Secure & Reliable",
+    description:
+      "Enterprise-grade security with automatic backups and data protection.",
+  },
+  {
+    icon: <Check className="w-6 h-6" />,
+    title: "Link Management",
+    description:
+      "Edit, delete, and organize all your links from one powerful dashboard.",
+  },
+];
+
+const footerColumns = [
+  {
+    title: "Product",
+    links: ["Features", "Pricing", "API", "Documentation"],
+  },
+  {
+    title: "Company",
+    links: ["About", "Blog", "Careers", "Contact"],
+  },
+  {
+    title: "Legal",
+    links: ["Privacy", "Terms", "Security", "Status"],
+  },
+];
+
+const highlightItems = [
+  { icon: <Zap className="w-5 h-5" />, text: "Lightning fast redirects" },
+  { icon: <Shield className="w-5 h-5" />, text: "Secure and reliable" },
+  { icon: <Globe className="w-5 h-5" />, text: "Works everywhere" },
+];
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,15 +181,20 @@ export default function LandingPage() {
   });
   const navigate = useNavigate();
 
-  // Generate or retrieve guest session ID
   useEffect(() => {
     let sessionId = localStorage.getItem("guestSessionId");
     if (!sessionId) {
-      sessionId = "guest_" + Math.random().toString(36).substr(2, 9);
+      sessionId = `guest_${Math.random().toString(36).slice(2, 11)}`;
       localStorage.setItem("guestSessionId", sessionId);
     }
     setGuestSessionId(sessionId);
   }, []);
+
+  const showModal = (type, title, message) => {
+    setModal({ isOpen: true, type, title, message });
+  };
+
+  const closeModal = () => setModal((prev) => ({ ...prev, isOpen: false }));
 
   const handleShorten = async () => {
     if (!url) {
@@ -53,10 +202,9 @@ export default function LandingPage() {
       return;
     }
 
-    // Basic URL validation
     try {
       new URL(url);
-    } catch (error) {
+    } catch {
       showModal(
         "error",
         "Invalid URL",
@@ -67,12 +215,9 @@ export default function LandingPage() {
 
     try {
       setIsLoading(true);
-
       const response = await fetch(`${BASE_URL}/api/links/guest/shorten`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           originalUrl: url,
           customAlias: customAlias || undefined,
@@ -80,7 +225,6 @@ export default function LandingPage() {
         }),
       });
 
-      // Check if response is JSON
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error(
@@ -92,13 +236,11 @@ export default function LandingPage() {
 
       if (!response.ok) {
         if (data.requiresAuth) {
-          // Guest has already used their free link
           showModal(
             "error",
             "Limit Reached",
             "You've used your free link! Sign up to create unlimited short links with analytics."
           );
-          // Redirect to auth after a delay
           setTimeout(() => navigate("/auth"), 3000);
         } else {
           throw new Error(data.error || "Failed to shorten URL");
@@ -106,13 +248,11 @@ export default function LandingPage() {
         return;
       }
 
-      // Success - show the shortened URL
       setShortenedUrl(data);
       setUrl("");
       setCustomAlias("");
       showModal("success", "Success!", "Your link has been shortened!");
     } catch (error) {
-      console.error("Error shortening URL:", error);
       showModal("error", "Error", error.message);
     } finally {
       setIsLoading(false);
@@ -124,51 +264,10 @@ export default function LandingPage() {
     showModal("success", "Copied!", "Link copied to clipboard!");
   };
 
-  const showModal = (type, title, message) => {
-    setModal({
-      isOpen: true,
-      type,
-      title,
-      message,
-    });
-  };
+  const redirectToAuth = () => navigate("/auth");
 
-  const Modal = () => {
-    if (!modal.isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
-          <div className="flex items-center space-x-3 mb-4">
-            <div
-              className={`p-2 rounded-full ${
-                modal.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
-              }`}
-            >
-              {modal.type === "success" ? (
-                <CheckCircle className="w-6 h-6 text-green-400" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-400" />
-              )}
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">{modal.title}</h3>
-              <p className="text-gray-400 text-sm">{modal.message}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setModal({ ...modal, isOpen: false })}
-            className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  const redirectToAuth = () => {
-    navigate("/auth");
+  const scrollToFeatures = () => {
+    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -182,29 +281,27 @@ export default function LandingPage() {
               <span className="text-2xl font-bold text-[#7ed957]">BitLink</span>
             </div>
 
-            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="#features"
+              <button
+                onClick={scrollToFeatures}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Features
-              </a>
-              <a className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+              </button>
+              <button className="text-gray-300 hover:text-white transition-colors">
                 Pricing
-              </a>
-              <a className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+              </button>
+              <button className="text-gray-300 hover:text-white transition-colors">
                 Docs
-              </a>
+              </button>
               <button
-                className="bg-[#7ed957] text-black px-4 py-2 rounded-lg hover:bg-[#8ee367] transition-all font-semibold cursor-pointer"
                 onClick={redirectToAuth}
+                className="bg-[#7ed957] text-black px-4 py-2 rounded-lg hover:bg-[#8ee367] transition-all font-semibold"
               >
                 Get Started
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               className="md:hidden text-gray-300"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -214,35 +311,36 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-[#0a0a0a] border-t border-gray-800">
             <div className="px-4 py-4 space-y-3">
-              <a
-                href="#features"
-                className="block text-gray-300 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToFeatures();
+                }}
+                className="block text-gray-300 hover:text-white w-full text-left"
               >
                 Features
-              </a>
-              <a
-                className="block text-gray-300 hover:text-white"
+              </button>
+              <button
                 onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-300 hover:text-white w-full text-left"
               >
                 Pricing
-              </a>
-              <a
-                className="block text-gray-300 hover:text-white"
+              </button>
+              <button
                 onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-300 hover:text-white w-full text-left"
               >
                 Docs
-              </a>
+              </button>
               <button
-                className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold text-center"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   redirectToAuth();
                 }}
+                className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold text-center"
               >
                 Get Started
               </button>
@@ -274,7 +372,6 @@ export default function LandingPage() {
               sizes.
             </p>
 
-            {/* URL Shortener Input */}
             <div className="max-w-2xl mx-auto mb-8">
               <div className="border border-[#7ed957]/20 rounded-xl p-6 mb-6">
                 <div className="flex flex-col gap-4">
@@ -298,7 +395,7 @@ export default function LandingPage() {
                       <button
                         onClick={handleShorten}
                         disabled={isLoading}
-                        className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
+                        className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
                       >
                         {isLoading ? (
                           <>
@@ -314,61 +411,11 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Result Display - Using Home Page Style */}
               {shortenedUrl && (
-                <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200 mb-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    {/* Link Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                        <a
-                          href={shortenedUrl.shortUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
-                        >
-                          <span className="break-all">
-                            {shortenedUrl.shortUrl}
-                          </span>
-                          <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                        </a>
-                        <button
-                          onClick={() => copyToClipboard(shortenedUrl.shortUrl)}
-                          className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
-                        >
-                          <Copy className="w-3 h-3" />
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
-                        {shortenedUrl.originalUrl}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center space-x-1">
-                          <Calendar className="w-3 h-3" />
-                          <span>
-                            {new Date(
-                              shortenedUrl.createdAt
-                            ).toLocaleDateString()}
-                          </span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <MousePointerClick className="w-3 h-3" />
-                          <span>{shortenedUrl.clicks || 0} clicks</span>
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Stats and Actions */}
-                    <div className="flex items-center gap-4">
-                      <div className="text-center min-w-[60px]">
-                        <div className="text-lg font-bold text-white">
-                          {shortenedUrl.clicks || 0}
-                        </div>
-                        <div className="text-xs text-gray-500">Clicks</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ShortenedUrlDisplay
+                  url={shortenedUrl}
+                  onCopy={copyToClipboard}
+                />
               )}
 
               <p className="text-xs text-gray-500 text-center">
@@ -382,19 +429,8 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Feature Highlights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 max-w-5xl mx-auto">
-            {[
-              {
-                icon: <Zap className="w-5 h-5" />,
-                text: "Lightning fast redirects",
-              },
-              {
-                icon: <Shield className="w-5 h-5" />,
-                text: "Secure and reliable",
-              },
-              { icon: <Globe className="w-5 h-5" />, text: "Works everywhere" },
-            ].map((item, i) => (
+            {highlightItems.map((item, i) => (
               <div
                 key={i}
                 className="flex items-center justify-center space-x-3 bg-gray-900/30 border border-gray-800 rounded-lg px-6 py-4"
@@ -423,56 +459,8 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Link2 className="w-6 h-6" />,
-                title: "Custom Short Links",
-                description:
-                  "Create branded, memorable links with custom aliases that represent your brand.",
-              },
-              {
-                icon: <QrCode className="w-6 h-6" />,
-                title: "QR Code Generation",
-                description:
-                  "Instantly generate QR codes for any link. Perfect for print, events, and mobile.",
-              },
-              {
-                icon: <BarChart3 className="w-6 h-6" />,
-                title: "Real-time Analytics",
-                description:
-                  "Track clicks, referrers, devices, and locations with detailed analytics dashboards.",
-              },
-              {
-                icon: <Zap className="w-6 h-6" />,
-                title: "Lightning Fast",
-                description:
-                  "Redirects happen in milliseconds with our globally distributed infrastructure.",
-              },
-              {
-                icon: <Shield className="w-6 h-6" />,
-                title: "Secure & Reliable",
-                description:
-                  "Enterprise-grade security with automatic backups and data protection.",
-              },
-              {
-                icon: <Check className="w-6 h-6" />,
-                title: "Link Management",
-                description:
-                  "Edit, delete, and organize all your links from one powerful dashboard.",
-              },
-            ].map((feature, i) => (
-              <div
-                key={i}
-                className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-[#7ed957]/30 transition-all hover:transform hover:scale-105"
-              >
-                <div className="w-12 h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center text-[#7ed957] mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-white">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400">{feature.description}</p>
-              </div>
+            {features.map((feature, i) => (
+              <FeatureCard key={i} {...feature} />
             ))}
           </div>
         </div>
@@ -493,18 +481,14 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={redirectToAuth}
-                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center cursor-pointer justify-center space-x-2"
+                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2"
               >
                 <UserPlus className="w-5 h-5" />
                 <span>Get Started Free</span>
               </button>
               <button
-                onClick={() =>
-                  document
-                    .getElementById("features")
-                    .scrollIntoView({ behavior: "smooth" })
-                }
-                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all cursor-pointer"
+                onClick={scrollToFeatures}
+                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all"
               >
                 Learn More
               </button>
@@ -527,20 +511,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {[
-              {
-                title: "Product",
-                links: ["Features", "Pricing", "API", "Documentation"],
-              },
-              {
-                title: "Company",
-                links: ["About", "Blog", "Careers", "Contact"],
-              },
-              {
-                title: "Legal",
-                links: ["Privacy", "Terms", "Security", "Status"],
-              },
-            ].map((column, i) => (
+            {footerColumns.map((column, i) => (
               <div key={i}>
                 <h3 className="font-semibold mb-4 text-white">
                   {column.title}
@@ -548,12 +519,9 @@ export default function LandingPage() {
                 <ul className="space-y-2">
                   {column.links.map((link, j) => (
                     <li key={j}>
-                      <a
-                        href="#"
-                        className="text-gray-500 hover:text-white transition-colors text-sm"
-                      >
+                      <button className="text-gray-500 hover:text-white transition-colors text-sm w-full text-left">
                         {link}
-                      </a>
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -567,7 +535,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      <Modal />
+      <Modal {...modal} onClose={closeModal} />
     </div>
   );
 }

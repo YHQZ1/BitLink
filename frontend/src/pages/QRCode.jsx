@@ -1,8 +1,44 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Copy, ExternalLink } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+
+const StatCard = ({ value, label }) => (
+  <div className="text-center">
+    <div className="text-2xl font-bold text-white">{value}</div>
+    <div className="text-gray-400 text-sm">{label}</div>
+  </div>
+);
+
+const ActionButton = ({
+  onClick,
+  icon: Icon,
+  label,
+  disabled,
+  variant = "primary",
+}) => {
+  const baseStyles =
+    "flex items-center justify-center space-x-2 py-2 px-4 rounded-lg transition-colors font-semibold";
+  const variants = {
+    primary: "bg-[#7ed957] text-black hover:bg-[#8ee367]",
+    secondary: "bg-gray-700 text-white hover:bg-gray-600",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${baseStyles} ${variants[variant]} ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{label}</span>
+    </button>
+  );
+};
 
 export default function QRCode() {
   const { linkId } = useParams();
@@ -12,12 +48,7 @@ export default function QRCode() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchUserData();
-    fetchLinkData();
-  }, [linkId]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await api.get("/api/user/profile");
       setCurrentUser({
@@ -28,9 +59,9 @@ export default function QRCode() {
       localStorage.removeItem("jwtToken");
       navigate("/auth");
     }
-  };
+  }, [navigate]);
 
-  const fetchLinkData = async () => {
+  const fetchLinkData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get("/api/links/me");
@@ -47,13 +78,17 @@ export default function QRCode() {
         qrCode: foundLink.qrCode,
         createdAt: new Date(foundLink.createdAt).toLocaleDateString(),
       });
-
-      setIsLoading(false);
-    } catch (error) {
-      setError(error.response?.data?.error || error.message);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
       setIsLoading(false);
     }
-  };
+  }, [linkId]);
+
+  useEffect(() => {
+    fetchUserData();
+    fetchLinkData();
+  }, [fetchUserData, fetchLinkData]);
 
   const downloadQRCode = () => {
     if (!link?.qrCode) return;
@@ -66,11 +101,20 @@ export default function QRCode() {
   };
 
   const copyToClipboard = (text) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     alert("Copied to clipboard!");
   };
 
   const handleBack = () => navigate(-1);
+
+  const usageTips = [
+    "Print the QR code for physical marketing materials",
+    "Share the QR code image on social media",
+    "Embed in presentations or documents",
+    "Use in email signatures",
+    "Display on digital screens at events",
+  ];
 
   if (isLoading) {
     return (
@@ -142,15 +186,14 @@ export default function QRCode() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-center space-x-4 mt-6">
-                <button
+              <div className="flex justify-center mt-6">
+                <ActionButton
                   onClick={downloadQRCode}
+                  icon={Download}
+                  label="Download QR"
                   disabled={!link?.qrCode}
-                  className="flex items-center space-x-2 bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  <Download className="w-5 h-5" />
-                  <span>Download QR</span>
-                </button>
+                  variant="primary"
+                />
               </div>
             </div>
 
@@ -192,38 +235,26 @@ export default function QRCode() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">
-                      {link?.clicks || 0}
-                    </div>
-                    <div className="text-gray-400 text-sm">Total Clicks</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-white">
-                      {link?.createdAt}
-                    </div>
-                    <div className="text-gray-400 text-sm">Created</div>
-                  </div>
+                  <StatCard value={link?.clicks || 0} label="Total Clicks" />
+                  <StatCard value={link?.createdAt} label="Created" />
                 </div>
 
                 <div className="pt-4 border-t border-gray-700">
                   <h3 className="text-gray-400 text-sm mb-3">Share</h3>
-                  <div className="flex space-x-3">
-                    <button
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <ActionButton
                       onClick={() => copyToClipboard(link?.shortUrl)}
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                    >
-                      <Copy className="w-4 h-4" />
-                      <span>Copy Link</span>
-                    </button>
-                    <button
+                      icon={Copy}
+                      label="Copy Link"
+                      variant="secondary"
+                    />
+                    <ActionButton
                       onClick={() => copyToClipboard(link?.qrCode)}
+                      icon={Copy}
+                      label="Copy QR Image URL"
                       disabled={!link?.qrCode}
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Copy className="w-4 h-4" />
-                      <span>Copy QR Image URL</span>
-                    </button>
+                      variant="secondary"
+                    />
                   </div>
                 </div>
               </div>
@@ -236,11 +267,9 @@ export default function QRCode() {
             QR Code Usage Tips
           </h3>
           <ul className="text-gray-400 space-y-2 text-sm">
-            <li>• Print the QR code for physical marketing materials</li>
-            <li>• Share the QR code image on social media</li>
-            <li>• Embed in presentations or documents</li>
-            <li>• Use in email signatures</li>
-            <li>• Display on digital screens at events</li>
+            {usageTips.map((tip, index) => (
+              <li key={index}>• {tip}</li>
+            ))}
           </ul>
         </div>
       </div>

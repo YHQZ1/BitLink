@@ -1,4 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import ProtectedRoutes from "./components/ProtectedRoutes";
+
 import LandingPage from "./pages/LandingPage";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
@@ -9,7 +13,14 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AuthSuccess from "./pages/AuthSuccess";
 
-import ProtectedRoutes from "./components/ProtectedRoutes";
+const protectedRoutes = [
+  { path: "/home", component: Home },
+  { path: "/qr/:linkId", component: QRCode },
+  { path: "/analytics/:linkId", component: LinkAnalytics },
+  { path: "/analytics", component: Analytics },
+  { path: "/dashboard", component: Dashboard },
+  { path: "/profile", component: Profile },
+];
 
 export default function App() {
   return (
@@ -18,54 +29,18 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/success" element={<AuthSuccess />} />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoutes>
-              <Home />
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="/qr/:linkId"
-          element={
-            <ProtectedRoutes>
-              <QRCode />
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="/analytics/:linkId"
-          element={
-            <ProtectedRoutes>
-              <LinkAnalytics />
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoutes>
-              <Analytics />
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoutes>
-              <Dashboard />
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoutes>
-              <Profile />
-            </ProtectedRoutes>
-          }
-        />
+
+        {protectedRoutes.map(({ path, component: Component }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <ProtectedRoutes>
+                <Component />
+              </ProtectedRoutes>
+            }
+          />
+        ))}
       </Routes>
     </Router>
   );

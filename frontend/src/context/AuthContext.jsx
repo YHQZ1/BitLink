@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import api from "../lib/api";
 
 const AuthContext = createContext(null);
@@ -7,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       setUser(null);
@@ -24,37 +31,44 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const login = async (jwtToken) => {
-    localStorage.setItem("jwtToken", jwtToken);
-    setLoading(true);
-    await loadUser();
-  };
+  const login = useCallback(
+    async (jwtToken) => {
+      localStorage.setItem("jwtToken", jwtToken);
+      setLoading(true);
+      await loadUser();
+    },
+    [loadUser]
+  );
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("jwtToken");
     setUser(null);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
+
+  const contextValue = {
+    user,
+    isAuthenticated: !!user,
+    loading,
+    login,
+    logout,
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        loading,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

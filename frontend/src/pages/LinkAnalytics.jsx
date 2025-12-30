@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -16,6 +17,57 @@ import {
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
 
+const timeRangeOptions = [
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+  { value: "90d", label: "90 Days" },
+  { value: "all", label: "All Time" },
+];
+
+const StatCard = ({ title, value, icon: Icon, subtext }) => (
+  <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
+    <div className="flex items-center justify-between mb-1 sm:mb-2">
+      <span className="text-gray-400 text-xs sm:text-sm">{title}</span>
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
+    </div>
+    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+      {value}
+    </div>
+    {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+  </div>
+);
+
+const DataSection = ({
+  title,
+  icon: Icon,
+  data,
+  dataKey,
+  labelKey = "name",
+}) => (
+  <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+    <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
+      {title}
+    </h3>
+    <div className="space-y-2 sm:space-y-3">
+      {data.length > 0 ? (
+        data.map((item, index) => (
+          <div key={index} className="flex items-center justify-between gap-2">
+            <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
+              {item[labelKey] || item.deviceType || item.device || item.source}
+            </span>
+            <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
+              {item.count}
+            </span>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-500 text-sm">No data available</p>
+      )}
+    </div>
+  </div>
+);
+
 export default function LinkAnalytics() {
   const { linkId } = useParams();
   const navigate = useNavigate();
@@ -26,12 +78,7 @@ export default function LinkAnalytics() {
   const [timeRange, setTimeRange] = useState("7d");
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    fetchUserData();
-    fetchLinkAnalytics();
-  }, [linkId, timeRange]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await api.get("/api/user/profile");
       setCurrentUser({
@@ -42,38 +89,34 @@ export default function LinkAnalytics() {
       localStorage.removeItem("jwtToken");
       navigate("/auth");
     }
-  };
+  }, [navigate]);
 
-  const fetchLinkAnalytics = async () => {
+  const fetchLinkAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get(`/api/analytics/link/${linkId}`, {
         params: { range: timeRange },
       });
       setAnalyticsData(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      setError(error.response?.data?.error || error.message);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
       setIsLoading(false);
     }
-  };
+  }, [linkId, timeRange]);
 
-  const copyToClipboard = (text) => {
+  useEffect(() => {
+    fetchUserData();
+    fetchLinkAnalytics();
+  }, [fetchUserData, fetchLinkAnalytics]);
+
+  const copyToClipboard = useCallback((text) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, []);
 
   const handleBack = () => navigate(-1);
-
-  // Safe data access helpers with backend field mapping
-  const getTotalClicks = () => analyticsData?.totalClicks || 0;
-  const getLink = () => analyticsData?.link || {};
-  const getReferrers = () => analyticsData?.referrers || [];
-  const getCountries = () => analyticsData?.countries || [];
-  const getDevices = () => analyticsData?.devices || [];
-  const getBrowsers = () => analyticsData?.browsers || [];
-  const getPeakHours = () => analyticsData?.peakHours || [];
 
   if (isLoading) {
     return (
@@ -133,7 +176,36 @@ export default function LinkAnalytics() {
     );
   }
 
-  const link = getLink();
+  const {
+    link = {},
+    totalClicks = 0,
+    referrers = [],
+    countries = [],
+    devices = [],
+    browsers = [],
+    peakHours = [],
+  } = analyticsData;
+
+  const getTopCountry = () => {
+    const topCountry = countries[0]?.country;
+    const excludedCountries = ["Local Network", "Unknown", "Localhost"];
+    return topCountry && !excludedCountries.includes(topCountry)
+      ? topCountry
+      : "Not Available";
+  };
+
+  const getTopDevice = () =>
+    devices[0]?.deviceType || devices[0]?.device || "N/A";
+
+  const formatCreatedDate = () => {
+    if (!link.createdAt) return "N/A";
+    const yearFormat = window.innerWidth < 640 ? "2-digit" : "numeric";
+    return new Date(link.createdAt).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: yearFormat,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
@@ -141,7 +213,7 @@ export default function LinkAnalytics() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pt-20 sm:pt-24">
         <button
           onClick={handleBack}
-          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-4 sm:mb-6 lg:mb-8 transition-colors touch-manipulation"
+          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-4 sm:mb-6 lg:mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           <span className="text-sm sm:text-base">Back to Links</span>
@@ -167,7 +239,7 @@ export default function LinkAnalytics() {
                 </a>
                 <button
                   onClick={() => copyToClipboard(link.shortUrl)}
-                  className="text-gray-400 hover:text-white transition-colors p-1 touch-manipulation"
+                  className="text-gray-400 hover:text-white transition-colors p-1"
                   aria-label="Copy to clipboard"
                 >
                   {copied ? (
@@ -183,23 +255,17 @@ export default function LinkAnalytics() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {["7d", "30d", "90d", "all"].map((range) => (
+              {timeRangeOptions.map(({ value, label }) => (
                 <button
-                  key={range}
-                  onClick={() => setTimeRange(range)}
-                  className={`flex-1 min-w-[70px] px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-all duration-200 touch-manipulation ${
-                    timeRange === range
+                  key={value}
+                  onClick={() => setTimeRange(value)}
+                  className={`flex-1 min-w-[70px] px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-all duration-200 ${
+                    timeRange === value
                       ? "bg-[#7ed957] text-black"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 active:bg-gray-600"
+                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                   }`}
                 >
-                  {range === "7d"
-                    ? "7 Days"
-                    : range === "30d"
-                    ? "30 Days"
-                    : range === "90d"
-                    ? "90 Days"
-                    : "All Time"}
+                  {label}
                 </button>
               ))}
             </div>
@@ -207,167 +273,44 @@ export default function LinkAnalytics() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">
-                Total Clicks
-              </span>
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-              {getTotalClicks()}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">Created</span>
-              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-sm sm:text-base lg:text-lg font-bold text-white leading-tight">
-              {link.createdAt
-                ? new Date(link.createdAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: window.innerWidth < 640 ? "2-digit" : "numeric",
-                  })
-                : "N/A"}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">
-                Top Country
-              </span>
-              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-sm sm:text-base lg:text-lg font-bold text-white truncate">
-              {getCountries()[0]?.country === "Local Network" ||
-              getCountries()[0]?.country === "Unknown" ||
-              getCountries()[0]?.country === "Localhost"
-                ? "Not Available"
-                : getCountries()[0]?.country || "N/A"}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-gray-400 text-xs sm:text-sm">
-                Top Device
-              </span>
-              <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-sm sm:text-base lg:text-lg font-bold text-white truncate">
-              {getDevices()[0]?.deviceType || getDevices()[0]?.device || "N/A"}
-            </div>
-          </div>
+          <StatCard
+            title="Total Clicks"
+            value={totalClicks}
+            icon={TrendingUp}
+          />
+          <StatCard
+            title="Created"
+            value={formatCreatedDate()}
+            icon={Calendar}
+          />
+          <StatCard title="Top Country" value={getTopCountry()} icon={MapPin} />
+          <StatCard
+            title="Top Device"
+            value={getTopDevice()}
+            icon={Smartphone}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
-              Traffic Sources
-            </h3>
-            <div className="space-y-2 sm:space-y-3">
-              {getReferrers().length > 0 ? (
-                getReferrers().map((ref, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
-                      {ref.source}
-                    </span>
-                    <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
-                      {ref.count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No data available</p>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-              <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
-              Top Countries
-            </h3>
-            <div className="space-y-2 sm:space-y-3">
-              {getCountries().length > 0 ? (
-                getCountries().map((country, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
-                      {country.country}
-                    </span>
-                    <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
-                      {country.count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No data available</p>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-              <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
-              Devices
-            </h3>
-            <div className="space-y-2 sm:space-y-3">
-              {getDevices().length > 0 ? (
-                getDevices().map((device, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
-                      {device.deviceType || device.device}
-                    </span>
-                    <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
-                      {device.count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No data available</p>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-              <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
-              Browsers
-            </h3>
-            <div className="space-y-2 sm:space-y-3">
-              {getBrowsers().length > 0 ? (
-                getBrowsers().map((browser, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
-                      {browser.browser}
-                    </span>
-                    <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
-                      {browser.count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No data available</p>
-              )}
-            </div>
-          </div>
+          <DataSection
+            title="Traffic Sources"
+            icon={Users}
+            data={referrers}
+            labelKey="source"
+          />
+          <DataSection
+            title="Top Countries"
+            icon={Globe}
+            data={countries}
+            labelKey="country"
+          />
+          <DataSection title="Devices" icon={Smartphone} data={devices} />
+          <DataSection
+            title="Browsers"
+            icon={Globe}
+            data={browsers}
+            labelKey="browser"
+          />
         </div>
 
         <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
@@ -376,8 +319,8 @@ export default function LinkAnalytics() {
             Peak Hours (Top 5)
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-            {getPeakHours().length > 0 ? (
-              getPeakHours().map((hour, index) => (
+            {peakHours.length > 0 ? (
+              peakHours.map((hour, index) => (
                 <div
                   key={index}
                   className="text-center bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700/50"

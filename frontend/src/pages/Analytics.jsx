@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -9,12 +10,41 @@ import {
   Users,
   Globe,
   Smartphone,
-  Calendar,
   Crown,
   ExternalLink,
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+
+const timeRangeOptions = [
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+  { value: "90d", label: "90 Days" },
+  { value: "all", label: "All Time" },
+];
+
+const StatCard = ({ title, value, icon: Icon, subtext }) => (
+  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-gray-400 text-sm">{title}</span>
+      <Icon className="w-5 h-5 text-[#7ed957]" />
+    </div>
+    <div className="text-3xl font-bold text-white">{value}</div>
+    {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+  </div>
+);
+
+const DataRow = ({ label, count, percentage }) => (
+  <div className="flex items-center justify-between">
+    <span className="text-gray-300">{label}</span>
+    <div className="flex items-center space-x-3">
+      <span className="text-[#7ed957] font-semibold">{count}</span>
+      <span className="text-gray-400 text-sm w-12 text-right">
+        {percentage}%
+      </span>
+    </div>
+  </div>
+);
 
 export default function Analytics() {
   const navigate = useNavigate();
@@ -25,12 +55,7 @@ export default function Analytics() {
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("30d");
 
-  useEffect(() => {
-    fetchUserData();
-    fetchGlobalAnalytics();
-  }, [timeRange]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await api.get("/api/user/profile");
       setCurrentUser({
@@ -41,9 +66,9 @@ export default function Analytics() {
       localStorage.removeItem("jwtToken");
       navigate("/auth");
     }
-  };
+  }, [navigate]);
 
-  const fetchGlobalAnalytics = async () => {
+  const fetchGlobalAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get("/api/analytics/global", {
@@ -51,42 +76,39 @@ export default function Analytics() {
       });
 
       const data = response.data;
+      const totalClicks = data.totalClicks || 0;
 
-      // Calculate percentages for display
-      const calculatePercentages = (items, total) =>
+      const calculatePercentages = (items) =>
         items.map((item) => ({
           ...item,
-          percentage: total > 0 ? Math.round((item.count / total) * 100) : 0,
+          percentage:
+            totalClicks > 0 ? Math.round((item.count / totalClicks) * 100) : 0,
         }));
-
-      const totalClicks = data.totalClicks || 0;
 
       setGlobalStats({
         ...data,
-        trafficSources: calculatePercentages(
-          data.trafficSources || [],
-          totalClicks
-        ),
-        geographicData: calculatePercentages(
-          data.geographicData || [],
-          totalClicks
-        ),
+        trafficSources: calculatePercentages(data.trafficSources || []),
+        geographicData: calculatePercentages(data.geographicData || []),
         deviceDistribution: calculatePercentages(
           (data.deviceDistribution || []).map((d) => ({
             ...d,
             device: d.deviceType || d.device,
-          })),
-          totalClicks
+          }))
         ),
       });
 
       setTopLinks(data.topLinks || []);
-      setIsLoading(false);
-    } catch (error) {
-      setError(error.response?.data?.error || error.message);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchUserData();
+    fetchGlobalAnalytics();
+  }, [fetchUserData, fetchGlobalAnalytics]);
 
   const handleBack = () => navigate(-1);
 
@@ -131,7 +153,7 @@ export default function Analytics() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <button
           onClick={handleBack}
-          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors cursor-pointer"
+          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Dashboard</span>
@@ -148,23 +170,17 @@ export default function Analytics() {
               </p>
             </div>
             <div className="flex space-x-2">
-              {["7d", "30d", "90d", "all"].map((range) => (
+              {timeRangeOptions.map(({ value, label }) => (
                 <button
-                  key={range}
-                  onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer duration-200 ${
-                    timeRange === range
+                  key={value}
+                  onClick={() => setTimeRange(value)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                    timeRange === value
                       ? "bg-[#7ed957] text-black"
                       : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                   }`}
                 >
-                  {range === "7d"
-                    ? "7 Days"
-                    : range === "30d"
-                    ? "30 Days"
-                    : range === "90d"
-                    ? "90 Days"
-                    : "All Time"}
+                  {label}
                 </button>
               ))}
             </div>
@@ -172,46 +188,27 @@ export default function Analytics() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Total Links</span>
-              <Link2 className="w-5 h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-3xl font-bold text-white">
-              {globalStats?.totalLinks || 0}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Total Clicks</span>
-              <MousePointerClick className="w-5 h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-3xl font-bold text-white">
-              {globalStats?.totalClicks?.toLocaleString() || 0}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Avg per Link</span>
-              <TrendingUp className="w-5 h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-3xl font-bold text-white">
-              {globalStats?.avgClicks || 0}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-400 text-sm">Active Links</span>
-              <BarChart3 className="w-5 h-5 text-[#7ed957]" />
-            </div>
-            <div className="text-3xl font-bold text-white">
-              {globalStats?.activeLinks || 0}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
-          </div>
+          <StatCard
+            title="Total Links"
+            value={globalStats?.totalLinks || 0}
+            icon={Link2}
+          />
+          <StatCard
+            title="Total Clicks"
+            value={(globalStats?.totalClicks || 0).toLocaleString()}
+            icon={MousePointerClick}
+          />
+          <StatCard
+            title="Avg per Link"
+            value={globalStats?.avgClicks || 0}
+            icon={TrendingUp}
+          />
+          <StatCard
+            title="Active Links"
+            value={globalStats?.activeLinks || 0}
+            icon={BarChart3}
+            subtext="Last 30 days"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -265,17 +262,12 @@ export default function Analytics() {
             </h3>
             <div className="space-y-3">
               {globalStats?.trafficSources?.map((source, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-gray-300">{source.source}</span>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">
-                      {source.count}
-                    </span>
-                    <span className="text-gray-400 text-sm w-12 text-right">
-                      {source.percentage}%
-                    </span>
-                  </div>
-                </div>
+                <DataRow
+                  key={index}
+                  label={source.source}
+                  count={source.count}
+                  percentage={source.percentage}
+                />
               ))}
             </div>
           </div>
@@ -290,20 +282,12 @@ export default function Analytics() {
             <div className="space-y-3">
               {globalStats?.geographicData?.length > 0 ? (
                 globalStats.geographicData.map((country, index) => (
-                  <div
+                  <DataRow
                     key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="text-gray-300">{country.country}</span>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-[#7ed957] font-semibold">
-                        {country.count}
-                      </span>
-                      <span className="text-gray-400 text-sm w-12 text-right">
-                        {country.percentage}%
-                      </span>
-                    </div>
-                  </div>
+                    label={country.country}
+                    count={country.count}
+                    percentage={country.percentage}
+                  />
                 ))
               ) : (
                 <p className="text-gray-500 text-sm text-center py-4">
@@ -321,17 +305,12 @@ export default function Analytics() {
             </h3>
             <div className="space-y-3">
               {globalStats?.deviceDistribution?.map((device, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-gray-300">{device.device}</span>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-[#7ed957] font-semibold">
-                      {device.count}
-                    </span>
-                    <span className="text-gray-400 text-sm w-12 text-right">
-                      {device.percentage}%
-                    </span>
-                  </div>
-                </div>
+                <DataRow
+                  key={index}
+                  label={device.device}
+                  count={device.count}
+                  percentage={device.percentage}
+                />
               ))}
             </div>
           </div>
