@@ -1,40 +1,48 @@
 import express from "express";
 import cors from "cors";
 
-import authRoutes from "./routes/authRoutes.js";
-import linkRoutes from "./routes/linkRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import { redirectToOriginal } from "./controllers/linkController.js";
+import authRoutes from "./routes/auth.routes.js";
+import linkRoutes from "./routes/link.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import { redirectToOriginal } from "./controllers/link.controller.js";
 
 export function createApp() {
   const app = express();
 
-  const allowedOrigins = ["https://btlink.vercel.app", "http://localhost:5173"];
+  const allowedOrigins = new Set([
+    "https://btlink.vercel.app",
+    "http://localhost:5173",
+  ]);
 
   app.use(
     cors({
-      origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin)) {
           callback(null, true);
         } else {
-          callback(new Error("Not allowed by CORS"));
+          callback(new Error("CORS"));
         }
       },
       credentials: true,
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
 
   app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
 
   app.use("/api/auth", authRoutes);
   app.use("/api/links", linkRoutes);
+  app.use("/api/analytics", analyticsRoutes);
   app.use("/api/user", userRoutes);
 
-  app.get("/", (_, res) => {
-    res.json({ message: "BitLink API is working!" });
-  });
+  app.get("/r/:code", redirectToOriginal);
 
-  app.get("/:code", redirectToOriginal);
+  app.use((err, req, res, next) => {
+    res.status(500).json({ error: "Internal Server Error" });
+  });
 
   return app;
 }

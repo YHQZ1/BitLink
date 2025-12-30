@@ -1,4 +1,3 @@
-// src/models/Link.js
 import mongoose from "mongoose";
 import shortid from "shortid";
 
@@ -13,10 +12,9 @@ const linkSchema = new mongoose.Schema(
       type: String,
       unique: true,
       default: shortid.generate,
+      index: true,
     },
-    shortUrl: {
-      type: String,
-    },
+    shortUrl: String,
     clicks: {
       type: Number,
       default: 0,
@@ -25,16 +23,13 @@ const linkSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    qrCode: {
-      type: String,
-    },
-    expiresAt: {
-      type: Date,
-    },
+    qrCode: String,
+    expiresAt: Date,
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false,
+      index: true,
+      default: null,
     },
     isActive: {
       type: Boolean,
@@ -46,6 +41,7 @@ const linkSchema = new mongoose.Schema(
     },
     sessionId: {
       type: String,
+      index: true,
       sparse: true,
     },
     isGuestLink: {
@@ -56,11 +52,10 @@ const linkSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Generate full shortUrl before saving (if not set)
 linkSchema.pre("save", function (next) {
   if (!this.shortUrl) {
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    this.shortUrl = `${baseUrl}/${this.shortCode}`;
+    this.shortUrl = `${baseUrl}/r/${this.shortCode}`;
   }
   next();
 });

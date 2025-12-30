@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      index: true,
     },
     name: String,
     avatar: String,
