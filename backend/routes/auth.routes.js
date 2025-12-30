@@ -6,6 +6,7 @@ import {
   githubCallback,
   googleLogin,
   googleCallback,
+  healthCheck,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
