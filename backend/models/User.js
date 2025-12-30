@@ -1,25 +1,41 @@
-// src/models/User.js
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+
+const authProviderSchema = new mongoose.Schema(
+  {
+    provider: {
+      type: String,
+      enum: ["github", "google", "local"],
+      required: true,
+    },
+    providerId: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
 
 const userSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String }, // make optional for OAuth
-    githubId: { type: String, unique: true, sparse: true }, // sparse avoids unique errors for null
-    avatar: { type: String },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    name: String,
+    avatar: String,
+    authProviders: {
+      type: [authProviderSchema],
+      required: true,
+    },
+    passwordHash: String,
   },
   { timestamps: true }
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  if (this.password) {
-    this.password = await bcrypt.hash(this.password, 12);
-  }
-  next();
-});
+userSchema.index(
+  { "authProviders.provider": 1, "authProviders.providerId": 1 },
+  { unique: true }
+);
 
 export default mongoose.model("User", userSchema);

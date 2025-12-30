@@ -1,15 +1,25 @@
-// src/routes/authRoutes.js
 import express from "express";
-import { signup, login, githubLogin, githubCallback } from "../controllers/authController.js";
+import {
+  signup,
+  login,
+  githubLogin,
+  githubCallback,
+  googleLogin,
+  googleCallback,
+} from "../controllers/authController.js";
 
 const router = express.Router();
 
-// Local authentication
+/* ---------------- LOCAL AUTH ---------------- */
 router.post("/signup", signup);
 router.post("/login", login);
 
-// GitHub OAuth authentication
-router.get("/github", githubLogin);              
-router.get("/github/callback", githubCallback); 
+/* ---------------- GITHUB OAUTH ---------------- */
+router.get("/github", githubLogin);
+router.get("/github/callback", githubCallback);
+
+/* ---------------- GOOGLE OAUTH ---------------- */
+router.get("/google", googleLogin);
+router.get("/google/callback", googleCallback);
 
 export default router;

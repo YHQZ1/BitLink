@@ -74,10 +74,9 @@ export default function Auth() {
 
   const handleOAuth = (provider) => {
     if (provider === "GitHub") {
-      // ✅ Open in same window for proper redirect flow
       window.location.href = `${BASE_URL}/api/auth/github`;
     } else if (provider === "Google") {
-      alert("Google authentication coming soon!");
+      window.location.href = `${BASE_URL}/api/auth/google`;
     }
   };
 
@@ -134,12 +133,22 @@ export default function Auth() {
 
           {/* OAuth Buttons */}
           <div className="space-y-3 mb-6">
+            {/* GitHub */}
             <button
               onClick={() => handleOAuth("GitHub")}
               className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
             >
               <Github className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
               <span className="font-medium">Continue with GitHub</span>
+            </button>
+
+            {/* Google */}
+            <button
+              onClick={() => handleOAuth("Google")}
+              className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
+            >
+              <Chrome className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+              <span className="font-medium">Continue with Google</span>
             </button>
           </div>
 

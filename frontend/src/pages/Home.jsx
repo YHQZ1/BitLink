@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,9 +21,7 @@ import {
   Filter,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+import api from "../lib/api";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -65,19 +65,8 @@ export default function Home() {
   const fetchUserData = async () => {
     try {
       setIsLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
 
-      if (!token) {
-        throw new Error("Please login to access your data");
-      }
-
-      const response = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.get("/api/user/profile");
 
       const userData = response.data;
       setCurrentUser({
@@ -100,19 +89,7 @@ export default function Home() {
   const fetchUserLinks = async () => {
     try {
       setLinksLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
-      if (!token) {
-        throw new Error("Please login to access your links");
-      }
-
-      const response = await axios.get(`${BASE_URL}/api/links/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.get("/api/links/user");
 
       const transformedLinks = response.data.links.map((link) => ({
         id: link._id,
@@ -139,17 +116,7 @@ export default function Home() {
 
   const fetchUserStats = async () => {
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
-      if (!token) return;
-
-      const response = await axios.get(`${BASE_URL}/api/links/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.get("/api/links/stats");
 
       setStats(response.data);
     } catch (error) {
@@ -200,24 +167,13 @@ export default function Home() {
 
     try {
       setLinksLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
 
       const requestBody = { originalUrl: url };
       if (customAlias) {
         requestBody.customAlias = customAlias;
       }
 
-      const response = await axios.post(
-        `${BASE_URL}/api/links/shorten`,
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.post("/api/links/shorten", requestBody);
 
       const newLink = response.data.link;
       const transformedLink = {
@@ -258,23 +214,11 @@ export default function Home() {
 
   const handleSaveEdit = async (linkId) => {
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
       const requestBody = {};
       if (editOriginalUrl) requestBody.originalUrl = editOriginalUrl;
       if (editCustomAlias) requestBody.customAlias = editCustomAlias;
 
-      const response = await axios.put(
-        `${BASE_URL}/api/links/${linkId}`,
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.put(`/api/links/${linkId}`, requestBody);
 
       const updatedLink = response.data.link;
       const transformedLink = {
@@ -326,15 +270,7 @@ export default function Home() {
     }
 
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
-      await axios.delete(`${BASE_URL}/api/links/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await api.delete(`/api/links/${id}`);
 
       setLinks(links.filter((link) => link.id !== id));
       fetchUserStats();
@@ -361,7 +297,7 @@ export default function Home() {
 
   const sortedLinks = [...filteredLinks].sort((a, b) => {
     switch (filterBy) {
-      case "recent":
+      case "recent": {
         const dateA = a.rawCreatedAt
           ? new Date(a.rawCreatedAt)
           : new Date(a.createdAt);
@@ -369,9 +305,10 @@ export default function Home() {
           ? new Date(b.rawCreatedAt)
           : new Date(b.createdAt);
         return dateB - dateA;
+      }
       case "popular":
         return b.clicks - a.clicks;
-      case "recent-activity":
+      case "recent-activity": {
         const activityA = a.rawLastAccessed
           ? new Date(a.rawLastAccessed)
           : new Date(0);
@@ -379,6 +316,7 @@ export default function Home() {
           ? new Date(b.rawLastAccessed)
           : new Date(0);
         return activityB - activityA;
+      }
       default:
         return 0;
     }
