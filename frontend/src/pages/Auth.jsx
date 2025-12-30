@@ -4,11 +4,15 @@ import {
   Mail,
   Lock,
   ArrowRight,
+  ArrowLeft,
   Github,
   Chrome,
   Eye,
   EyeOff,
   User,
+  Shield,
+  Zap,
+  Link2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,10 +21,10 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const OAuthButton = ({ provider, icon: Icon, label, onClick }) => (
   <button
     onClick={() => onClick(provider)}
-    className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group"
+    className="w-full bg-transparent border border-neutral-800 hover:border-[#76B900] text-neutral-300 hover:text-white px-4 py-3 transition-all flex items-center justify-center gap-3 group cursor-pointer"
   >
-    <Icon className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
-    <span className="font-medium">Continue with {label}</span>
+    <Icon className="w-5 h-5 text-neutral-400 group-hover:text-[#76B900] transition-colors" />
+    <span className="font-medium">{label}</span>
   </button>
 );
 
@@ -37,17 +41,17 @@ const InputField = ({
   onTogglePassword,
 }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-300 mb-2">
+    <label className="block text-sm font-medium text-neutral-300 mb-2">
       {label}
     </label>
     <div className="relative">
-      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
       <input
         type={type}
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
+        className="w-full bg-transparent border border-neutral-800 focus:border-[#76B900] pl-12 pr-4 py-3 text-white placeholder-neutral-600 outline-none transition-all"
         placeholder={placeholder}
         required={required}
         minLength={type === "password" ? "6" : undefined}
@@ -56,7 +60,7 @@ const InputField = ({
         <button
           type="button"
           onClick={onTogglePassword}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
         >
           {type === "password" ? (
             <Eye className="w-5 h-5" />
@@ -141,69 +145,80 @@ export default function Auth() {
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#7ed957]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#7ed957]/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 mb-4">
-            <img
-              src="/logo.png"
-              alt="BitLink Logo"
-              className="w-10 h-10 rounded-lg object-contain"
-            />
-            <span className="text-2xl font-bold text-[#7ed957]">BitLink</span>
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex">
+      {/* Left Side - Auth Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <button
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate("/")
+            }
+            className="flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors mb-8 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          {/* Logo */}
+          <div
+            onClick={() => navigate("/")}
+            className="flex items-center gap-3 mb-12 cursor-pointer group"
+          >
+            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+            <span className="text-xl font-medium tracking-tight group-hover:text-[#76B900] transition-colors">
+              BitLink
+            </span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            {isSignUp ? "Create your account" : "Welcome back"}
-          </h1>
-          <p className="text-gray-400">
-            {isSignUp
-              ? "Start creating powerful short links today"
-              : "Sign in to manage your links"}
-          </p>
-        </div>
 
-        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 backdrop-blur-sm">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-light mb-3">
+              {isSignUp ? "Create account" : "Welcome back"}
+            </h1>
+            <p className="text-neutral-400">
+              {isSignUp
+                ? "Start shortening and tracking your links"
+                : "Sign in to access your dashboard"}
+            </p>
+          </div>
+
+          {/* Message Alert */}
           {message && (
             <div
-              className={`mb-4 p-3 rounded-lg text-sm ${
+              className={`mb-6 p-4 border text-sm ${
                 message.includes("successful")
-                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-red-500/20 text-red-400 border border-red-500/30"
+                  ? "bg-[#76B900]/10 text-[#76B900] border-[#76B900]/30"
+                  : "bg-red-500/10 text-red-400 border-red-500/30"
               }`}
             >
               {message}
             </div>
           )}
 
-          <div className="space-y-3 mb-6">
+          {/* OAuth Buttons */}
+          <div className="space-y-3 mb-8">
             <OAuthButton
               provider="GitHub"
               icon={Github}
-              label="GitHub"
+              label="Continue with GitHub"
               onClick={handleOAuth}
             />
             <OAuthButton
               provider="Google"
               icon={Chrome}
-              label="Google"
+              label="Continue with Google"
               onClick={handleOAuth}
             />
           </div>
 
-          <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-gray-600"></div>
-            <span className="mx-4 text-gray-400 text-sm">
-              Or continue with email
-            </span>
-            <div className="flex-grow border-t border-gray-600"></div>
+          {/* Divider */}
+          <div className="flex items-center mb-8">
+            <div className="flex-1 border-t border-neutral-800"></div>
+            <span className="mx-4 text-neutral-500 text-sm">or</span>
+            <div className="flex-1 border-t border-neutral-800"></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             {isSignUp && (
               <InputField
                 label="Full Name"
@@ -211,19 +226,19 @@ export default function Auth() {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Enter your full name"
+                placeholder="Enter your name"
                 required
                 icon={User}
               />
             )}
 
             <InputField
-              label="Email Address"
+              label="Email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="Enter your email"
+              placeholder="your@email.com"
               required
               icon={Mail}
             />
@@ -234,7 +249,7 @@ export default function Auth() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              placeholder="Enter your password"
+              placeholder="••••••••"
               required
               icon={Lock}
               showPasswordToggle
@@ -244,7 +259,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#7ed957] hover:bg-[#8ee367] disabled:bg-gray-600 text-black font-semibold rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-2 group disabled:cursor-not-allowed"
+              className="w-full bg-[#76B900] hover:bg-[#8FD400] disabled:bg-neutral-800 disabled:text-neutral-500 text-black font-medium py-3 transition-all flex items-center justify-center gap-2 group disabled:cursor-not-allowed mt-8 cursor-pointer"
             >
               <span>
                 {loading
@@ -253,49 +268,136 @@ export default function Auth() {
                   ? "Create Account"
                   : "Sign In"}
               </span>
-              {!loading && (
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              )}
+              {!loading && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm">
-            <span className="text-gray-400">
+          {/* Toggle Auth Mode */}
+          <div className="mt-8 text-center text-sm">
+            <span className="text-neutral-400">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}
             </span>{" "}
             <button
               onClick={toggleAuthMode}
-              className="text-[#7ed957] hover:text-[#8ee367] font-medium transition-colors"
+              className="text-[#76B900] hover:text-[#8FD400] font-medium transition-colors cursor-pointer"
             >
               {isSignUp ? "Sign in" : "Sign up"}
             </button>
           </div>
 
+          {/* Terms */}
           {isSignUp && (
-            <p className="mt-6 text-xs text-center text-gray-500">
+            <p className="mt-6 text-xs text-center text-neutral-500">
               By creating an account, you agree to our{" "}
               <a
                 href="#"
-                className="text-[#7ed957] hover:text-[#8ee367] transition-colors"
+                className="text-neutral-400 hover:text-white transition-colors underline"
               >
-                Terms of Service
+                Terms
               </a>{" "}
               and{" "}
               <a
                 href="#"
-                className="text-[#7ed957] hover:text-[#8ee367] transition-colors"
+                className="text-neutral-400 hover:text-white transition-colors underline"
               >
                 Privacy Policy
               </a>
             </p>
           )}
         </div>
+      </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500 flex items-center justify-center space-x-1">
-            <Lock className="w-3 h-3" />
-            <span>Secured with enterprise-grade encryption</span>
-          </p>
+      {/* Right Side - Feature Showcase */}
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#0D0F13] to-[#0B0D10] border-l border-neutral-800 items-center justify-center p-12">
+        <div className="max-w-lg">
+          {/* Animated Feature Cards */}
+          <div className="mb-12">
+            <h2 className="text-4xl font-light leading-tight mb-4">
+              Your links,
+              <br />
+              <span className="text-[#76B900]">supercharged.</span>
+            </h2>
+            <p className="text-neutral-400 text-lg">
+              Track every click, optimize every campaign, and manage all your
+              links from one powerful dashboard.
+            </p>
+          </div>
+
+          {/* Feature List */}
+          <div className="space-y-6">
+            <div className="flex items-start gap-4 group">
+              <div className="p-3 border border-neutral-800 bg-[#0B0D10] group-hover:border-[#76B900]/50 transition-colors">
+                <Zap className="w-6 h-6 text-[#76B900]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium mb-1">Lightning Fast</h3>
+                <p className="text-sm text-neutral-400">
+                  Create and share links in milliseconds with our optimized
+                  infrastructure.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 group">
+              <div className="p-3 border border-neutral-800 bg-[#0B0D10] group-hover:border-[#76B900]/50 transition-colors">
+                <Shield className="w-6 h-6 text-[#76B900]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium mb-1">Enterprise Security</h3>
+                <p className="text-sm text-neutral-400">
+                  Bank-grade encryption and security protocols to keep your data
+                  safe.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 group">
+              <div className="p-3 border border-neutral-800 bg-[#0B0D10] group-hover:border-[#76B900]/50 transition-colors">
+                <Link2 className="w-6 h-6 text-[#76B900]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium mb-1">Branded Links</h3>
+                <p className="text-sm text-neutral-400">
+                  Custom domains and memorable short codes for maximum brand
+                  impact.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="mt-12 pt-8 border-t border-neutral-800">
+            <div className="grid grid-cols-3 gap-8">
+              <div>
+                <div className="text-2xl font-light text-[#76B900] mb-1">
+                  10M+
+                </div>
+                <div className="text-xs text-neutral-500">Links Created</div>
+              </div>
+              <div>
+                <div className="text-2xl font-light text-[#76B900] mb-1">
+                  99.9%
+                </div>
+                <div className="text-xs text-neutral-500">Uptime</div>
+              </div>
+              <div>
+                <div className="text-2xl font-light text-[#76B900] mb-1">
+                  &lt;100ms
+                </div>
+                <div className="text-xs text-neutral-500">Response</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Decorative Element */}
+          <div className="mt-12 relative h-32 overflow-hidden border border-neutral-800 bg-[#0B0D10]">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-[#76B900]/10 text-8xl font-mono">
+                {"</>"}
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D10] via-transparent to-transparent"></div>
+          </div>
         </div>
       </div>
     </div>

@@ -9,16 +9,15 @@ import Home from "./pages/Home";
 import QRCode from "./pages/QRCode";
 import LinkAnalytics from "./pages/LinkAnalytics";
 import Analytics from "./pages/Analytics";
-import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AuthSuccess from "./pages/AuthSuccess";
+import NotFound from "./pages/NotFound";
 
 const protectedRoutes = [
   { path: "/home", component: Home },
   { path: "/qr/:linkId", component: QRCode },
   { path: "/analytics/:linkId", component: LinkAnalytics },
   { path: "/analytics", component: Analytics },
-  { path: "/dashboard", component: Dashboard },
   { path: "/profile", component: Profile },
 ];
 
@@ -41,6 +40,7 @@ export default function App() {
             }
           />
         ))}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

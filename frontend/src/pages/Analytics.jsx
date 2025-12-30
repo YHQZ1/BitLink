@@ -12,6 +12,7 @@ import {
   Smartphone,
   Crown,
   ExternalLink,
+  Activity,
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
@@ -24,22 +25,29 @@ const timeRangeOptions = [
 ];
 
 const StatCard = ({ title, value, icon: Icon, subtext }) => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-    <div className="flex items-center justify-between mb-2">
-      <span className="text-gray-400 text-sm">{title}</span>
-      <Icon className="w-5 h-5 text-[#7ed957]" />
+  <div className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors">
+    <div className="flex items-center justify-between mb-4">
+      <span className="text-neutral-400 text-xs uppercase tracking-wider">
+        {title}
+      </span>
+      <Icon className="w-4 h-4 text-[#76B900]" />
     </div>
-    <div className="text-3xl font-bold text-white">{value}</div>
-    {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+    <div className="text-4xl font-light text-white mb-1">{value}</div>
+    {subtext && <div className="text-xs text-neutral-500 mt-2">{subtext}</div>}
   </div>
 );
 
-const DataRow = ({ label, count, percentage }) => (
-  <div className="flex items-center justify-between">
-    <span className="text-gray-300">{label}</span>
-    <div className="flex items-center space-x-3">
-      <span className="text-[#7ed957] font-semibold">{count}</span>
-      <span className="text-gray-400 text-sm w-12 text-right">
+const DataRow = ({ label, count, percentage, rank }) => (
+  <div className="flex items-center gap-4 py-3 border-b border-neutral-800 last:border-0">
+    {rank && (
+      <div className="w-6 h-6 flex items-center justify-center bg-[#76B900]/10 text-[#76B900] text-xs font-medium flex-shrink-0">
+        {rank}
+      </div>
+    )}
+    <span className="text-neutral-300 text-sm flex-1 truncate">{label}</span>
+    <div className="flex items-center gap-4 flex-shrink-0">
+      <span className="text-[#76B900] font-medium text-sm">{count}</span>
+      <span className="text-neutral-500 text-xs w-12 text-right">
         {percentage}%
       </span>
     </div>
@@ -114,12 +122,12 @@ export default function Analytics() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading global analytics...</p>
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+          <div className="text-center py-20">
+            <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-neutral-400">Loading analytics...</p>
           </div>
         </div>
       </div>
@@ -128,15 +136,16 @@ export default function Analytics() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-          <div className="text-center">
-            <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 max-w-md mx-auto">
-              <p className="text-red-400 mb-4">{error}</p>
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+          <div className="max-w-md mx-auto">
+            <div className="border border-red-500/30 bg-red-500/10 p-8 text-center">
+              <Activity className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-red-400 mb-6 text-lg">{error}</p>
               <button
                 onClick={handleBack}
-                className="bg-[#7ed957] text-black px-6 py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200"
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium"
               >
                 Go Back
               </button>
@@ -148,46 +157,48 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+
+      <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors"
+          className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Dashboard</span>
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Homepage</span>
         </button>
 
-        <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Global Analytics
-              </h1>
-              <p className="text-gray-400">
-                Overview of all your links and their combined performance
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              {timeRangeOptions.map(({ value, label }) => (
-                <button
-                  key={value}
-                  onClick={() => setTimeRange(value)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    timeRange === value
-                      ? "bg-[#7ed957] text-black"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-light text-white mb-3">
+            Global Analytics
+          </h1>
+          <p className="text-neutral-400 text-lg">
+            Overview of all your links and their performance
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Time Range Selector */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {timeRangeOptions.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => setTimeRange(value)}
+              className={`px-5 py-2.5 font-medium transition-colors cursor-pointer text-sm ${
+                timeRange === value
+                  ? "bg-[#76B900] text-black"
+                  : "border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900]"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           <StatCard
             title="Total Links"
             value={globalStats?.totalLinks || 0}
@@ -211,107 +222,135 @@ export default function Analytics() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <Crown className="w-5 h-5 mr-2 text-[#7ed957]" />
+        {/* Top Performing Links - Full Width */}
+        <div className="border border-neutral-800 p-8 bg-[#0D0F13] mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+            <h3 className="text-xl font-light text-white">
               Top Performing Links
             </h3>
-            <div className="space-y-4">
+          </div>
+
+          {topLinks.length > 0 ? (
+            <div className="grid gap-4">
               {topLinks.map((link, index) => (
                 <div
                   key={link.id}
-                  className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg"
+                  className="border border-neutral-800 p-5 hover:border-neutral-700 transition-colors"
                 >
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <div className="flex-shrink-0 w-8 h-8 bg-[#7ed957]/20 rounded-full flex items-center justify-center">
-                      <span className="text-[#7ed957] font-bold text-sm">
-                        {index + 1}
-                      </span>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="w-10 h-10 flex items-center justify-center bg-[#76B900]/10 text-[#76B900] font-medium flex-shrink-0">
+                        #{index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <a
+                          href={link.shortUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 mb-1 transition-colors cursor-pointer"
+                        >
+                          <span className="truncate text-sm font-medium">
+                            {link.shortUrl}
+                          </span>
+                          <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                        </a>
+                        <p className="text-xs text-neutral-500 truncate">
+                          {link.originalUrl}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <a
-                        href={link.shortUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm"
-                      >
-                        <span className="truncate">{link.shortUrl}</span>
-                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                      </a>
-                      <p className="text-xs text-gray-400 truncate">
-                        {link.originalUrl}
-                      </p>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-2xl font-light text-white">
+                        {link.clicks.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-neutral-500">clicks</div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-white">
-                      {link.clicks}
-                    </div>
-                    <div className="text-xs text-gray-500">clicks</div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <Users className="w-5 h-5 mr-2 text-[#7ed957]" />
-              Traffic Sources
-            </h3>
-            <div className="space-y-3">
-              {globalStats?.trafficSources?.map((source, index) => (
-                <DataRow
-                  key={index}
-                  label={source.source}
-                  count={source.count}
-                  percentage={source.percentage}
-                />
-              ))}
-            </div>
-          </div>
+          ) : (
+            <p className="text-neutral-500 text-sm text-center py-8">
+              No links yet. Create your first link to see performance data.
+            </p>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <Globe className="w-5 h-5 mr-2 text-[#7ed957]" />
-              Top Countries
-            </h3>
-            <div className="space-y-3">
+        {/* Data Grid - 3 Columns */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Traffic Sources */}
+          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+              <h3 className="text-xl font-light text-white">Traffic Sources</h3>
+            </div>
+            <div className="space-y-1">
+              {globalStats?.trafficSources?.length > 0 ? (
+                globalStats.trafficSources.map((source, index) => (
+                  <DataRow
+                    key={index}
+                    rank={index + 1}
+                    label={source.source}
+                    count={source.count}
+                    percentage={source.percentage}
+                  />
+                ))
+              ) : (
+                <p className="text-neutral-500 text-sm text-center py-8">
+                  No traffic data yet
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Top Countries */}
+          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+              <h3 className="text-xl font-light text-white">Top Countries</h3>
+            </div>
+            <div className="space-y-1">
               {globalStats?.geographicData?.length > 0 ? (
                 globalStats.geographicData.map((country, index) => (
                   <DataRow
                     key={index}
+                    rank={index + 1}
                     label={country.country}
                     count={country.count}
                     percentage={country.percentage}
                   />
                 ))
               ) : (
-                <p className="text-gray-500 text-sm text-center py-4">
-                  Geographic data will appear as your links get clicks from
-                  around the world
+                <p className="text-neutral-500 text-sm text-center py-8">
+                  Geographic data will appear as links get clicks
                 </p>
               )}
             </div>
           </div>
 
-          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <Smartphone className="w-5 h-5 mr-2 text-[#7ed957]" />
-              Device Distribution
-            </h3>
-            <div className="space-y-3">
-              {globalStats?.deviceDistribution?.map((device, index) => (
-                <DataRow
-                  key={index}
-                  label={device.device}
-                  count={device.count}
-                  percentage={device.percentage}
-                />
-              ))}
+          {/* Device Distribution */}
+          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+              <h3 className="text-xl font-light text-white">Devices</h3>
+            </div>
+            <div className="space-y-1">
+              {globalStats?.deviceDistribution?.length > 0 ? (
+                globalStats.deviceDistribution.map((device, index) => (
+                  <DataRow
+                    key={index}
+                    rank={index + 1}
+                    label={device.device}
+                    count={device.count}
+                    percentage={device.percentage}
+                  />
+                ))
+              ) : (
+                <p className="text-neutral-500 text-sm text-center py-8">
+                  No device data yet
+                </p>
+              )}
             </div>
           </div>
         </div>

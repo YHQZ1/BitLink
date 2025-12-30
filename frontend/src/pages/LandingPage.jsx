@@ -2,540 +2,745 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Link2,
-  Zap,
   BarChart3,
   QrCode,
   Shield,
   Menu,
   X,
-  Globe,
-  UserPlus,
   Copy,
-  CheckCircle,
-  AlertCircle,
   ExternalLink,
   Calendar,
   MousePointerClick,
-  Check,
+  Zap,
+  Users,
+  Lock,
+  Globe,
+  Code,
+  TrendingUp,
+  CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
-const Modal = ({ isOpen, type, title, message, onClose }) => {
-  if (!isOpen) return null;
-
-  const Icon = type === "success" ? CheckCircle : AlertCircle;
-  const bgColor = type === "success" ? "bg-green-500/20" : "bg-red-500/20";
-  const iconColor = type === "success" ? "text-green-400" : "text-red-400";
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className={`p-2 rounded-full ${bgColor}`}>
-            <Icon className={`w-6 h-6 ${iconColor}`} />
-          </div>
-          <div>
-            <h3 className="text-white font-semibold">{title}</h3>
-            <p className="text-gray-400 text-sm">{message}</p>
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
-        >
-          OK
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const FeatureCard = ({ icon, title, description }) => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-[#7ed957]/30 transition-all hover:scale-105">
-    <div className="w-12 h-12 bg-[#7ed957]/10 rounded-lg flex items-center justify-center text-[#7ed957] mb-4">
-      {icon}
-    </div>
-    <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-    <p className="text-gray-400">{description}</p>
-  </div>
-);
-
 const ShortenedUrlDisplay = ({ url, onCopy }) => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200 mb-6">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-          <a
-            href={url.shortUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
-          >
-            <span className="break-all">{url.shortUrl}</span>
-            <ExternalLink className="w-3 h-3 flex-shrink-0" />
-          </a>
-          <button
-            onClick={() => onCopy(url.shortUrl)}
-            className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
-          >
-            <Copy className="w-3 h-3" />
-          </button>
-        </div>
-        <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
-          {url.originalUrl}
-        </p>
-        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-          <span className="flex items-center space-x-1">
-            <Calendar className="w-3 h-3" />
-            <span>{new Date(url.createdAt).toLocaleDateString()}</span>
-          </span>
-          <span className="flex items-center space-x-1">
-            <MousePointerClick className="w-3 h-3" />
-            <span>{url.clicks || 0} clicks</span>
-          </span>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="text-center min-w-[60px]">
-          <div className="text-lg font-bold text-white">{url.clicks || 0}</div>
-          <div className="text-xs text-gray-500">Clicks</div>
-        </div>
-      </div>
+  <div className="border border-neutral-800 p-4 mt-6">
+    <div className="flex items-center justify-between gap-4">
+      <a
+        href={url.shortUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[#76B900] text-sm break-all flex items-center gap-1"
+      >
+        {url.shortUrl}
+        <ExternalLink className="w-3 h-3" />
+      </a>
+      <button
+        onClick={() => onCopy(url.shortUrl)}
+        className="text-neutral-400 hover:text-[#76B900] cursor-pointer"
+      >
+        <Copy className="w-4 h-4" />
+      </button>
+    </div>
+    <p className="text-xs text-neutral-500 mt-2 break-all">{url.originalUrl}</p>
+    <div className="flex gap-6 text-xs text-neutral-500 mt-3">
+      <span className="flex items-center gap-1">
+        <Calendar className="w-3 h-3" />
+        {new Date(url.createdAt).toLocaleDateString()}
+      </span>
+      <span className="flex items-center gap-1">
+        <MousePointerClick className="w-3 h-3" />
+        {url.clicks || 0} clicks
+      </span>
     </div>
   </div>
 );
 
 const features = [
   {
-    icon: <Link2 className="w-6 h-6" />,
-    title: "Custom Short Links",
-    description:
-      "Create branded, memorable links with custom aliases that represent your brand.",
+    icon: <Link2 className="w-5 h-5" />,
+    title: "Custom Links",
+    desc: "Short, readable, branded URLs.",
   },
   {
-    icon: <QrCode className="w-6 h-6" />,
-    title: "QR Code Generation",
-    description:
-      "Instantly generate QR codes for any link. Perfect for print, events, and mobile.",
+    icon: <QrCode className="w-5 h-5" />,
+    title: "QR Codes",
+    desc: "Instant QR generation for every link.",
   },
   {
-    icon: <BarChart3 className="w-6 h-6" />,
-    title: "Real-time Analytics",
-    description:
-      "Track clicks, referrers, devices, and locations with detailed analytics dashboards.",
+    icon: <BarChart3 className="w-5 h-5" />,
+    title: "Analytics",
+    desc: "Clicks, devices, referrers, geography.",
   },
   {
-    icon: <Zap className="w-6 h-6" />,
-    title: "Lightning Fast",
-    description:
-      "Redirects happen in milliseconds with our globally distributed infrastructure.",
-  },
-  {
-    icon: <Shield className="w-6 h-6" />,
-    title: "Secure & Reliable",
-    description:
-      "Enterprise-grade security with automatic backups and data protection.",
-  },
-  {
-    icon: <Check className="w-6 h-6" />,
-    title: "Link Management",
-    description:
-      "Edit, delete, and organize all your links from one powerful dashboard.",
+    icon: <Shield className="w-5 h-5" />,
+    title: "Secure",
+    desc: "Rate-limited, validated, protected.",
   },
 ];
 
-const footerColumns = [
+const stats = [
+  { value: "10M+", label: "Links Created" },
+  { value: "500K+", label: "Active Users" },
+  { value: "99.9%", label: "Uptime" },
+  { value: "<100ms", label: "Response Time" },
+];
+
+const useCases = [
   {
-    title: "Product",
-    links: ["Features", "Pricing", "API", "Documentation"],
+    icon: <Users className="w-6 h-6" />,
+    title: "Marketing Teams",
+    description:
+      "Track campaign performance with detailed analytics and UTM parameter support.",
   },
   {
-    title: "Company",
-    links: ["About", "Blog", "Careers", "Contact"],
+    icon: <Code className="w-6 h-6" />,
+    title: "Developers",
+    description:
+      "RESTful API with comprehensive documentation and webhook support for automation.",
   },
   {
-    title: "Legal",
-    links: ["Privacy", "Terms", "Security", "Status"],
+    icon: <TrendingUp className="w-6 h-6" />,
+    title: "Content Creators",
+    description:
+      "Branded short links with custom domains and beautiful QR codes for your audience.",
   },
 ];
 
-const highlightItems = [
-  { icon: <Zap className="w-5 h-5" />, text: "Lightning fast redirects" },
-  { icon: <Shield className="w-5 h-5" />, text: "Secure and reliable" },
-  { icon: <Globe className="w-5 h-5" />, text: "Works everywhere" },
+const pricingPlans = [
+  {
+    name: "Free",
+    price: "$0",
+    period: "forever",
+    features: [
+      "5 links per day",
+      "Basic analytics",
+      "QR code generation",
+      "7-day data retention",
+    ],
+  },
+  {
+    name: "Pro",
+    price: "$9",
+    period: "per month",
+    popular: true,
+    features: [
+      "Unlimited links",
+      "Advanced analytics",
+      "Custom domains",
+      "Unlimited data retention",
+      "API access",
+      "Priority support",
+    ],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "contact us",
+    features: [
+      "Everything in Pro",
+      "Dedicated support",
+      "SLA guarantee",
+      "Custom integrations",
+      "SSO/SAML",
+      "Volume discounts",
+    ],
+  },
 ];
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [url, setUrl] = useState("");
-  const [customAlias, setCustomAlias] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shortenedUrl, setShortenedUrl] = useState(null);
   const [guestSessionId, setGuestSessionId] = useState("");
-  const [modal, setModal] = useState({
-    isOpen: false,
-    type: "success",
-    title: "",
-    message: "",
-  });
+  const [authRequired, setAuthRequired] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    let sessionId = localStorage.getItem("guestSessionId");
-    if (!sessionId) {
-      sessionId = `guest_${Math.random().toString(36).slice(2, 11)}`;
-      localStorage.setItem("guestSessionId", sessionId);
+    let id = localStorage.getItem("guestSessionId");
+    if (!id) {
+      id = `guest_${Math.random().toString(36).slice(2, 11)}`;
+      localStorage.setItem("guestSessionId", id);
     }
-    setGuestSessionId(sessionId);
+    setGuestSessionId(id);
   }, []);
 
-  const showModal = (type, title, message) => {
-    setModal({ isOpen: true, type, title, message });
-  };
-
-  const closeModal = () => setModal((prev) => ({ ...prev, isOpen: false }));
-
   const handleShorten = async () => {
-    if (!url) {
-      showModal("error", "Missing URL", "Please enter a URL to shorten");
-      return;
-    }
+    if (!url) return;
 
     try {
       new URL(url);
     } catch {
-      showModal(
-        "error",
-        "Invalid URL",
-        "Please enter a valid URL including http:// or https://"
-      );
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/links/guest/shorten`, {
+      const res = await fetch(`${BASE_URL}/api/links/guest/shorten`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           originalUrl: url,
-          customAlias: customAlias || undefined,
           sessionId: guestSessionId,
         }),
       });
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error(
-          "Server returned an invalid response. Please try again."
-        );
-      }
+      const data = await res.json();
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.requiresAuth) {
-          showModal(
-            "error",
-            "Limit Reached",
-            "You've used your free link! Sign up to create unlimited short links with analytics."
-          );
-          setTimeout(() => navigate("/auth"), 3000);
-        } else {
-          throw new Error(data.error || "Failed to shorten URL");
+      if (!res.ok) {
+        if (data?.requiresAuth) {
+          setAuthRequired(true);
         }
         return;
       }
 
-      setShortenedUrl(data);
+      const link = data.data || data;
+
+      setShortenedUrl({
+        shortUrl: link.shortUrl,
+        originalUrl: link.originalUrl || url,
+        createdAt: link.createdAt || new Date().toISOString(),
+        clicks: link.clicks ?? 0,
+      });
+
       setUrl("");
-      setCustomAlias("");
-      showModal("success", "Success!", "Your link has been shortened!");
-    } catch (error) {
-      showModal("error", "Error", error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    showModal("success", "Copied!", "Link copied to clipboard!");
-  };
+  const copyToClipboard = (text) => navigator.clipboard.writeText(text);
 
-  const redirectToAuth = () => navigate("/auth");
-
-  const scrollToFeatures = () => {
-    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMobileMenuOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      {/* Navigation */}
-      <nav className="fixed w-full bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-gray-800 z-50">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-16">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <img src="/logo.png" alt="BitLink" className="w-12 h-12" />
-              <span className="text-2xl font-bold text-[#7ed957]">BitLink</span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={scrollToFeatures}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Features
-              </button>
-              <button className="text-gray-300 hover:text-white transition-colors">
-                Pricing
-              </button>
-              <button className="text-gray-300 hover:text-white transition-colors">
-                Docs
-              </button>
-              <button
-                onClick={redirectToAuth}
-                className="bg-[#7ed957] text-black px-4 py-2 rounded-lg hover:bg-[#8ee367] transition-all font-semibold"
-              >
-                Get Started
-              </button>
-            </div>
-
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+      <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+            <span className="text-[20px] font-medium tracking-tight">
+              BitLink
+            </span>
+          </div>
+          <div className="hidden md:flex gap-12 text-[20px] font-medium tracking-tight">
             <button
-              className="md:hidden text-gray-300"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => scrollToSection("features")}
+              className="cursor-pointer text-neutral-400 hover:text-white transition-colors"
             >
-              {mobileMenuOpen ? <X /> : <Menu />}
+              Features
+            </button>
+            <button
+              onClick={() => scrollToSection("docs")}
+              className="cursor-pointer text-neutral-400 hover:text-white transition-colors"
+            >
+              Docs
+            </button>
+            <button
+              onClick={() => navigate("/auth")}
+              className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+      </nav>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-40">
+          <div className="px-5 py-4 flex flex-col gap-4 text-sm">
+            <button
+              onClick={() => scrollToSection("features")}
+              className="text-neutral-400 hover:text-white text-left"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => scrollToSection("docs")}
+              className="text-neutral-400 hover:text-white text-left"
+            >
+              Docs
+            </button>
+            <button
+              onClick={() => navigate("/auth")}
+              className="text-[#76B900] text-left"
+            >
+              Get Started
             </button>
           </div>
         </div>
-
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0a0a0a] border-t border-gray-800">
-            <div className="px-4 py-4 space-y-3">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  scrollToFeatures();
-                }}
-                className="block text-gray-300 hover:text-white w-full text-left"
-              >
-                Features
-              </button>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-300 hover:text-white w-full text-left"
-              >
-                Pricing
-              </button>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-300 hover:text-white w-full text-left"
-              >
-                Docs
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  redirectToAuth();
-                }}
-                className="block w-full bg-[#7ed957] text-black px-4 py-2 rounded-lg font-semibold text-center"
-              >
-                Get Started
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+      )}
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center space-x-2 bg-gray-800/50 border border-gray-700 rounded-full px-4 py-2 mb-8">
-              <Zap className="w-4 h-4 text-[#7ed957]" />
-              <span className="text-sm text-gray-300">
-                Shorten smarter. Share faster.
-              </span>
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-white">Transform Your Links</span>
+      <section className="pt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-light leading-tight">
+              Short links.
               <br />
-              <span className="text-[#7ed957]">Into Powerful Assets</span>
+              Real analytics.
+              <br />
+              <span className="text-[#76B900]">Zero noise.</span>
             </h1>
 
-            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-              Create short, memorable links with built-in analytics and QR
-              codes. Perfect for marketers, developers, and businesses of all
-              sizes.
+            <p className="text-neutral-400 mt-6 max-w-xl text-lg">
+              A fast, minimal URL shortener built for developers and teams who
+              care about clarity and control.
             </p>
 
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="border border-[#7ed957]/20 rounded-xl p-6 mb-6">
-                <div className="flex flex-col gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-white mb-2 text-center">
-                      Create Short Link
-                    </h2>
-                    <p className="text-gray-400 text-sm text-center">
-                      Shorten URLs instantly with custom aliases
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <input
-                        type="url"
-                        placeholder="Paste your URL here"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
-                      />
-                      <button
-                        onClick={handleShorten}
-                        disabled={isLoading}
-                        className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
-                      >
-                        {isLoading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                            Shortening...
-                          </>
-                        ) : (
-                          "Shorten"
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+            <div className="mt-10 max-w-xl">
+              <div className="flex gap-3">
+                <input
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleShorten()}
+                  placeholder="https://example.com"
+                  className="flex-1 bg-transparent border border-neutral-700 px-4 py-3 text-sm focus:border-[#76B900] outline-none"
+                />
+                <button
+                  onClick={handleShorten}
+                  disabled={isLoading}
+                  className="px-6 py-3 border border-[#76B900] text-[#76B900] hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isLoading ? "..." : "Shorten"}
+                </button>
               </div>
 
               {shortenedUrl && (
                 <ShortenedUrlDisplay
                   url={shortenedUrl}
                   onCopy={copyToClipboard}
+                  className="cursor-pointer"
                 />
               )}
 
-              <p className="text-xs text-gray-500 text-center">
-                💡 <strong>Free trial:</strong> Create one link without signing
-                up. Sign up for unlimited links with analytics!
-              </p>
+              {authRequired && (
+                <div className="mt-4 border border-neutral-800 px-4 py-3 text-sm flex items-center justify-between">
+                  <span className="text-neutral-400">
+                    Free limit reached. Sign in to continue.
+                  </span>
+                  <button
+                    onClick={() => navigate("/auth")}
+                    className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors whitespace-nowrap"
+                  >
+                    Login →
+                  </button>
+                </div>
+              )}
             </div>
-
-            <p className="text-sm text-gray-500">
-              No credit card required • Free forever
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 max-w-5xl mx-auto">
-            {highlightItems.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-center space-x-3 bg-gray-900/30 border border-gray-800 rounded-lg px-6 py-4"
-              >
-                <div className="text-[#7ed957]">{item.icon}</div>
-                <span className="text-gray-300">{item.text}</span>
+          {/* Dashboard Preview Card */}
+          <div className="hidden lg:block h-full">
+            <div className="border border-neutral-800 p-6 bg-gradient-to-br from-[#0D0F13] to-[#0B0D10] h-full flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+                  <span className="text-xs text-neutral-400">
+                    Live Analytics
+                  </span>
+                </div>
+                <div className="text-xs text-neutral-500">Last 7 days</div>
               </div>
-            ))}
+
+              {/* Mini Chart */}
+              <div className="h-32 mb-6">
+                <svg
+                  viewBox="0 0 100 40"
+                  preserveAspectRatio="none"
+                  className="w-full h-full"
+                >
+                  <path
+                    d="
+        M0 28
+        L10 24
+        L20 26
+        L30 20
+        L40 22
+        L50 18
+        L60 21
+        L70 14
+        L80 17
+        L90 13
+        L100 15
+      "
+                    fill="none"
+                    stroke="#76B900"
+                    strokeWidth="0.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.9"
+                  />
+                </svg>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="border border-neutral-800 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MousePointerClick className="w-3 h-3 text-[#76B900]" />
+                    <span className="text-xs text-neutral-400">
+                      Total Clicks
+                    </span>
+                  </div>
+                  <div className="text-2xl font-light">12,847</div>
+                  <div className="text-xs text-[#76B900] mt-1">+23.5%</div>
+                </div>
+                <div className="border border-neutral-800 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Link2 className="w-3 h-3 text-[#76B900]" />
+                    <span className="text-xs text-neutral-400">
+                      Active Links
+                    </span>
+                  </div>
+                  <div className="text-2xl font-light">284</div>
+                  <div className="text-xs text-[#76B900] mt-1">+12</div>
+                </div>
+              </div>
+
+              {/* Recent Links */}
+              <div className="flex-1">
+                <div className="text-xs text-neutral-400 mb-3">
+                  Recent Activity
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { short: "btlink/prod2024", clicks: 145 },
+                    { short: "btlink/launch", clicks: 89 },
+                    { short: "btlink/spring", clicks: 67 },
+                  ].map((link, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between text-xs border-l-2 border-[#76B900]/20 pl-3 py-1"
+                    >
+                      <span className="text-neutral-300">{link.short}</span>
+                      <span className="text-neutral-500">
+                        {link.clicks} clicks
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="mt-24 px-5 md:px-8 max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-3xl md:text-4xl font-light text-[#76B900] mb-2">
+                {stat.value}
+              </div>
+              <div className="text-sm text-neutral-400">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Features Section */}
       <section
         id="features"
-        className="pt-0 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-gray-900/20"
+        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">
-              Everything you need to scale
-            </h2>
-            <p className="text-gray-400 text-lg">
-              Powerful features built for modern link management
-            </p>
-          </div>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-light mb-4">
+            Everything you need to manage links
+          </h2>
+          <p className="text-neutral-400 max-w-2xl mx-auto">
+            Powerful features designed to give you complete control over your
+            shortened URLs
+          </p>
+        </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, i) => (
-              <FeatureCard key={i} {...feature} />
-            ))}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((f, i) => (
+            <div
+              key={i}
+              className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors"
+            >
+              <div className="text-[#76B900] mb-4">{f.icon}</div>
+              <h3 className="text-sm font-medium mb-2">{f.title}</h3>
+              <p className="text-xs text-neutral-400">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-light mb-4">
+            Built for teams of all sizes
+          </h2>
+          <p className="text-neutral-400 max-w-2xl mx-auto">
+            Whether you're a solo creator or enterprise team, BitLink scales
+            with your needs
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {useCases.map((useCase, i) => (
+            <div key={i} className="border border-neutral-800 p-8">
+              <div className="text-[#76B900] mb-4">{useCase.icon}</div>
+              <h3 className="text-xl font-medium mb-3">{useCase.title}</h3>
+              <p className="text-neutral-400 leading-relaxed">
+                {useCase.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Docs/API Section */}
+      <section
+        id="docs"
+        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+      >
+        <div className="border border-neutral-800 p-8 md:p-12">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center gap-2 text-[#76B900] mb-4">
+                <Code className="w-5 h-5" />
+                <span className="text-sm font-medium">Developer First</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-light mb-6">
+                Powerful API for automation
+              </h2>
+              <p className="text-neutral-400 mb-6 leading-relaxed">
+                Integrate BitLink into your workflow with our RESTful API.
+                Create, manage, and track links programmatically with
+                comprehensive documentation and SDKs.
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
+                  <span>RESTful API with JSON responses</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
+                  <span>Webhook support for real-time events</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
+                  <span>Rate limiting with clear error messages</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
+                  <span>Comprehensive documentation and examples</span>
+                </li>
+              </ul>
+              <button className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer flex items-center gap-2">
+                View API Docs
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="bg-[#0D0F13] border border-neutral-800 p-6 rounded font-mono text-xs">
+              <div className="text-neutral-500 mb-4">
+                // Create a short link
+              </div>
+              <div className="space-y-1">
+                <div>
+                  <span className="text-[#76B900]">POST</span>{" "}
+                  /api/links/shorten
+                </div>
+                <div className="text-neutral-400">{`{`}</div>
+                <div className="pl-4 text-neutral-400">
+                  <span className="text-[#76B900]">"originalUrl"</span>:{" "}
+                  <span className="text-orange-400">"https://example.com"</span>
+                  ,
+                </div>
+                <div className="pl-4 text-neutral-400">
+                  <span className="text-[#76B900]">"customAlias"</span>:{" "}
+                  <span className="text-orange-400">"my-link"</span>
+                </div>
+                <div className="text-neutral-400">{`}`}</div>
+              </div>
+              <div className="border-t border-neutral-800 mt-6 pt-6">
+                <div className="text-neutral-500 mb-4">// Response</div>
+                <div className="space-y-1 text-neutral-400">
+                  <div>{`{`}</div>
+                  <div className="pl-4">
+                    <span className="text-[#76B900]">"shortUrl"</span>:{" "}
+                    <span className="text-orange-400">
+                      "https://bit.ly/my-link"
+                    </span>
+                    ,
+                  </div>
+                  <div className="pl-4">
+                    <span className="text-[#76B900]">"qrCode"</span>:{" "}
+                    <span className="text-orange-400">"https://..."</span>
+                  </div>
+                  <div>{`}`}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900/20 to-gray-900/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-[#7ed957]/10 to-[#7ed957]/5 border border-[#7ed957]/20 rounded-2xl p-8 sm:p-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Ready to supercharge your links?
-            </h2>
-            <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-              Join thousands of users who trust BitLink for their link
-              management needs. Get unlimited links, advanced analytics, and
-              custom domains.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      {/* Pricing Section */}
+      <section className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-light mb-4">
+            Simple, transparent pricing
+          </h2>
+          <p className="text-neutral-400 max-w-2xl mx-auto">
+            Start free and scale as you grow. No hidden fees, no surprises.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {pricingPlans.map((plan, i) => (
+            <div
+              key={i}
+              className={`border p-8 relative flex flex-col ${
+                plan.popular
+                  ? "border-[#76B900] bg-[#76B900]/5"
+                  : "border-neutral-800"
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#76B900] text-black text-xs px-3 py-1 font-medium">
+                  MOST POPULAR
+                </div>
+              )}
+              <div className="mb-6">
+                <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-light">{plan.price}</span>
+                  <span className="text-neutral-400 text-sm">
+                    /{plan.period}
+                  </span>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {plan.features.map((feature, j) => (
+                  <li key={j} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                    <span className="text-neutral-300">{feature}</span>
+                  </li>
+                ))}
+              </ul>
               <button
-                onClick={redirectToAuth}
-                className="bg-[#7ed957] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#8ee367] transition-all flex items-center justify-center space-x-2"
+                onClick={() => navigate("/auth")}
+                className={`mt-auto w-full py-3 cursor-pointer transition-colors ${
+                  plan.popular
+                    ? "bg-[#76B900] text-black hover:bg-[#8FD400]"
+                    : "border border-neutral-700 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900]"
+                }`}
               >
-                <UserPlus className="w-5 h-5" />
-                <span>Get Started Free</span>
-              </button>
-              <button
-                onClick={scrollToFeatures}
-                className="border border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-gray-400 transition-all"
-              >
-                Learn More
+                {plan.name === "Free"
+                  ? "Start free"
+                  : plan.name === "Pro"
+                  ? "Upgrade"
+                  : "Contact sales"}
               </button>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+      <footer className="mt-32 border-t border-neutral-800">
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <img src="/logo.png" alt="BitLink" className="w-12 h-12" />
-                <span className="text-xl font-bold text-white">BitLink</span>
-              </div>
-              <p className="text-gray-500 text-sm">
-                The modern URL shortener built for speed and scale.
-              </p>
+              <h4 className="text-sm font-medium mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-neutral-400">
+                <li>
+                  <button
+                    onClick={() => scrollToSection("features")}
+                    className="hover:text-white"
+                  >
+                    Features
+                  </button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Analytics</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">QR Codes</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Pricing</button>
+                </li>
+              </ul>
             </div>
 
-            {footerColumns.map((column, i) => (
-              <div key={i}>
-                <h3 className="font-semibold mb-4 text-white">
-                  {column.title}
-                </h3>
-                <ul className="space-y-2">
-                  {column.links.map((link, j) => (
-                    <li key={j}>
-                      <button className="text-gray-500 hover:text-white transition-colors text-sm w-full text-left">
-                        {link}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div>
+              <h4 className="text-sm font-medium mb-4">Developers</h4>
+              <ul className="space-y-2 text-sm text-neutral-400">
+                <li>
+                  <button
+                    onClick={() => scrollToSection("docs")}
+                    className="hover:text-white"
+                  >
+                    API
+                  </button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Documentation</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Status</button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-neutral-400">
+                <li>
+                  <button className="hover:text-white">About</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Blog</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Contact</button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-neutral-400">
+                <li>
+                  <button className="hover:text-white">Privacy</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Terms</button>
+                </li>
+                <li>
+                  <button className="hover:text-white">Security</button>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-            <p>© 2025 BitLink. All rights reserved.</p>
+          <div className="mt-16 pt-6 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="BitLink" className="w-6 h-6" />
+              <span>© 2025 BitLink</span>
+            </div>
+            <span>Built for speed. Designed for scale.</span>
           </div>
         </div>
       </footer>
-
-      <Modal {...modal} onClose={closeModal} />
     </div>
   );
 }

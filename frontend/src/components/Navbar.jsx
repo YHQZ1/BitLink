@@ -1,37 +1,19 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, LogOut, User } from "lucide-react";
 
-const NavLink = ({ onClick, children }) => (
+const NavLink = ({ onClick, children, isActive }) => (
   <button
     onClick={onClick}
-    className="text-gray-300 hover:text-white transition-colors"
+    className={`text-base transition-colors cursor-pointer font-medium ${
+      isActive ? "text-[#76B900]" : "text-neutral-400 hover:text-white"
+    }`}
   >
     {children}
   </button>
 );
 
-const UserDropdownItem = ({
-  onClick,
-  icon: Icon,
-  children,
-  isDanger = false,
-}) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center space-x-3 px-4 py-2 text-sm transition-colors ${
-      isDanger
-        ? "text-red-400 hover:text-red-300 hover:bg-red-900/20"
-        : "text-gray-300 hover:text-white hover:bg-gray-800"
-    }`}
-  >
-    <Icon className="w-4 h-4" />
-    <span>{children}</span>
-  </button>
-);
-
-export default function Navbar({ userName = "User" }) {
+export default function Navbar({ userName = "User", userEmail = "" }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -59,11 +41,6 @@ export default function Navbar({ userName = "User" }) {
     },
     [navigate]
   );
-
-  const closeAllMenus = useCallback(() => {
-    setUserDropdownOpen(false);
-    setMobileMenuOpen(false);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -93,60 +70,73 @@ export default function Navbar({ userName = "User" }) {
   }, [userDropdownOpen, mobileMenuOpen]);
 
   return (
-    <nav className="fixed w-full bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-gray-800 z-50">
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-12">
+    <nav className="fixed w-full bg-[#0B0D10]/95 backdrop-blur-sm border-b border-neutral-800 z-50">
+      <div className="max-w-[1600px] mx-auto px-5 md:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <button
             onClick={() => navigate("/home")}
-            className="flex items-center space-x-2"
+            className="flex items-center gap-3 cursor-pointer"
           >
-            <img src="/logo.png" alt="BitLink" className="w-10 h-10" />
-            <span className="text-xl font-bold text-[#7ed957]">BitLink</span>
+            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+            <span className="text-[20px] font-medium tracking-tight text-white">
+              BitLink
+            </span>
           </button>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <NavLink onClick={() => navigate("/dashboard")}>Dashboard</NavLink>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-12">
             <NavLink onClick={() => navigate("/analytics")}>Analytics</NavLink>
 
+            {/* User Button */}
             <div className="relative" ref={userDropdownRef}>
               <button
                 ref={userButtonRef}
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center p-1 rounded-lg transition-colors"
+                className="flex items-center gap-3 px-4 py-2 border border-neutral-800 hover:border-[#76B900] transition-colors cursor-pointer"
               >
-                <div className="w-8 h-8 bg-[#7ed957] rounded-full flex items-center justify-center text-black font-semibold text-sm">
-                  {userName.charAt(0)}
+                <div className="w-8 h-8 bg-[#76B900] flex items-center justify-center text-black font-semibold">
+                  {userName.charAt(0).toUpperCase()}
                 </div>
+                <span className="text-base text-white font-medium">
+                  {userName}
+                </span>
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-12 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-lg py-2 z-50">
-                  <div className="px-4 pb-2 border-b border-gray-700">
-                    <p className="text-sm text-white font-medium">{userName}</p>
-                    <p className="text-xs text-gray-400">Welcome back!</p>
+                <div className="absolute right-0 top-14 w-64 bg-[#0D0F13] border border-neutral-800 shadow-2xl">
+                  <div className="p-4 border-b border-neutral-800">
+                    <p className="text-base text-white font-medium mb-1">
+                      {userName}
+                    </p>
+                    <p className="text-sm text-neutral-500">{userEmail}</p>
                   </div>
 
-                  <UserDropdownItem onClick={handleEditProfile} icon={User}>
-                    Edit Profile
-                  </UserDropdownItem>
-
-                  <div className="border-t border-gray-700"></div>
-
-                  <UserDropdownItem
-                    onClick={handleLogout}
-                    icon={LogOut}
-                    isDanger
-                  >
-                    Logout
-                  </UserDropdownItem>
+                  <div className="p-2">
+                    <button
+                      onClick={handleEditProfile}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-base text-neutral-300 hover:bg-[#76B900]/10 hover:text-[#76B900] transition-colors cursor-pointer"
+                    >
+                      <User className="w-5 h-5" />
+                      <span>Profile</span>
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-base text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
+          {/* Mobile Menu Button */}
           <button
             ref={mobileMenuButtonRef}
-            className="md:hidden text-gray-300"
+            className="md:hidden text-neutral-400 hover:text-white transition-colors cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -158,35 +148,58 @@ export default function Navbar({ userName = "User" }) {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div
           ref={mobileMenuRef}
-          className="md:hidden bg-[#0a0a0a] border-t border-gray-800"
+          className="md:hidden bg-[#0B0D10]/95 backdrop-blur-sm border-t border-neutral-800"
         >
-          <div className="px-4 py-4 space-y-3">
-            <NavLink onClick={() => handleNavigation("/dashboard")}>
-              Dashboard
-            </NavLink>
-            <NavLink onClick={() => handleNavigation("/analytics")}>
-              Analytics
-            </NavLink>
-
-            <div className="pt-2 border-t border-gray-800">
-              <div className="flex items-center space-x-3 py-2">
-                <div className="w-8 h-8 bg-[#7ed957] rounded-full flex items-center justify-center text-black font-semibold text-sm">
-                  {userName.charAt(0)}
-                </div>
-                <span className="text-gray-300">{userName}</span>
+          <div className="px-5 py-6">
+            {/* User Info */}
+            <div className="flex items-center gap-4 pb-6 border-b border-neutral-800">
+              <div className="w-12 h-12 bg-[#76B900] flex items-center justify-center text-black font-semibold text-lg">
+                {userName.charAt(0).toUpperCase()}
               </div>
-
-              <div className="space-y-1">
-                <UserDropdownItem onClick={handleEditProfile} icon={User}>
-                  Edit Profile
-                </UserDropdownItem>
-                <UserDropdownItem onClick={handleLogout} icon={LogOut} isDanger>
-                  Logout
-                </UserDropdownItem>
+              <div className="flex-1 min-w-0">
+                <p className="text-base text-white font-medium truncate">
+                  {userName}
+                </p>
+                <p className="text-sm text-neutral-500 truncate">{userEmail}</p>
               </div>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="py-6 space-y-2">
+              <button
+                onClick={() => handleNavigation("/home")}
+                className="block w-full text-left px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => handleNavigation("/analytics")}
+                className="block w-full text-left px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+              >
+                Analytics
+              </button>
+            </div>
+
+            {/* User Actions */}
+            <div className="pt-6 border-t border-neutral-800 space-y-2">
+              <button
+                onClick={handleEditProfile}
+                className="flex items-center gap-3 w-full px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+              >
+                <User className="w-5 h-5" />
+                <span>Profile</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 w-full px-4 py-3 text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </div>

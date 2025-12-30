@@ -18,57 +18,123 @@ import {
   CheckCircle,
   AlertCircle,
   Filter,
+  ChevronDown,
+  Plus,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import api from "../lib/api";
 
 const statsConfig = [
-  { key: "totalLinks", label: "Total Links", icon: Link2 },
-  { key: "totalClicks", label: "Total Clicks", icon: MousePointerClick },
-  { key: "avgClicks", label: "Avg per Link", icon: TrendingUp },
-  { key: "activeLinks", label: "Active Links", icon: BarChart3 },
+  {
+    key: "totalLinks",
+    label: "Total Links",
+    icon: Link2,
+    color: "text-[#76B900]",
+  },
+  {
+    key: "totalClicks",
+    label: "Total Clicks",
+    icon: MousePointerClick,
+    color: "text-[#76B900]",
+  },
+  {
+    key: "avgClicks",
+    label: "Avg per Link",
+    icon: TrendingUp,
+    color: "text-[#76B900]",
+  },
+  {
+    key: "activeLinks",
+    label: "Active Links",
+    icon: BarChart3,
+    color: "text-[#76B900]",
+  },
 ];
 
-const Modal = ({ isOpen, type, title, message, onClose }) => {
-  if (!isOpen) return null;
+// Toast Notification Component
+const Toast = ({ isVisible, type, message, onClose }) => {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(onClose, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose]);
+
+  if (!isVisible) return null;
 
   const Icon = type === "success" ? CheckCircle : AlertCircle;
-  const bgColor = type === "success" ? "bg-green-500/20" : "bg-red-500/20";
-  const iconColor = type === "success" ? "text-green-400" : "text-red-400";
+  const bgColor = type === "success" ? "bg-[#76B900]" : "bg-red-500";
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className={`p-2 rounded-full ${bgColor}`}>
-            <Icon className={`w-6 h-6 ${iconColor}`} />
-          </div>
-          <div>
-            <h3 className="text-white font-semibold">{title}</h3>
-            <p className="text-gray-400 text-sm">{message}</p>
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
-        >
-          OK
+    <div className="fixed top-20 right-5 z-50 animate-slide-in">
+      <div
+        className={`${bgColor} text-black px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md shadow-lg`}
+      >
+        <Icon className="w-4 h-4 flex-shrink-0" />
+        <span className="text-sm font-medium flex-1">{message}</span>
+        <button onClick={onClose} className="hover:opacity-70 cursor-pointer">
+          <X className="w-4 h-4" />
         </button>
       </div>
     </div>
   );
 };
 
-const StatCard = ({ label, value, icon: Icon, subtext }) => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-3 sm:p-4 hover:border-gray-700 transition-colors">
-    <div className="flex items-center justify-between mb-2">
-      <span className="text-gray-400 text-xs sm:text-sm">{label}</span>
-      <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-[#7ed957]" />
+// Delete Confirmation Modal
+const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel, linkUrl }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-[#0D0F13] border border-neutral-800 max-w-md w-full">
+        <div className="p-6">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="p-2 border border-red-500/30 bg-red-500/10">
+              <AlertCircle className="w-5 h-5 text-red-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-white font-medium mb-2">Delete Link</h3>
+              <p className="text-neutral-400 text-sm mb-3">
+                Are you sure you want to delete this link? This action cannot be
+                undone.
+              </p>
+              {linkUrl && (
+                <p className="text-xs text-neutral-500 break-all border-l-2 border-neutral-800 pl-3 py-1">
+                  {linkUrl}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={onCancel}
+              className="flex-1 bg-transparent border border-neutral-800 text-neutral-300 py-2.5 font-medium hover:border-neutral-700 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 bg-red-500 text-white py-2.5 font-medium hover:bg-red-600 transition-colors cursor-pointer"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-      {value}
+  );
+};
+
+const StatCard = ({ label, value, icon: Icon, subtext, color }) => (
+  <div className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors">
+    <div className="flex items-center justify-between mb-4">
+      <span className="text-neutral-400 text-xs uppercase tracking-wider">
+        {label}
+      </span>
+      <Icon className={`w-4 h-4 ${color}`} />
     </div>
-    {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+    <div className="text-4xl font-light text-white mb-1">{value}</div>
+    {subtext && <div className="text-xs text-neutral-500 mt-2">{subtext}</div>}
   </div>
 );
 
@@ -86,110 +152,113 @@ const LinkItem = ({
   setEditOriginalUrl,
   setEditCustomAlias,
 }) => (
-  <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div className="border border-neutral-800 p-6 hover:border-neutral-700 transition-all">
+    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
       <div className="flex-1 min-w-0">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-3">
           <a
             href={link.shortUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
+            className="text-[#76B900] font-medium hover:text-[#8FD400] flex items-center gap-2 transition-colors"
           >
-            <span className="break-all">{link.shortUrl}</span>
-            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+            <span className="break-all text-sm">{link.shortUrl}</span>
+            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
           </a>
           <button
             onClick={() => onCopy(link.shortUrl)}
-            className="text-gray-400 hover:text-white transition-colors p-1 self-start sm:self-center"
+            className="text-neutral-500 hover:text-[#76B900] transition-colors p-1 cursor-pointer"
+            title="Copy link"
           >
-            <Copy className="w-3 h-3" />
+            <Copy className="w-3.5 h-3.5" />
           </button>
         </div>
+
         {editingLink === link.id ? (
-          <div className="space-y-2 mb-2">
+          <div className="space-y-3 mb-4">
             <input
               type="url"
               value={editOriginalUrl}
               onChange={(e) => setEditOriginalUrl(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-[#7ed957] focus:outline-none"
+              className="w-full bg-transparent border border-neutral-700 px-4 py-2.5 text-white text-sm focus:border-[#76B900] outline-none transition-colors"
               placeholder="Original URL"
             />
             <input
               type="text"
               value={editCustomAlias}
               onChange={(e) => setEditCustomAlias(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-[#7ed957] focus:outline-none"
+              className="w-full bg-transparent border border-neutral-700 px-4 py-2.5 text-white text-sm focus:border-[#76B900] outline-none transition-colors"
               placeholder="Custom alias"
             />
           </div>
         ) : (
-          <p className="text-xs text-gray-400 break-words mb-2 line-clamp-2">
+          <p className="text-sm text-neutral-400 break-words mb-4 line-clamp-1">
             {link.originalUrl}
           </p>
         )}
-        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-          <span className="flex items-center space-x-1">
-            <Calendar className="w-3 h-3" />
+
+        <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-500">
+          <span className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5" />
             <span>{link.createdAt}</span>
           </span>
-          <span>Last click: {link.lastAccessed}</span>
+          <span className="flex items-center gap-1.5">
+            <MousePointerClick className="w-3.5 h-3.5" />
+            <span className="text-[#76B900]">{link.clicks}</span> clicks
+          </span>
+          <span className="text-neutral-600">·</span>
+          <span>Last: {link.lastAccessed}</span>
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="text-center min-w-[60px]">
-          <div className="text-lg font-bold text-white">{link.clicks}</div>
-          <div className="text-xs text-gray-500">Clicks</div>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onNavigate(`/qr/${link.id}`)}
-            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group"
-            title="QR Code"
-          >
-            <QrCode className="w-4 h-4 text-gray-400 group-hover:text-white" />
-          </button>
-          <button
-            onClick={() => onNavigate(`/analytics/${link.id}`)}
-            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group"
-            title="Analytics"
-          >
-            <BarChart3 className="w-4 h-4 text-gray-400 group-hover:text-white" />
-          </button>
-          {editingLink === link.id ? (
-            <>
-              <button
-                onClick={() => onSaveEdit(link.id)}
-                className="p-2 bg-gray-800 hover:bg-green-900/50 rounded-lg transition-colors duration-200 group"
-                title="Save"
-              >
-                <Save className="w-4 h-4 text-gray-400 group-hover:text-green-400" />
-              </button>
-              <button
-                onClick={onCancelEdit}
-                className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group"
-                title="Cancel"
-              >
-                <X className="w-4 h-4 text-gray-400 group-hover:text-white" />
-              </button>
-            </>
-          ) : (
+
+      <div className="flex items-center gap-2 lg:ml-6 flex-shrink-0">
+        <button
+          onClick={() => onNavigate(`/qr/${link.id}`)}
+          className="p-2.5 border border-neutral-800 hover:border-[#76B900] text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer"
+          title="QR Code"
+        >
+          <QrCode className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onNavigate(`/analytics/${link.id}`)}
+          className="p-2.5 border border-neutral-800 hover:border-[#76B900] text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer"
+          title="Analytics"
+        >
+          <BarChart3 className="w-4 h-4" />
+        </button>
+        {editingLink === link.id ? (
+          <>
             <button
-              onClick={() => onEdit(link)}
-              className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 group"
-              title="Edit"
+              onClick={() => onSaveEdit(link.id)}
+              className="p-2.5 border border-[#76B900] text-[#76B900] hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer"
+              title="Save"
             >
-              <Edit2 className="w-4 h-4 text-gray-400 group-hover:text-white" />
+              <Save className="w-4 h-4" />
             </button>
-          )}
+            <button
+              onClick={onCancelEdit}
+              className="p-2.5 border border-neutral-800 hover:border-red-500 text-neutral-400 hover:text-red-500 transition-colors cursor-pointer"
+              title="Cancel"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </>
+        ) : (
           <button
-            onClick={() => onDelete(link.id)}
-            className="p-2 bg-gray-800 hover:bg-red-900/50 rounded-lg transition-colors duration-200 group"
-            title="Delete"
+            onClick={() => onEdit(link)}
+            className="p-2.5 border border-neutral-800 hover:border-[#76B900] text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer"
+            title="Edit"
           >
-            <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-400" />
+            <Edit2 className="w-4 h-4" />
           </button>
-        </div>
+        )}
+        <button
+          onClick={() => onDelete(link.id)}
+          className="p-2.5 border border-neutral-800 hover:border-red-500 text-neutral-400 hover:text-red-500 transition-colors cursor-pointer"
+          title="Delete"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
     </div>
   </div>
@@ -231,12 +300,15 @@ export default function Home() {
   const [editingLink, setEditingLink] = useState(null);
   const [editOriginalUrl, setEditOriginalUrl] = useState("");
   const [editCustomAlias, setEditCustomAlias] = useState("");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [modal, setModal] = useState({
-    isOpen: false,
+  const [toast, setToast] = useState({
+    isVisible: false,
     type: "success",
-    title: "",
     message: "",
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    linkId: null,
+    linkUrl: "",
   });
   const navigate = useNavigate();
 
@@ -314,15 +386,15 @@ export default function Home() {
     }
   }, [links, fetchUserStats]);
 
-  const showModal = (type, title, message) => {
-    setModal({ isOpen: true, type, title, message });
+  const showToast = (type, message) => {
+    setToast({ isVisible: true, type, message });
   };
 
-  const closeModal = () => setModal((prev) => ({ ...prev, isOpen: false }));
+  const closeToast = () => setToast((prev) => ({ ...prev, isVisible: false }));
 
   const handleShorten = async () => {
     if (!url) {
-      showModal("error", "Missing URL", "Please enter a URL to shorten");
+      showToast("error", "Please enter a URL to shorten");
       return;
     }
 
@@ -335,13 +407,14 @@ export default function Home() {
       setLinks([newLink, ...links]);
       setUrl("");
       setCustomAlias("");
-      showModal("success", "Success", "Link shortened successfully!");
+      showToast("success", "Link shortened successfully");
     } catch (error) {
-      showModal(
-        "error",
-        "Error",
-        error.response?.data?.error || "Failed to create short link"
-      );
+      // Show the exact error message from the API
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to create short link";
+      showToast("error", errorMessage);
     } finally {
       setLinksLoading(false);
     }
@@ -366,13 +439,13 @@ export default function Home() {
       setEditingLink(null);
       setEditOriginalUrl("");
       setEditCustomAlias("");
-      showModal("success", "Success", "Link updated successfully!");
+      showToast("success", "Link updated successfully");
     } catch (error) {
-      showModal(
-        "error",
-        "Error",
-        error.response?.data?.error || "Failed to update link"
-      );
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to update link";
+      showToast("error", errorMessage);
     }
   };
 
@@ -384,23 +457,37 @@ export default function Home() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    showModal("success", "Copied", "Link copied to clipboard!");
+    showToast("success", "Link copied to clipboard");
   };
 
   const deleteLink = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this link?")) return;
+    const link = links.find((l) => l.id === id);
+    setDeleteModal({
+      isOpen: true,
+      linkId: id,
+      linkUrl: link?.shortUrl || "",
+    });
+  };
+
+  const confirmDelete = async () => {
+    const { linkId } = deleteModal;
+    setDeleteModal({ isOpen: false, linkId: null, linkUrl: "" });
 
     try {
-      await api.delete(`/api/links/${id}`);
-      setLinks(links.filter((link) => link.id !== id));
-      showModal("success", "Deleted", "Link deleted successfully!");
+      await api.delete(`/api/links/${linkId}`);
+      setLinks(links.filter((link) => link.id !== linkId));
+      showToast("success", "Link deleted successfully");
     } catch (error) {
-      showModal(
-        "error",
-        "Error",
-        error.response?.data?.error || "Failed to delete link"
-      );
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to delete link";
+      showToast("error", errorMessage);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModal({ isOpen: false, linkId: null, linkUrl: "" });
   };
 
   const filteredLinks = links.filter((link) => {
@@ -428,76 +515,76 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
-          <p className="mt-4 text-gray-400">Loading...</p>
+          <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-neutral-400">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-      <Modal {...modal} onClose={closeModal} />
+      <Toast {...toast} onClose={closeToast} />
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        linkUrl={deleteModal.linkUrl}
+      />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 pt-20">
-        <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
-            Welcome back, {currentUser.name}
+      <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-light text-white mb-3">
+            Welcome back,{" "}
+            <span className="text-[#76B900]">{currentUser.name}</span>
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-neutral-400 text-lg">
             Manage your links and track performance
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-[#7ed957]/10 to-transparent border border-[#7ed957]/20 rounded-xl p-4 sm:p-6 mb-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold text-white mb-2">
-                Create Short Link
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Shorten URLs instantly with custom aliases
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
+        {/* Create Link Section */}
+        <div className="border border-neutral-800 bg-[#0D0F13] p-8 mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
+            <h2 className="text-xl font-light text-white">Create Short Link</h2>
+          </div>
+
+          <div className="grid gap-4">
+            <input
+              type="url"
+              placeholder="Paste your long URL here"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleShorten()}
+              className="w-full bg-transparent border border-neutral-700 px-4 py-3.5 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors text-sm"
+            />
+            <div className="flex flex-col sm:flex-row gap-4">
               <input
-                type="url"
-                placeholder="Paste your URL here"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
+                type="text"
+                placeholder="Custom alias (optional)"
+                value={customAlias}
+                onChange={(e) => setCustomAlias(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleShorten()}
+                className="flex-1 bg-transparent border border-neutral-700 px-4 py-3.5 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors text-sm"
               />
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  placeholder="Custom alias (optional)"
-                  value={customAlias}
-                  onChange={(e) => setCustomAlias(e.target.value)}
-                  className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-base"
-                />
-                <button
-                  onClick={handleShorten}
-                  disabled={linksLoading}
-                  className="bg-[#7ed957] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed text-base min-w-[120px]"
-                >
-                  {linksLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                      Shortening...
-                    </>
-                  ) : (
-                    "Shorten"
-                  )}
-                </button>
-              </div>
+              <button
+                onClick={handleShorten}
+                disabled={linksLoading}
+                className="border border-[#76B900] text-[#76B900] px-8 py-3.5 font-medium hover:bg-[#76B900] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px] text-sm cursor-pointer"
+              >
+                {linksLoading ? "Creating..." : "Shorten URL"}
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {statsConfig.map((stat) => (
             <StatCard
               key={stat.key}
@@ -508,120 +595,82 @@ export default function Home() {
                   : stats[stat.key]
               }
               icon={stat.icon}
+              color={stat.color}
               subtext={stat.key === "activeLinks" ? "Last 30 days" : undefined}
             />
           ))}
         </div>
 
-        <div className="bg-gray-900/30 border border-gray-800 rounded-xl">
-          <div className="p-4 sm:p-6 border-b border-gray-800">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-lg font-semibold text-white">Your Links</h2>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="sm:hidden flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                      type="text"
-                      placeholder="Search links..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full text-sm"
-                    />
-                  </div>
-                  <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-2 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
-                  >
-                    <Filter className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="hidden sm:flex gap-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                      type="text"
-                      placeholder="Search links..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full sm:w-64 text-sm"
-                    />
-                  </div>
-                  <div className="relative">
-                    <select
-                      value={filterBy}
-                      onChange={(e) => setFilterBy(e.target.value)}
-                      className="appearance-none bg-gray-900/50 border border-gray-700 rounded-lg px-4 pr-10 py-2 text-white focus:border-[#7ed957] focus:outline-none transition-colors cursor-pointer text-sm min-w-[140px]"
-                    >
-                      <option value="all">All Links</option>
-                      <option value="recent">Most Recent</option>
-                      <option value="recent-activity">Recent Activity</option>
-                      <option value="popular">Most Clicks</option>
-                    </select>
-                    <svg
-                      className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
+        {/* Links Section */}
+        <div className="border border-neutral-800">
+          <div className="p-6 border-b border-neutral-800 bg-[#0D0F13]">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-light text-white">Your Links</h2>
+                <span className="text-xs text-neutral-500 border border-neutral-800 px-2 py-1">
+                  {sortedLinks.length}
+                </span>
               </div>
-            </div>
-            {isMobileMenuOpen && (
-              <div className="sm:hidden mt-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border border-neutral-800 pl-10 pr-4 py-2.5 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none w-full sm:w-64 text-sm"
+                  />
+                </div>
                 <div className="relative">
                   <select
                     value={filterBy}
                     onChange={(e) => setFilterBy(e.target.value)}
-                    className="appearance-none bg-gray-900/50 border border-gray-700 rounded-lg px-4 pr-10 py-2 text-white focus:border-[#7ed957] focus:outline-none transition-colors cursor-pointer text-sm w-full"
+                    className="appearance-none bg-transparent border border-neutral-800 px-4 pr-10 py-2.5 text-white focus:border-[#76B900] outline-none cursor-pointer text-sm min-w-[160px] w-full"
                   >
-                    <option value="all">All Links</option>
-                    <option value="recent">Most Recent</option>
-                    <option value="recent-activity">Recent Activity</option>
-                    <option value="popular">Most Clicks</option>
+                    <option value="all" className="bg-[#0D0F13]">
+                      All Links
+                    </option>
+                    <option value="recent" className="bg-[#0D0F13]">
+                      Most Recent
+                    </option>
+                    <option value="recent-activity" className="bg-[#0D0F13]">
+                      Recent Activity
+                    </option>
+                    <option value="popular" className="bg-[#0D0F13]">
+                      Most Clicks
+                    </option>
                   </select>
-                  <svg
-                    className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
-          <div className="p-4 sm:p-6">
+          <div className="p-6 bg-[#0B0D10]">
             {linksLoading ? (
-              <div className="text-center py-8 sm:py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7ed957] mx-auto"></div>
-                <p className="mt-4 text-gray-400 text-sm">Loading links...</p>
+              <div className="text-center py-16">
+                <div className="w-10 h-10 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
+                <p className="mt-4 text-neutral-400 text-sm">
+                  Loading links...
+                </p>
               </div>
             ) : sortedLinks.length === 0 ? (
-              <div className="text-center py-8 sm:py-12">
-                <Link2 className="w-8 h-8 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-500 text-sm">No links created yet</p>
-                <p className="text-gray-400 text-xs mt-1">
-                  Create your first short link above
+              <div className="text-center py-16">
+                <div className="w-16 h-16 border border-neutral-800 flex items-center justify-center mx-auto mb-4">
+                  <Link2 className="w-8 h-8 text-neutral-600" />
+                </div>
+                <p className="text-neutral-300 mb-2 text-lg font-light">
+                  No links found
+                </p>
+                <p className="text-neutral-500 text-sm">
+                  {searchQuery
+                    ? "Try a different search term"
+                    : "Create your first short link above"}
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {sortedLinks.map((link) => (
                   <LinkItem
                     key={link.id}
@@ -644,6 +693,22 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
