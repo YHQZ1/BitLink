@@ -1,4 +1,3 @@
-// src/pages/LinkAnalytics.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -14,19 +13,14 @@ import {
   ExternalLink,
   Check,
 } from "lucide-react";
-import axios from "axios";
+import api from "../lib/api";
 import Navbar from "../components/Navbar";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function LinkAnalytics() {
   const { linkId } = useParams();
   const navigate = useNavigate();
   const [analyticsData, setAnalyticsData] = useState(null);
-  const [currentUser, setCurrentUser] = useState({
-    name: "",
-    profileImage: null,
-  });
+  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("7d");
@@ -39,46 +33,26 @@ export default function LinkAnalytics() {
 
   const fetchUserData = async () => {
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-      if (!token) return;
-
-      const response = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/api/user/profile");
       setCurrentUser({
-        name: response.data.name || response.data.username,
-        profileImage: response.data.profileImage,
+        name: response.data.name || "User",
+        email: response.data.email,
       });
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      navigate("/auth");
     }
   };
 
   const fetchLinkAnalytics = async () => {
     try {
       setIsLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
-      if (!token) {
-        throw new Error("Please login to view analytics");
-      }
-
-      const response = await axios.get(
-        `${BASE_URL}/api/links/analytics/${linkId}?range=${timeRange}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await api.get(`/api/analytics/link/${linkId}`, {
+        params: { range: timeRange },
+      });
       setAnalyticsData(response.data);
       setIsLoading(false);
     } catch (error) {
-      console.error("❌ Error fetching link analytics:", error);
-      console.error("Error details:", error.response?.data);
       setError(error.response?.data?.error || error.message);
       setIsLoading(false);
     }
@@ -90,14 +64,11 @@ export default function LinkAnalytics() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const handleBack = () => navigate(-1);
 
-  // Safe data access helpers
+  // Safe data access helpers with backend field mapping
   const getTotalClicks = () => analyticsData?.totalClicks || 0;
   const getLink = () => analyticsData?.link || {};
-  const getClicksOverTime = () => analyticsData?.clicksOverTime || [];
   const getReferrers = () => analyticsData?.referrers || [];
   const getCountries = () => analyticsData?.countries || [];
   const getDevices = () => analyticsData?.devices || [];
@@ -107,10 +78,7 @@ export default function LinkAnalytics() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
@@ -124,10 +92,7 @@ export default function LinkAnalytics() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
           <div className="text-center">
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 sm:p-6 max-w-md mx-auto">
@@ -148,10 +113,7 @@ export default function LinkAnalytics() {
   if (!analyticsData) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
           <div className="text-center">
             <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4 sm:p-6 max-w-md mx-auto">
@@ -175,13 +137,8 @@ export default function LinkAnalytics() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar
-        userName={currentUser.name}
-        profileImage={currentUser.profileImage}
-      />
-
+      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pt-20 sm:pt-24">
-        {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center space-x-2 text-gray-400 hover:text-white mb-4 sm:mb-6 lg:mb-8 transition-colors touch-manipulation"
@@ -190,7 +147,6 @@ export default function LinkAnalytics() {
           <span className="text-sm sm:text-base">Back to Links</span>
         </button>
 
-        {/* Header */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 lg:mb-8">
           <div className="flex flex-col gap-4 sm:gap-6">
             <div className="flex-1">
@@ -205,7 +161,7 @@ export default function LinkAnalytics() {
                   className="text-[#7ed957] text-sm sm:text-base font-medium hover:underline flex items-center space-x-1 break-all"
                 >
                   <span className="truncate max-w-[200px] sm:max-w-none">
-                    bit.lk/{link.shortCode}
+                    {link.shortUrl}
                   </span>
                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 </a>
@@ -226,7 +182,6 @@ export default function LinkAnalytics() {
               </p>
             </div>
 
-            {/* Time Range Filter - Now Mobile Optimized */}
             <div className="flex flex-wrap gap-2">
               {["7d", "30d", "90d", "all"].map((range) => (
                 <button
@@ -251,7 +206,6 @@ export default function LinkAnalytics() {
           </div>
         </div>
 
-        {/* Main Stats - Responsive Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
@@ -305,15 +259,12 @@ export default function LinkAnalytics() {
               <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-[#7ed957]" />
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-bold text-white truncate">
-              {getDevices()[0]?.device || "N/A"}
+              {getDevices()[0]?.deviceType || getDevices()[0]?.device || "N/A"}
             </div>
           </div>
         </div>
 
-        {/* Analytics Sections - Responsive Grid */}
-        {/* Analytics Sections - Responsive Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
-          {/* Referrers */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
@@ -340,7 +291,6 @@ export default function LinkAnalytics() {
             </div>
           </div>
 
-          {/* Countries */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
@@ -367,7 +317,6 @@ export default function LinkAnalytics() {
             </div>
           </div>
 
-          {/* Devices */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
@@ -381,7 +330,7 @@ export default function LinkAnalytics() {
                     className="flex items-center justify-between gap-2"
                   >
                     <span className="text-gray-300 text-sm sm:text-base truncate flex-1">
-                      {device.device}
+                      {device.deviceType || device.device}
                     </span>
                     <span className="text-[#7ed957] font-semibold text-sm sm:text-base flex-shrink-0">
                       {device.count}
@@ -394,7 +343,6 @@ export default function LinkAnalytics() {
             </div>
           </div>
 
-          {/* Browsers */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />
@@ -422,7 +370,6 @@ export default function LinkAnalytics() {
           </div>
         </div>
 
-        {/* Peak Hours - Full Width Section */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
           <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
             <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#7ed957]" />

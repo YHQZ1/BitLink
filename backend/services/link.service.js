@@ -53,6 +53,8 @@ export const createGuestLink = async (data) => {
     isGuestLink: true,
   });
 
+  link.qrCode = await QRCode.toDataURL(`${BASE_URL}/r/${link.shortCode}`);
+
   await link.save();
 
   return sanitizeLink(link);
@@ -148,4 +150,5 @@ const sanitizeLink = (link) => ({
   clicks: link.clicks,
   createdAt: link.createdAt,
   isGuestLink: link.isGuestLink || false,
+  qrCode: link.qrCode || null,
 });

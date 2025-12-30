@@ -1,20 +1,14 @@
-// src/pages/QRCode.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Copy, ExternalLink } from "lucide-react";
-import axios from "axios";
+import api from "../lib/api";
 import Navbar from "../components/Navbar";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function QRCode() {
   const { linkId } = useParams();
   const navigate = useNavigate();
   const [link, setLink] = useState(null);
-  const [currentUser, setCurrentUser] = useState({
-    name: "",
-    profileImage: null,
-  });
+  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,45 +19,27 @@ export default function QRCode() {
 
   const fetchUserData = async () => {
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-      if (!token) return;
-
-      const response = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/api/user/profile");
       setCurrentUser({
-        name: response.data.name || response.data.username,
-        profileImage: response.data.profileImage,
+        name: response.data.name || "User",
+        email: response.data.email,
       });
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      navigate("/auth");
     }
   };
 
   const fetchLinkData = async () => {
     try {
       setIsLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
+      const response = await api.get("/api/links/me");
+      const foundLink = response.data.find((link) => link.id === linkId);
 
-      if (!token) {
-        throw new Error("Please login to view QR code");
-      }
-
-      // First get all user links to find the specific one
-      const response = await axios.get(`${BASE_URL}/api/links/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const foundLink = response.data.links.find((link) => link._id === linkId);
-
-      if (!foundLink) {
-        throw new Error("Link not found");
-      }
+      if (!foundLink) throw new Error("Link not found");
 
       setLink({
-        id: foundLink._id,
+        id: foundLink.id,
         originalUrl: foundLink.originalUrl,
         shortUrl: foundLink.shortUrl,
         shortCode: foundLink.shortCode,
@@ -74,15 +50,13 @@ export default function QRCode() {
 
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching link data:", error);
-      setError(error.message);
+      setError(error.response?.data?.error || error.message);
       setIsLoading(false);
     }
   };
 
   const downloadQRCode = () => {
     if (!link?.qrCode) return;
-
     const linkElement = document.createElement("a");
     linkElement.href = link.qrCode;
     linkElement.download = `qrcode-${link.shortCode}.png`;
@@ -96,17 +70,12 @@ export default function QRCode() {
     alert("Copied to clipboard!");
   };
 
-  const handleBack = () => {
-    navigate(-1); // Go back to previous page
-  };
+  const handleBack = () => navigate(-1);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
@@ -120,10 +89,7 @@ export default function QRCode() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 max-w-md mx-auto">
@@ -143,13 +109,8 @@ export default function QRCode() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar
-        userName={currentUser.name}
-        profileImage={currentUser.profileImage}
-      />
-
+      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors"
@@ -158,7 +119,6 @@ export default function QRCode() {
           <span>Back to Links</span>
         </button>
 
-        {/* Main Content */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">QR Code</h1>
@@ -168,7 +128,6 @@ export default function QRCode() {
           </div>
 
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-            {/* QR Code Section */}
             <div className="flex-1 text-center">
               <div className="bg-white p-6 rounded-2xl inline-block">
                 {link?.qrCode ? (
@@ -183,8 +142,6 @@ export default function QRCode() {
                   </div>
                 )}
               </div>
-
-              {/* QR Code Actions */}
               <div className="flex justify-center space-x-4 mt-6">
                 <button
                   onClick={downloadQRCode}
@@ -197,15 +154,11 @@ export default function QRCode() {
               </div>
             </div>
 
-            {/* Link Information */}
             <div className="flex-1 bg-gray-800/50 rounded-xl p-6">
               <h2 className="text-xl font-semibold text-white mb-4">
                 Link Information
               </h2>
-
               <div className="space-y-4">
-                {/* Short URL */}
-                {/* Short URL */}
                 <div>
                   <label className="text-gray-400 text-sm block mb-2">
                     Short URL
@@ -217,7 +170,7 @@ export default function QRCode() {
                       rel="noopener noreferrer"
                       className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 flex-1"
                     >
-                      <span>bit.lk/{link?.shortCode}</span>
+                      <span>{link?.shortUrl}</span>
                       <ExternalLink className="w-4 h-4" />
                     </a>
                     <button
@@ -229,7 +182,6 @@ export default function QRCode() {
                   </div>
                 </div>
 
-                {/* Original URL */}
                 <div>
                   <label className="text-gray-400 text-sm block mb-2">
                     Original URL
@@ -239,7 +191,6 @@ export default function QRCode() {
                   </p>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">
@@ -255,7 +206,6 @@ export default function QRCode() {
                   </div>
                 </div>
 
-                {/* Share Actions */}
                 <div className="pt-4 border-t border-gray-700">
                   <h3 className="text-gray-400 text-sm mb-3">Share</h3>
                   <div className="flex space-x-3">
@@ -272,7 +222,7 @@ export default function QRCode() {
                       className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Copy className="w-4 h-4" />
-                      <span>Copy Address</span>
+                      <span>Copy QR Image URL</span>
                     </button>
                   </div>
                 </div>
@@ -281,7 +231,6 @@ export default function QRCode() {
           </div>
         </div>
 
-        {/* Usage Tips */}
         <div className="mt-8 bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-white mb-4">
             QR Code Usage Tips

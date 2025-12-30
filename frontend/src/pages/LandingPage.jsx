@@ -107,7 +107,7 @@ export default function LandingPage() {
       }
 
       // Success - show the shortened URL
-      setShortenedUrl(data.link);
+      setShortenedUrl(data);
       setUrl("");
       setCustomAlias("");
       showModal("success", "Success!", "Your link has been shortened!");

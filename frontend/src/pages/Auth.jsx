@@ -7,7 +7,6 @@ import {
   Chrome,
   Eye,
   EyeOff,
-  Link2,
   User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,7 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
@@ -52,20 +51,15 @@ export default function Auth() {
       const data = await response.json();
 
       if (response.ok) {
-        if (isSignUp) {
-          localStorage.setItem("jwtToken", data.token);
-          setMessage("Account created successfully!");
-          navigate("/home");
-        } else {
-          // Save token to localStorage
-          localStorage.setItem("jwtToken", data.token);
-          setMessage("Login successful! Redirecting...");
-          navigate("/home");
-        }
+        localStorage.setItem("jwtToken", data.token);
+        setMessage(
+          isSignUp ? "Account created successfully!" : "Login successful!"
+        );
+        setTimeout(() => navigate("/home"), 1000);
       } else {
         setMessage(data.error || "Something went wrong!");
       }
-    } catch (error) {
+    } catch {
       setMessage("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -89,14 +83,12 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#7ed957]/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#7ed957]/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center space-x-2 mb-4">
             <img
@@ -116,9 +108,7 @@ export default function Auth() {
           </p>
         </div>
 
-        {/* Auth Card */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 backdrop-blur-sm">
-          {/* Message Alert */}
           {message && (
             <div
               className={`mb-4 p-3 rounded-lg text-sm ${
@@ -131,9 +121,7 @@ export default function Auth() {
             </div>
           )}
 
-          {/* OAuth Buttons */}
           <div className="space-y-3 mb-6">
-            {/* GitHub */}
             <button
               onClick={() => handleOAuth("GitHub")}
               className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
@@ -142,7 +130,6 @@ export default function Auth() {
               <span className="font-medium">Continue with GitHub</span>
             </button>
 
-            {/* Google */}
             <button
               onClick={() => handleOAuth("Google")}
               className="w-full bg-white/5 hover:bg-white/10 border border-gray-700 hover:border-gray-600 text-white rounded-lg px-4 py-3 transition-all flex items-center justify-center space-x-3 group cursor-pointer"
@@ -152,7 +139,6 @@ export default function Auth() {
             </button>
           </div>
 
-          {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-grow border-t border-gray-600"></div>
             <span className="mx-4 text-gray-400 text-sm">
@@ -161,22 +147,21 @@ export default function Auth() {
             <div className="flex-grow border-t border-gray-600"></div>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Username
+                  Full Name
                 </label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
                     type="text"
-                    name="username"
-                    value={formData.username}
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     className="w-full bg-gray-950/50 border border-gray-700 focus:border-[#7ed957] rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
-                    placeholder="Enter your username"
+                    placeholder="Enter your full name"
                     required
                   />
                 </div>
@@ -231,24 +216,6 @@ export default function Auth() {
               </div>
             </div>
 
-            {!isSignUp && (
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center space-x-2 text-gray-400 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 rounded border-gray-700 bg-gray-950/50 text-[#7ed957] focus:ring-[#7ed957] focus:ring-offset-0 cursor-pointer"
-                  />
-                  <span>Remember me</span>
-                </label>
-                <a
-                  href="#"
-                  className="text-[#7ed957] hover:text-[#8ee367] transition-colors"
-                >
-                  Forgot password?
-                </a>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={loading}
@@ -267,7 +234,6 @@ export default function Auth() {
             </button>
           </form>
 
-          {/* Toggle Sign In/Up */}
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-400">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}
@@ -283,7 +249,6 @@ export default function Auth() {
             </button>
           </div>
 
-          {/* Terms */}
           {isSignUp && (
             <p className="mt-6 text-xs text-center text-gray-500">
               By creating an account, you agree to our{" "}
@@ -304,7 +269,6 @@ export default function Auth() {
           )}
         </div>
 
-        {/* Security Badge */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500 flex items-center justify-center space-x-1">
             <Lock className="w-3 h-3" />

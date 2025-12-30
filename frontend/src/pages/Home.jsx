@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,20 +26,15 @@ export default function Home() {
   const [customAlias, setCustomAlias] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBy, setFilterBy] = useState("all");
-  const [currentUser, setCurrentUser] = useState({
-    name: "",
-    profileImage: null,
-  });
+  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
   const [stats, setStats] = useState({
     totalLinks: 0,
     totalClicks: 0,
     avgClicks: 0,
     activeLinks: 0,
   });
-
   const [isLoading, setIsLoading] = useState(true);
   const [linksLoading, setLinksLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [links, setLinks] = useState([]);
   const [editingLink, setEditingLink] = useState(null);
   const [editOriginalUrl, setEditOriginalUrl] = useState("");
@@ -49,13 +42,12 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
-    type: "success", // 'success' or 'error'
+    type: "success",
     title: "",
     message: "",
   });
   const navigate = useNavigate();
 
-  // Fetch user data and links from backend
   useEffect(() => {
     fetchUserData();
     fetchUserLinks();
@@ -65,34 +57,22 @@ export default function Home() {
   const fetchUserData = async () => {
     try {
       setIsLoading(true);
-
       const response = await api.get("/api/user/profile");
-
       const userData = response.data;
-      setCurrentUser({
-        name: userData.name || userData.username || "User",
-        profileImage: userData.profileImage || null,
-      });
-
+      setCurrentUser({ name: userData.name || "User", email: userData.email });
       setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setError(error.message);
-      setCurrentUser({
-        name: "Guest",
-        profileImage: null,
-      });
-      setIsLoading(false);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      navigate("/auth");
     }
   };
 
   const fetchUserLinks = async () => {
     try {
       setLinksLoading(true);
-      const response = await api.get("/api/links/user");
-
-      const transformedLinks = response.data.links.map((link) => ({
-        id: link._id,
+      const response = await api.get("/api/links/me");
+      const transformedLinks = response.data.map((link) => ({
+        id: link.id,
         originalUrl: link.originalUrl,
         shortCode: link.shortCode,
         shortUrl: link.shortUrl,
@@ -103,12 +83,9 @@ export default function Home() {
         rawLastAccessed: link.lastAccessed,
         rawCreatedAt: link.createdAt,
       }));
-
       setLinks(transformedLinks);
       setLinksLoading(false);
-      fetchUserStats();
-    } catch (error) {
-      console.error("Error fetching links:", error);
+    } catch {
       setLinks([]);
       setLinksLoading(false);
     }
@@ -116,46 +93,38 @@ export default function Home() {
 
   const fetchUserStats = async () => {
     try {
-      const response = await api.get("/api/links/stats");
-
+      const response = await api.get("/api/analytics/stats");
       setStats(response.data);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
+    } catch {
+      const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
+      const activeLinks = links.filter((link) => {
+        if (!link.rawLastAccessed) return false;
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        return new Date(link.rawLastAccessed) > thirtyDaysAgo;
+      }).length;
       setStats({
         totalLinks: links.length,
-        totalClicks: links.reduce((sum, link) => sum + link.clicks, 0),
-        avgClicks:
-          links.length > 0
-            ? Math.round(
-                links.reduce((sum, link) => sum + link.clicks, 0) / links.length
-              )
-            : 0,
-        activeLinks: links.filter((link) => {
-          if (!link.rawLastAccessed) return false;
-          const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          return new Date(link.rawLastAccessed) > thirtyDaysAgo;
-        }).length,
+        totalClicks,
+        avgClicks: links.length ? Math.round(totalClicks / links.length) : 0,
+        activeLinks,
       });
     }
   };
 
   const formatLastAccessed = (lastAccessed) => {
     if (!lastAccessed) return "Never";
-
     const now = new Date();
     const lastAccessDate = new Date(lastAccessed);
     const diffTime = Math.abs(now - lastAccessDate);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
     const diffMinutes = Math.floor(diffTime / (1000 * 60));
-
     if (diffMinutes < 1) return "Just now";
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays}d ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-
     return lastAccessDate.toLocaleDateString();
   };
 
@@ -164,31 +133,23 @@ export default function Home() {
       showModal("error", "Missing URL", "Please enter a URL to shorten");
       return;
     }
-
     try {
       setLinksLoading(true);
-
       const requestBody = { originalUrl: url };
-      if (customAlias) {
-        requestBody.customAlias = customAlias;
-      }
-
+      if (customAlias) requestBody.customAlias = customAlias;
       const response = await api.post("/api/links/shorten", requestBody);
-
-      const newLink = response.data.link;
       const transformedLink = {
-        id: newLink._id,
-        originalUrl: newLink.originalUrl,
-        shortCode: newLink.shortCode,
-        shortUrl: newLink.shortUrl,
-        clicks: newLink.clicks,
-        createdAt: new Date(newLink.createdAt).toLocaleDateString(),
+        id: response.data.id,
+        originalUrl: response.data.originalUrl,
+        shortCode: response.data.shortCode,
+        shortUrl: response.data.shortUrl,
+        clicks: response.data.clicks,
+        createdAt: new Date(response.data.createdAt).toLocaleDateString(),
         lastAccessed: "Never",
-        qrCode: newLink.qrCode,
+        qrCode: response.data.qrCode,
         rawLastAccessed: null,
-        rawCreatedAt: newLink.createdAt,
+        rawCreatedAt: response.data.createdAt,
       };
-
       setLinks([transformedLink, ...links]);
       setUrl("");
       setCustomAlias("");
@@ -196,7 +157,6 @@ export default function Home() {
       fetchUserStats();
       showModal("success", "Success", "Link shortened successfully!");
     } catch (error) {
-      console.error("Error creating short link:", error);
       showModal(
         "error",
         "Error",
@@ -217,12 +177,10 @@ export default function Home() {
       const requestBody = {};
       if (editOriginalUrl) requestBody.originalUrl = editOriginalUrl;
       if (editCustomAlias) requestBody.customAlias = editCustomAlias;
-
       const response = await api.put(`/api/links/${linkId}`, requestBody);
-
-      const updatedLink = response.data.link;
+      const updatedLink = response.data;
       const transformedLink = {
-        id: updatedLink._id,
+        id: updatedLink.id,
         originalUrl: updatedLink.originalUrl,
         shortCode: updatedLink.shortCode,
         shortUrl: updatedLink.shortUrl,
@@ -233,18 +191,15 @@ export default function Home() {
         rawLastAccessed: updatedLink.lastAccessed,
         rawCreatedAt: updatedLink.createdAt,
       };
-
       setLinks(
         links.map((link) => (link.id === linkId ? transformedLink : link))
       );
-
       setEditingLink(null);
       setEditOriginalUrl("");
       setEditCustomAlias("");
       fetchUserStats();
       showModal("success", "Success", "Link updated successfully!");
     } catch (error) {
-      console.error("Error updating link:", error);
       showModal(
         "error",
         "Error",
@@ -265,18 +220,13 @@ export default function Home() {
   };
 
   const deleteLink = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this link?")) {
-      return;
-    }
-
+    if (!window.confirm("Are you sure you want to delete this link?")) return;
     try {
       await api.delete(`/api/links/${id}`);
-
       setLinks(links.filter((link) => link.id !== id));
       fetchUserStats();
       showModal("success", "Deleted", "Link deleted successfully!");
     } catch (error) {
-      console.error("Error deleting link:", error);
       showModal(
         "error",
         "Error",
@@ -285,13 +235,48 @@ export default function Home() {
     }
   };
 
-  // Filter and sort links based on search and filter
+  const showModal = (type, title, message) => {
+    setModal({ isOpen: true, type, title, message });
+  };
+
+  const Modal = () => {
+    if (!modal.isOpen) return null;
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
+          <div className="flex items-center space-x-3 mb-4">
+            <div
+              className={`p-2 rounded-full ${
+                modal.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
+              }`}
+            >
+              {modal.type === "success" ? (
+                <CheckCircle className="w-6 h-6 text-green-400" />
+              ) : (
+                <AlertCircle className="w-6 h-6 text-red-400" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">{modal.title}</h3>
+              <p className="text-gray-400 text-sm">{modal.message}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setModal({ ...modal, isOpen: false })}
+            className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const filteredLinks = links.filter((link) => {
     const matchesSearch =
       searchQuery === "" ||
       link.originalUrl.toLowerCase().includes(searchQuery.toLowerCase()) ||
       link.shortCode.toLowerCase().includes(searchQuery.toLowerCase());
-
     return matchesSearch;
   });
 
@@ -327,67 +312,17 @@ export default function Home() {
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
-          <p className="mt-4 text-gray-400">Loading user data...</p>
+          <p className="mt-4 text-gray-400">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Add this function BEFORE the return statement
-  const showModal = (type, title, message) => {
-    setModal({
-      isOpen: true,
-      type,
-      title,
-      message,
-    });
-  };
-
-  // Add this component BEFORE the return statement
-  const Modal = () => {
-    if (!modal.isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full mx-auto">
-          <div className="flex items-center space-x-3 mb-4">
-            <div
-              className={`p-2 rounded-full ${
-                modal.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
-              }`}
-            >
-              {modal.type === "success" ? (
-                <CheckCircle className="w-6 h-6 text-green-400" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-400" />
-              )}
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">{modal.title}</h3>
-              <p className="text-gray-400 text-sm">{modal.message}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setModal({ ...modal, isOpen: false })}
-            className="w-full bg-[#7ed957] text-black py-2 rounded-lg font-semibold hover:bg-[#8ee367] transition-colors"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar
-        userName={currentUser.name}
-        profileImage={currentUser.profileImage}
-      />
+      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Modal />
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 pt-20">
-        {/* Welcome Section */}
         <div className="mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Welcome back, {currentUser.name}
@@ -397,7 +332,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Quick Action Card */}
         <div className="bg-gradient-to-br from-[#7ed957]/10 to-transparent border border-[#7ed957]/20 rounded-xl p-4 sm:p-6 mb-6">
           <div className="flex flex-col gap-4">
             <div className="flex-1">
@@ -443,7 +377,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {[
             { key: "totalLinks", label: "Total Links", icon: Link2 },
@@ -477,15 +410,11 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Links Management Section */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-xl">
-          {/* Header with Search and Filters */}
           <div className="p-4 sm:p-6 border-b border-gray-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-lg font-semibold text-white">Your Links</h2>
-
               <div className="flex flex-col sm:flex-row gap-3">
-                {/* Mobile Search and Filter Toggle */}
                 <div className="sm:hidden flex gap-2">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -504,8 +433,6 @@ export default function Home() {
                     <Filter className="w-4 h-4" />
                   </button>
                 </div>
-
-                {/* Desktop Search and Filter */}
                 <div className="hidden sm:flex gap-3">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -517,7 +444,6 @@ export default function Home() {
                       className="bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none w-full sm:w-64 text-sm"
                     />
                   </div>
-
                   <div className="relative">
                     <select
                       value={filterBy}
@@ -546,8 +472,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
-            {/* Mobile Filter Dropdown */}
             {isMobileMenuOpen && (
               <div className="sm:hidden mt-4">
                 <div className="relative">
@@ -579,7 +503,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Links List */}
           <div className="p-4 sm:p-6">
             {linksLoading ? (
               <div className="text-center py-8 sm:py-12">
@@ -594,7 +517,6 @@ export default function Home() {
                     className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-all duration-200"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      {/* Link Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                           <a
@@ -603,9 +525,7 @@ export default function Home() {
                             rel="noopener noreferrer"
                             className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm break-all"
                           >
-                            <span className="break-all">
-                              bit.lk/{link.shortCode}
-                            </span>
+                            <span className="break-all">{link.shortUrl}</span>
                             <ExternalLink className="w-3 h-3 flex-shrink-0" />
                           </a>
                           <button
@@ -615,7 +535,6 @@ export default function Home() {
                             <Copy className="w-3 h-3" />
                           </button>
                         </div>
-
                         {editingLink === link.id ? (
                           <div className="space-y-2 mb-2">
                             <input
@@ -642,7 +561,6 @@ export default function Home() {
                             {link.originalUrl}
                           </p>
                         )}
-
                         <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center space-x-1">
                             <Calendar className="w-3 h-3" />
@@ -651,8 +569,6 @@ export default function Home() {
                           <span>Last click: {link.lastAccessed}</span>
                         </div>
                       </div>
-
-                      {/* Stats and Actions */}
                       <div className="flex items-center gap-4">
                         <div className="text-center min-w-[60px]">
                           <div className="text-lg font-bold text-white">
@@ -660,7 +576,6 @@ export default function Home() {
                           </div>
                           <div className="text-xs text-gray-500">Clicks</div>
                         </div>
-
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => navigate(`/qr/${link.id}`)}
@@ -716,7 +631,6 @@ export default function Home() {
                 ))}
               </div>
             )}
-
             {!linksLoading && sortedLinks.length === 0 && (
               <div className="text-center py-8 sm:py-12">
                 <Link2 className="w-8 h-8 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-3" />

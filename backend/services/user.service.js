@@ -30,8 +30,12 @@ export const updateUser = async (userId, data) => {
 
   if (newPassword) {
     if (!currentPassword) throw new Error();
+    if (!user.passwordHash) {
+      throw new Error("OAuth users cannot change password");
+    }
+
     const valid = await verifyPassword(currentPassword, user.passwordHash);
-    if (!valid) throw new Error();
+    if (!valid) throw new Error("Invalid current password");
     user.passwordHash = await hashPassword(newPassword);
   }
 

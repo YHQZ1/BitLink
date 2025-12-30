@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import QRCode from "./pages/QRCode";
 import LinkAnalytics from "./pages/LinkAnalytics";
 import Analytics from "./pages/Analytics";
-import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AuthSuccess from "./pages/AuthSuccess";
@@ -51,14 +50,6 @@ export default function App() {
             </ProtectedRoutes>
           }
         />
-        {/* <Route
-          path="/settings"
-          element={
-            <ProtectedRoutes>
-              <Settings />
-            </ProtectedRoutes>
-          }
-        /> */}
         <Route
           path="/dashboard"
           element={
@@ -71,7 +62,7 @@ export default function App() {
           path="/profile"
           element={
             <ProtectedRoutes>
-              <Profile/>
+              <Profile />
             </ProtectedRoutes>
           }
         />

@@ -1,25 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Save, Shield, Lock, Eye, EyeOff, Edit, X } from "lucide-react";
-import axios from "axios";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Save,
+  Shield,
+  Lock,
+  Eye,
+  EyeOff,
+  Edit,
+  X,
+} from "lucide-react";
+import api from "../lib/api";
 import Navbar from "../components/Navbar";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState({
-    username: "",
+    name: "",
     email: "",
     createdAt: "",
-    id: ""
+    id: "",
   });
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     currentPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,7 +37,7 @@ export default function Profile() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [editingSection, setEditingSection] = useState(null); // 'username', 'email', 'password'
+  const [editingSection, setEditingSection] = useState(null);
 
   useEffect(() => {
     fetchUserProfile();
@@ -37,46 +46,36 @@ export default function Profile() {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token") || localStorage.getItem("jwtToken");
-      
-      if (!token) {
-        navigate("/auth");
-        return;
-      }
-
-      const response = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/api/user/profile");
 
       const userData = response.data;
       setCurrentUser({
-        username: userData.username || "",
+        name: userData.name || "",
         email: userData.email || "",
         createdAt: userData.createdAt || "",
-        id: userData.id || ""
+        id: userData.id || "",
       });
 
       setFormData({
-        username: userData.username || "",
+        name: userData.name || "",
         email: userData.email || "",
         currentPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
       });
 
       setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      setError("Failed to load profile data");
-      setIsLoading(false);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      navigate("/auth");
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -88,11 +87,13 @@ export default function Profile() {
 
   const cancelEditing = () => {
     setEditingSection(null);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
+      name: currentUser.name,
+      email: currentUser.email,
       currentPassword: "",
       newPassword: "",
-      confirmPassword: ""
+      confirmPassword: "",
     }));
     setError(null);
   };
@@ -104,88 +105,69 @@ export default function Profile() {
       setError(null);
       setSuccess(null);
 
-      // Validate password confirmation if changing password
-      if (editingSection === 'password' && formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+      if (
+        editingSection === "password" &&
+        formData.newPassword !== formData.confirmPassword
+      ) {
         setError("New passwords do not match");
         setIsSaving(false);
         return;
       }
 
-      const token = localStorage.getItem("token") || localStorage.getItem("jwtToken");
-
-      // Prepare data for API based on which section is being edited
       const updateData = {};
-      
-      if (editingSection === 'username') {
-        if (formData.username !== currentUser.username) {
-          updateData.username = formData.username;
+
+      if (editingSection === "name") {
+        if (formData.name !== currentUser.name) {
+          updateData.name = formData.name;
         }
-      } else if (editingSection === 'email') {
+      } else if (editingSection === "email") {
         if (formData.email !== currentUser.email) {
           updateData.email = formData.email;
         }
-      } else if (editingSection === 'password') {
+      } else if (editingSection === "password") {
         if (formData.newPassword) {
           updateData.currentPassword = formData.currentPassword;
           updateData.newPassword = formData.newPassword;
         }
       }
 
-      // Check if any changes are being made
       if (Object.keys(updateData).length === 0) {
         setError("No changes made");
         setIsSaving(false);
         return;
       }
 
-      const response = await axios.put(
-        `${BASE_URL}/api/user/profile`, 
-        updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.put("/api/user", updateData);
 
-      setSuccess(response.data.message);
-      
-      // Update current user data
-      if (editingSection === 'username') {
-        setCurrentUser(prev => ({ ...prev, username: formData.username }));
-      } else if (editingSection === 'email') {
-        setCurrentUser(prev => ({ ...prev, email: formData.email }));
-      }
+      const updatedUser = response.data;
+      setCurrentUser((prev) => ({
+        ...prev,
+        name: updatedUser.name || prev.name,
+        email: updatedUser.email || prev.email,
+      }));
 
-      // Clear password fields and reset editing state
-      setFormData(prev => ({
+      setSuccess("Profile updated successfully!");
+
+      setFormData((prev) => ({
         ...prev,
         currentPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
       }));
       setEditingSection(null);
-
-      // Update Navbar by triggering a storage event
-      window.dispatchEvent(new Event('storage'));
-
     } catch (error) {
-      console.error("Error updating profile:", error);
       setError(error.response?.data?.error || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const handleBack = () => navigate(-1);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar userName={currentUser.username} />
+        <Navbar userName={currentUser.name} />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 sm:pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
@@ -198,10 +180,9 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar userName={currentUser.username} />
+      <Navbar userName={currentUser.name} />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        {/* Back Button - Fixed positioning */}
         <div className="mb-4 sm:mb-6 lg:mb-8">
           <button
             onClick={handleBack}
@@ -212,7 +193,6 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3">
             Edit Profile
@@ -222,32 +202,29 @@ export default function Profile() {
           </p>
         </div>
 
-        {/* Profile Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Error/Success Messages */}
           {error && (
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-4">
               <p className="text-red-400 text-sm sm:text-base">{error}</p>
             </div>
           )}
-          
+
           {success && (
             <div className="bg-green-900/20 border border-green-800 rounded-xl p-4">
               <p className="text-green-400 text-sm sm:text-base">{success}</p>
             </div>
           )}
 
-          {/* Username Section */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white flex items-center">
                 <User className="w-5 h-5 mr-2 text-[#7ed957]" />
-                Username
+                Name
               </h2>
-              {editingSection !== 'username' ? (
+              {editingSection !== "name" ? (
                 <button
                   type="button"
-                  onClick={() => startEditing('username')}
+                  onClick={() => startEditing("name")}
                   className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
                 >
                   <Edit className="w-4 h-4" />
@@ -264,39 +241,39 @@ export default function Profile() {
                 </button>
               )}
             </div>
-            
-            {editingSection === 'username' ? (
+
+            {editingSection === "name" ? (
               <div className="space-y-4">
                 <div>
                   <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
-                    New Username
+                    New Name
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                     <input
                       type="text"
-                      name="username"
-                      value={formData.username}
+                      name="name"
+                      value={formData.name}
                       onChange={handleInputChange}
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 sm:pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-[#7ed957] focus:outline-none transition-colors text-sm sm:text-base"
-                      placeholder="Enter new username"
+                      placeholder="Enter your name"
                     />
                   </div>
                 </div>
                 <button
                   type="submit"
-                  disabled={isSaving || formData.username === currentUser.username}
+                  disabled={isSaving || formData.name === currentUser.name}
                   className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base cursor-pointer"
                 >
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-black"></div>
-                      <span>Updating Username...</span>
+                      <span>Updating Name...</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Update Username</span>
+                      <span>Update Name</span>
                     </>
                   )}
                 </button>
@@ -304,24 +281,27 @@ export default function Profile() {
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
                 <div>
-                  <p className="text-gray-300 font-medium text-sm sm:text-base">{currentUser.username}</p>
-                  <p className="text-gray-500 text-xs sm:text-sm">Your current username</p>
+                  <p className="text-gray-300 font-medium text-sm sm:text-base">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-gray-500 text-xs sm:text-sm">
+                    Your display name
+                  </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Email Section */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white flex items-center">
                 <Mail className="w-5 h-5 mr-2 text-[#7ed957]" />
                 Email Address
               </h2>
-              {editingSection !== 'email' ? (
+              {editingSection !== "email" ? (
                 <button
                   type="button"
-                  onClick={() => startEditing('email')}
+                  onClick={() => startEditing("email")}
                   className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
                 >
                   <Edit className="w-4 h-4" />
@@ -338,8 +318,8 @@ export default function Profile() {
                 </button>
               )}
             </div>
-            
-            {editingSection === 'email' ? (
+
+            {editingSection === "email" ? (
               <div className="space-y-4">
                 <div>
                   <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
@@ -378,24 +358,27 @@ export default function Profile() {
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
                 <div>
-                  <p className="text-gray-300 font-medium text-sm sm:text-base">{currentUser.email}</p>
-                  <p className="text-gray-500 text-xs sm:text-sm">Your current email address</p>
+                  <p className="text-gray-300 font-medium text-sm sm:text-base">
+                    {currentUser.email}
+                  </p>
+                  <p className="text-gray-500 text-xs sm:text-sm">
+                    Your current email address
+                  </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Password Section */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white flex items-center">
                 <Lock className="w-5 h-5 mr-2 text-[#7ed957]" />
                 Password
               </h2>
-              {editingSection !== 'password' ? (
+              {editingSection !== "password" ? (
                 <button
                   type="button"
-                  onClick={() => startEditing('password')}
+                  onClick={() => startEditing("password")}
                   className="flex items-center space-x-2 bg-[#7ed957] text-black px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-[#8ee367] transition-colors text-sm cursor-pointer"
                 >
                   <Edit className="w-4 h-4" />
@@ -412,10 +395,9 @@ export default function Profile() {
                 </button>
               )}
             </div>
-            
-            {editingSection === 'password' ? (
+
+            {editingSection === "password" ? (
               <div className="space-y-4">
-                {/* Current Password */}
                 <div>
                   <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
                     Current Password
@@ -432,15 +414,20 @@ export default function Profile() {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
                     >
-                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showCurrentPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
 
-                {/* New Password */}
                 <div>
                   <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
                     New Password
@@ -460,15 +447,20 @@ export default function Profile() {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
                     >
-                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showNewPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   {formData.newPassword && formData.newPassword.length < 6 && (
-                    <p className="text-yellow-500 text-xs mt-1">Password must be at least 6 characters</p>
+                    <p className="text-yellow-500 text-xs mt-1">
+                      Password must be at least 6 characters
+                    </p>
                   )}
                 </div>
 
-                {/* Confirm Password */}
                 <div>
                   <label className="text-gray-300 text-sm sm:text-base font-medium mb-2 block">
                     Confirm New Password
@@ -485,20 +477,34 @@ export default function Profile() {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-400 cursor-pointer"
                     >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
-                  {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
-                  )}
+                  {formData.confirmPassword &&
+                    formData.newPassword !== formData.confirmPassword && (
+                      <p className="text-red-500 text-xs mt-1">
+                        Passwords do not match
+                      </p>
+                    )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSaving || !formData.newPassword || formData.newPassword.length < 6 || formData.newPassword !== formData.confirmPassword}
+                  disabled={
+                    isSaving ||
+                    !formData.newPassword ||
+                    formData.newPassword.length < 6 ||
+                    formData.newPassword !== formData.confirmPassword
+                  }
                   className="w-full bg-[#7ed957] text-black py-3 px-6 rounded-lg font-semibold hover:bg-[#8ee367] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base cursor-pointer"
                 >
                   {isSaving ? (
@@ -517,14 +523,17 @@ export default function Profile() {
             ) : (
               <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
                 <div>
-                  <p className="text-gray-300 font-medium text-sm sm:text-base">••••••••</p>
-                  <p className="text-gray-500 text-xs sm:text-sm">Your password</p>
+                  <p className="text-gray-300 font-medium text-sm sm:text-base">
+                    ••••••••
+                  </p>
+                  <p className="text-gray-500 text-xs sm:text-sm">
+                    Your password
+                  </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Account Details Section */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Shield className="w-5 h-5 mr-2 text-[#7ed957]" />
@@ -534,13 +543,15 @@ export default function Profile() {
               <div>
                 <p className="text-gray-500">Member since</p>
                 <p className="text-gray-300 font-medium">
-                  {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'N/A'}
+                  {currentUser.createdAt
+                    ? new Date(currentUser.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500">User ID</p>
                 <p className="text-gray-300 font-medium text-xs sm:text-sm font-mono truncate">
-                  {currentUser.id || 'N/A'}
+                  {currentUser.id || "N/A"}
                 </p>
               </div>
             </div>

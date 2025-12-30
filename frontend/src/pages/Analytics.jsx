@@ -13,19 +13,14 @@ import {
   Crown,
   ExternalLink,
 } from "lucide-react";
-import axios from "axios";
+import api from "../lib/api";
 import Navbar from "../components/Navbar";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export default function Analytics() {
   const navigate = useNavigate();
   const [globalStats, setGlobalStats] = useState(null);
   const [topLinks, setTopLinks] = useState([]);
-  const [currentUser, setCurrentUser] = useState({
-    name: "",
-    profileImage: null,
-  });
+  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("30d");
@@ -37,61 +32,68 @@ export default function Analytics() {
 
   const fetchUserData = async () => {
     try {
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
-      if (!token) return;
-
-      const response = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/api/user/profile");
       setCurrentUser({
-        name: response.data.name || response.data.username,
-        profileImage: response.data.profileImage,
+        name: response.data.name || "User",
+        email: response.data.email,
       });
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      navigate("/auth");
     }
   };
 
   const fetchGlobalAnalytics = async () => {
     try {
       setIsLoading(true);
-      const token =
-        localStorage.getItem("token") || localStorage.getItem("jwtToken");
+      const response = await api.get("/api/analytics/global", {
+        params: { range: timeRange },
+      });
 
-      if (!token) {
-        throw new Error("Please login to view analytics");
-      }
+      const data = response.data;
 
-      // Fetch global analytics from backend
-      const response = await axios.get(
-        `${BASE_URL}/api/links/global-analytics?range=${timeRange}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // Calculate percentages for display
+      const calculatePercentages = (items, total) =>
+        items.map((item) => ({
+          ...item,
+          percentage: total > 0 ? Math.round((item.count / total) * 100) : 0,
+        }));
 
-      setGlobalStats(response.data);
-      setTopLinks(response.data.topLinks || []);
+      const totalClicks = data.totalClicks || 0;
+
+      setGlobalStats({
+        ...data,
+        trafficSources: calculatePercentages(
+          data.trafficSources || [],
+          totalClicks
+        ),
+        geographicData: calculatePercentages(
+          data.geographicData || [],
+          totalClicks
+        ),
+        deviceDistribution: calculatePercentages(
+          (data.deviceDistribution || []).map((d) => ({
+            ...d,
+            device: d.deviceType || d.device,
+          })),
+          totalClicks
+        ),
+      });
+
+      setTopLinks(data.topLinks || []);
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching global analytics:", error);
-      setError(error.message);
+      setError(error.response?.data?.error || error.message);
       setIsLoading(false);
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const handleBack = () => navigate(-1);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957] mx-auto"></div>
@@ -105,10 +107,7 @@ export default function Analytics() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-        <Navbar
-          userName={currentUser.name}
-          profileImage={currentUser.profileImage}
-        />
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
           <div className="text-center">
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 max-w-md mx-auto">
@@ -128,13 +127,8 @@ export default function Analytics() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <Navbar
-        userName={currentUser.name}
-        profileImage={currentUser.profileImage}
-      />
-
+      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors cursor-pointer"
@@ -143,7 +137,6 @@ export default function Analytics() {
           <span>Back to Dashboard</span>
         </button>
 
-        {/* Header */}
         <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex-1">
@@ -154,8 +147,6 @@ export default function Analytics() {
                 Overview of all your links and their combined performance
               </p>
             </div>
-
-            {/* Time Range Filter */}
             <div className="flex space-x-2">
               {["7d", "30d", "90d", "all"].map((range) => (
                 <button
@@ -180,7 +171,6 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* Main Stats Overview */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
@@ -225,7 +215,6 @@ export default function Analytics() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Top Performing Links */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Crown className="w-5 h-5 mr-2 text-[#7ed957]" />
@@ -250,9 +239,7 @@ export default function Analytics() {
                         rel="noopener noreferrer"
                         className="text-[#7ed957] font-medium hover:underline flex items-center space-x-1 text-sm"
                       >
-                        <span className="truncate">
-                          bit.lk/{link.shortCode}
-                        </span>
+                        <span className="truncate">{link.shortUrl}</span>
                         <ExternalLink className="w-3 h-3 flex-shrink-0" />
                       </a>
                       <p className="text-xs text-gray-400 truncate">
@@ -271,7 +258,6 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Traffic Sources */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Users className="w-5 h-5 mr-2 text-[#7ed957]" />
@@ -296,8 +282,6 @@ export default function Analytics() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Geographic Distribution */}
-          {/* Geographic Distribution */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Globe className="w-5 h-5 mr-2 text-[#7ed957]" />
@@ -330,7 +314,6 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Device Distribution */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Smartphone className="w-5 h-5 mr-2 text-[#7ed957]" />
