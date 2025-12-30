@@ -1,6 +1,7 @@
 import Link from "../models/Link.js";
 import QRCode from "qrcode";
 import mongoose from "mongoose";
+import { trackAnalytics } from "./analytics.service.js";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
@@ -134,6 +135,7 @@ export const resolveRedirect = async (code, req) => {
   link.isActive = true;
 
   await link.save();
+  await trackAnalytics(link, req);
 
   return link.originalUrl;
 };
