@@ -6,7 +6,6 @@ import {
   githubCallback,
   googleLogin,
   googleCallback,
-  healthCheck,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -19,7 +18,5 @@ router.get("/github/callback", githubCallback);
 
 router.get("/google", googleLogin);
 router.get("/google/callback", googleCallback);
-
-router.get("/health", healthCheck);
 
 export default router;
