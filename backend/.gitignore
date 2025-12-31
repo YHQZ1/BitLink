@@ -37,4 +37,4 @@ build/
 coverage/
 
 #pem key
-backend/bitlink-key.pem
+*.pem
