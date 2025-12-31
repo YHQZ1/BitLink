@@ -1,3 +1,11 @@
+# Environment files
+.env
+.env.*
+.env.local
+.env.*.local
+.env.production
+.env.*.production
+
 # Logs
 logs
 *.log
