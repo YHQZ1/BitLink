@@ -13,7 +13,7 @@ export function createApp() {
   const allowedOrigins = new Set([
     "https://btlink.vercel.app",
     "http://localhost:5173",
-    "https://www.bitlk.in/",
+    "https://www.bitlk.in",
   ]);
 
   app.use(
@@ -26,7 +26,7 @@ export function createApp() {
         }
       },
       credentials: true,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
