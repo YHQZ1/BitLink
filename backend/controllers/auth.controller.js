@@ -2,18 +2,12 @@ import axios from "axios";
 import { signupUser, loginUser, oauthLogin } from "../services/auth.service.js";
 
 export const signup = async (req, res) => {
-  console.log("SIGNUP BODY:", req.body);
-
   try {
     const { email, password, name } = req.body;
     const result = await signupUser({ email, password, name });
     res.status(201).json(result);
-  } catch (err) {
-    console.error("SIGNUP ERROR:", err);
-    res.status(400).json({
-      error: err.message,
-      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
-    });
+  } catch {
+    res.status(400).json({ error: "Signup failed" });
   }
 };
 
@@ -70,9 +64,6 @@ export const githubCallback = async (req, res) => {
       return res.redirect(`${process.env.CLIENT_URL}/auth?error=no_email`);
     }
 
-    if (!email)
-      return res.redirect(`${process.env.CLIENT_URL}/auth?error=oauth_failed`);
-
     const { token, isNewUser } = await oauthLogin({
       provider: "github",
       providerId: String(userRes.data.id),
@@ -121,8 +112,9 @@ export const googleCallback = async (req, res) => {
     );
 
     const { email, sub, name, picture } = userRes.data;
-    if (!email)
+    if (!email) {
       return res.redirect(`${process.env.CLIENT_URL}/auth?error=oauth_failed`);
+    }
 
     const { token, isNewUser } = await oauthLogin({
       provider: "google",
