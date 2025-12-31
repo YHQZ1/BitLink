@@ -10,10 +10,7 @@ import { redirectToOriginal } from "./controllers/link.controller.js";
 export function createApp() {
   const app = express();
 
-  const allowedOrigins = new Set([
-    "http://localhost:5173",
-    "https://www.bitlk.in",
-  ]);
+  const allowedOrigins = new Set(process.env.CLIENT_URL.split(","));
 
   app.use(
     cors({

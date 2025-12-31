@@ -3,8 +3,6 @@ import QRCode from "qrcode";
 import mongoose from "mongoose";
 import { trackAnalytics } from "./analytics.service.js";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
-
 export const createUserLink = async (userId, data) => {
   const { originalUrl, customAlias } = data;
   if (!originalUrl) throw new Error();
@@ -20,10 +18,10 @@ export const createUserLink = async (userId, data) => {
     user: userId,
   });
 
-  link.qrCode = await QRCode.toDataURL(`${BASE_URL}/r/${link.shortCode}`);
+  const baseUrl = process.env.BASE_URL;
+  link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${link.shortCode}`);
 
   await link.save();
-
   return sanitizeLink(link);
 };
 
@@ -53,10 +51,10 @@ export const createGuestLink = async (data) => {
     isGuestLink: true,
   });
 
-  link.qrCode = await QRCode.toDataURL(`${BASE_URL}/r/${link.shortCode}`);
+  const baseUrl = process.env.BASE_URL;
+  link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${link.shortCode}`);
 
   await link.save();
-
   return sanitizeLink(link);
 };
 
@@ -85,11 +83,12 @@ export const updateUserLink = async (userId, linkId, data) => {
     if (exists) throw new Error();
 
     link.shortCode = customAlias;
-    link.qrCode = await QRCode.toDataURL(`${BASE_URL}/r/${customAlias}`);
+
+    const baseUrl = process.env.BASE_URL;
+    link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${customAlias}`);
   }
 
   await link.save();
-
   return sanitizeLink(link);
 };
 

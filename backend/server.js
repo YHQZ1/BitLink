@@ -9,6 +9,10 @@ dotenv.config({
       : ".env.development",
 });
 
+if (!process.env.BASE_URL || !process.env.CLIENT_URL) {
+  throw new Error("Missing required environment variables");
+}
+
 async function startServer() {
   await mongoose.connect(process.env.MONGODB_URI);
 
