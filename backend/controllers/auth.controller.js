@@ -56,7 +56,14 @@ export const githubCallback = async (req, res) => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    const email = emailRes.data.find((e) => e.primary && e.verified)?.email;
+    const email =
+      emailRes.data.find((e) => e.primary && e.verified)?.email ||
+      emailRes.data.find((e) => e.verified)?.email;
+
+    if (!email) {
+      return res.redirect(`${process.env.CLIENT_URL}/auth?error=no_email`);
+    }
+
     if (!email)
       return res.redirect(`${process.env.CLIENT_URL}/auth?error=oauth_failed`);
 
