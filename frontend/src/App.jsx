@@ -21,26 +21,34 @@ import Security from "./pages/Security";
 import About from "./pages/About";
 
 const protectedRoutes = [
+  { path: "/home", component: Home },
+  { path: "/profile", component: Profile },
+  { path: "/analytics", component: Analytics },
+  { path: "/analytics/:linkId", component: LinkAnalytics },
+  { path: "/qr/:linkId", component: QRCode },
+];
+
+const publicRoutes = [
   { path: "/api-docs", component: ApiDocs },
   { path: "/terms", component: Terms },
   { path: "/privacy", component: Privacy },
-  { path: "/about", component: About },
   { path: "/security", component: Security },
-  { path: "/home", component: Home },
-  { path: "/qr/:linkId", component: QRCode },
-  { path: "/analytics/:linkId", component: LinkAnalytics },
-  { path: "/analytics", component: Analytics },
-  { path: "/profile", component: Profile },
+  { path: "/about", component: About },
 ];
 
 export default function App() {
   return (
     <Router>
       <ScrollToTop />
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/success" element={<AuthSuccess />} />
+
+        {publicRoutes.map(({ path, component: Component }) => (
+          <Route key={path} path={path} element={<Component />} />
+        ))}
 
         {protectedRoutes.map(({ path, component: Component }) => (
           <Route
@@ -53,6 +61,7 @@ export default function App() {
             }
           />
         ))}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
