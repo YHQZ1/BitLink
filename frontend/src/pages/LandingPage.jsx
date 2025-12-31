@@ -81,7 +81,7 @@ const features = [
 
 const stats = [
   { value: "10M+", label: "Links Created" },
-  { value: "500K+", label: "Active Users" },
+  { value: "62⁶", label: "ID Space" },
   { value: "99.9%", label: "Uptime" },
   { value: "<100ms", label: "Response Time" },
 ];
@@ -512,78 +512,110 @@ export default function LandingPage() {
       >
         <div className="border border-neutral-800 p-8 md:p-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left: Copy */}
             <div>
               <div className="flex items-center gap-2 text-[#76B900] mb-4">
                 <Code className="w-5 h-5" />
                 <span className="text-sm font-medium">Developer First</span>
               </div>
+
               <h2 className="text-3xl md:text-4xl font-light mb-6">
-                Powerful API for automation
+                A clean, predictable API
               </h2>
+
               <p className="text-neutral-400 mb-6 leading-relaxed">
-                Integrate BitLink into your workflow with our RESTful API.
-                Create, manage, and track links programmatically with
-                comprehensive documentation and SDKs.
+                BitLink exposes a simple REST API for creating and resolving
+                short links. Designed to be stateless, secure, and easy to
+                integrate into any workflow.
               </p>
+
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>RESTful API with JSON responses</span>
+                  <span>JSON-based REST endpoints</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Webhook support for real-time events</span>
+                  <span>Guest and authenticated link creation</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Rate limiting with clear error messages</span>
+                  <span>Built-in rate limiting and validation</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Comprehensive documentation and examples</span>
+                  <span>Per-link analytics and QR generation</span>
                 </li>
               </ul>
-              <button className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer flex items-center gap-2">
+
+              <button
+                onClick={() => navigate("/api-docs")}
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer flex items-center gap-2"
+              >
                 View API Docs
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Right: Code snippet */}
             <div className="bg-[#0D0F13] border border-neutral-800 p-6 rounded font-mono text-xs">
               <div className="text-neutral-500 mb-4">
-                // Create a short link
+                // Create a short link (guest)
               </div>
+
               <div className="space-y-1">
                 <div>
                   <span className="text-[#76B900]">POST</span>{" "}
-                  /api/links/shorten
+                  /api/links/guest/shorten
                 </div>
+
                 <div className="text-neutral-400">{`{`}</div>
+
                 <div className="pl-4 text-neutral-400">
                   <span className="text-[#76B900]">"originalUrl"</span>:{" "}
                   <span className="text-orange-400">"https://example.com"</span>
                   ,
                 </div>
+
                 <div className="pl-4 text-neutral-400">
                   <span className="text-[#76B900]">"customAlias"</span>:{" "}
-                  <span className="text-orange-400">"my-link"</span>
+                  <span className="text-orange-400">"my-link"</span>,
                 </div>
+
+                <div className="pl-4 text-neutral-400">
+                  <span className="text-[#76B900]">"sessionId"</span>:{" "}
+                  <span className="text-orange-400">"guest_x9a2k1d"</span>
+                </div>
+
                 <div className="text-neutral-400">{`}`}</div>
               </div>
+
               <div className="border-t border-neutral-800 mt-6 pt-6">
                 <div className="text-neutral-500 mb-4">// Response</div>
+
                 <div className="space-y-1 text-neutral-400">
                   <div>{`{`}</div>
+
                   <div className="pl-4">
                     <span className="text-[#76B900]">"shortUrl"</span>:{" "}
                     <span className="text-orange-400">
-                      "https://bit.ly/my-link"
+                      "https://bitlink.xyz/r/my-link"
                     </span>
                     ,
                   </div>
+
+                  <div className="pl-4">
+                    <span className="text-[#76B900]">"shortCode"</span>:{" "}
+                    <span className="text-orange-400">"my-link"</span>,
+                  </div>
+
                   <div className="pl-4">
                     <span className="text-[#76B900]">"qrCode"</span>:{" "}
-                    <span className="text-orange-400">"https://..."</span>
+                    <span className="text-orange-400">
+                      "data:image/png;base64,..."
+                    </span>
                   </div>
+
                   <div>{`}`}</div>
                 </div>
               </div>
@@ -593,7 +625,10 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
+      <section
+        id="pricing"
+        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+      >
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-light mb-4">
             Simple, transparent pricing
@@ -654,84 +689,129 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="mt-32 border-t border-neutral-800">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            {/* Product */}
             <div>
               <h4 className="text-sm font-medium mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
                   <button
                     onClick={() => scrollToSection("features")}
-                    className="hover:text-white"
+                    className="hover:text-white transition-colors"
                   >
                     Features
                   </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Analytics</button>
+                  <button
+                    onClick={() => scrollToSection("features")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Analytics
+                  </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">QR Codes</button>
+                  <button
+                    onClick={() => scrollToSection("features")}
+                    className="hover:text-white transition-colors"
+                  >
+                    QR Codes
+                  </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Pricing</button>
+                  <button
+                    onClick={() => scrollToSection("pricing")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </button>
                 </li>
               </ul>
             </div>
 
+            {/* Developers */}
             <div>
               <h4 className="text-sm font-medium mb-4">Developers</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
                   <button
                     onClick={() => scrollToSection("docs")}
-                    className="hover:text-white"
+                    className="hover:text-white transition-colors"
                   >
-                    API
+                    API Docs
                   </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Documentation</button>
-                </li>
-                <li>
-                  <button className="hover:text-white">Status</button>
+                  <a
+                    href="https://github.com/YHQZ1/BitLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    GitHub
+                  </a>
                 </li>
               </ul>
             </div>
 
+            {/* Company */}
             <div>
               <h4 className="text-sm font-medium mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
-                  <button className="hover:text-white">About</button>
+                  <button
+                    onClick={() => navigate("/about")}
+                    className="hover:text-white transition-colors"
+                  >
+                    About
+                  </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Blog</button>
-                </li>
-                <li>
-                  <button className="hover:text-white">Contact</button>
+                  <a
+                    href="mailto:support@bitlink.xyz"
+                    className="hover:text-white transition-colors"
+                  >
+                    Contact
+                  </a>
                 </li>
               </ul>
             </div>
 
+            {/* Legal */}
             <div>
               <h4 className="text-sm font-medium mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>
-                  <button className="hover:text-white">Privacy</button>
+                  <button
+                    onClick={() => navigate("/privacy")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Privacy
+                  </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Terms</button>
+                  <button
+                    onClick={() => navigate("/terms")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Terms
+                  </button>
                 </li>
                 <li>
-                  <button className="hover:text-white">Security</button>
+                  <button
+                    onClick={() => navigate("/security")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Security
+                  </button>
                 </li>
               </ul>
             </div>
           </div>
 
+          {/* Bottom bar */}
           <div className="mt-16 pt-6 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="BitLink" className="w-6 h-6" />
