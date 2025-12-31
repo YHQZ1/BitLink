@@ -1,4 +1,6 @@
-const ProtectedRoute = ({ children }) => {
+import { Navigate } from "react-router-dom";
+
+const ProtectedRoutes = ({ children }) => {
   const token = localStorage.getItem("jwtToken");
 
   if (!token) {
@@ -8,4 +10,4 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default ProtectedRoute;
+export default ProtectedRoutes;
