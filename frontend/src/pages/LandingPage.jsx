@@ -223,7 +223,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+            <img src="/logo.png" alt="BitLink" className="w-10 h-10" />
             <span className="text-[20px] font-medium tracking-tight">
               BitLink
             </span>
@@ -691,123 +691,136 @@ export default function LandingPage() {
 
       <footer className="mt-32 border-t border-neutral-800">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-            {/* Product */}
-            <div>
-              <h4 className="text-sm font-medium mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li>
-                  <button
-                    onClick={() => scrollToSection("features")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Features
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("features")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Analytics
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("features")}
-                    className="hover:text-white transition-colors"
-                  >
-                    QR Codes
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("pricing")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Pricing
-                  </button>
-                </li>
-              </ul>
+          <div className="flex items-center justify-center gap-12">
+            {/* Left minimal decoration */}
+            <div className="hidden lg:block flex-1">
+              <div className="h-px bg-gradient-to-r from-transparent to-neutral-800"></div>
             </div>
 
-            {/* Developers */}
-            <div>
-              <h4 className="text-sm font-medium mb-4">Developers</h4>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li>
-                  <button
-                    onClick={() => scrollToSection("docs")}
-                    className="hover:text-white transition-colors"
-                  >
-                    API Docs
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="https://github.com/YHQZ1/BitLink"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors"
-                  >
-                    GitHub
-                  </a>
-                </li>
-              </ul>
+            {/* Center - Navigation */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 flex-shrink-0">
+              {/* Product */}
+              <div className="text-center">
+                <h4 className="text-sm font-medium mb-4">Product</h4>
+                <ul className="space-y-2 text-sm text-neutral-400">
+                  <li>
+                    <button
+                      onClick={() => scrollToSection("features")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Features
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => scrollToSection("features")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Analytics
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => scrollToSection("features")}
+                      className="hover:text-white transition-colors"
+                    >
+                      QR Codes
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => scrollToSection("pricing")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Pricing
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Developers */}
+              <div className="text-center">
+                <h4 className="text-sm font-medium mb-4">Developers</h4>
+                <ul className="space-y-2 text-sm text-neutral-400">
+                  <li>
+                    <button
+                      onClick={() => scrollToSection("docs")}
+                      className="hover:text-white transition-colors"
+                    >
+                      API Docs
+                    </button>
+                  </li>
+                  <li>
+                    <a
+                      href="https://github.com/YHQZ1/BitLink"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      GitHub
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Company */}
+              <div className="text-center">
+                <h4 className="text-sm font-medium mb-4">Company</h4>
+                <ul className="space-y-2 text-sm text-neutral-400">
+                  <li>
+                    <button
+                      onClick={() => navigate("/about")}
+                      className="hover:text-white transition-colors"
+                    >
+                      About
+                    </button>
+                  </li>
+                  <li>
+                    <a
+                      href="mailto:support@bitlink.xyz"
+                      className="hover:text-white transition-colors"
+                    >
+                      Contact
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Legal */}
+              <div className="text-center">
+                <h4 className="text-sm font-medium mb-4">Legal</h4>
+                <ul className="space-y-2 text-sm text-neutral-400">
+                  <li>
+                    <button
+                      onClick={() => navigate("/privacy")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Privacy
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigate("/terms")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Terms
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigate("/security")}
+                      className="hover:text-white transition-colors"
+                    >
+                      Security
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            {/* Company */}
-            <div>
-              <h4 className="text-sm font-medium mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li>
-                  <button
-                    onClick={() => navigate("/about")}
-                    className="hover:text-white transition-colors"
-                  >
-                    About
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="mailto:support@bitlink.xyz"
-                    className="hover:text-white transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h4 className="text-sm font-medium mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li>
-                  <button
-                    onClick={() => navigate("/privacy")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Privacy
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/terms")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Terms
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/security")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Security
-                  </button>
-                </li>
-              </ul>
+            {/* Right minimal decoration */}
+            <div className="hidden lg:block flex-1">
+              <div className="h-px bg-gradient-to-l from-transparent to-neutral-800"></div>
             </div>
           </div>
 
