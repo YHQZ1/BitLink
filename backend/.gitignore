@@ -35,3 +35,6 @@ build/
 
 # Optional: coverage reports
 coverage/
+
+#pem key
+backend/bitlink-key.pem

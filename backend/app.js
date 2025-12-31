@@ -13,6 +13,7 @@ export function createApp() {
   const allowedOrigins = new Set([
     "https://btlink.vercel.app",
     "http://localhost:5173",
+    "https://www.bitlk.in/",
   ]);
 
   app.use(
