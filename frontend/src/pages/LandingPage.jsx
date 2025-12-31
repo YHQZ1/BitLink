@@ -599,7 +599,7 @@ export default function LandingPage() {
                   <div className="pl-4">
                     <span className="text-[#76B900]">"shortUrl"</span>:{" "}
                     <span className="text-orange-400">
-                      "https://bitlink.xyz/r/my-link"
+                      "https://api.bitlk.in/r/my-link"
                     </span>
                     ,
                   </div>
