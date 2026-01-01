@@ -1,12 +1,14 @@
 name: Deploy Backend to EC2
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Build Backend Image"]
+    types:
+      - completed
 
 jobs:
   deploy-backend:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -21,20 +23,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-
-            echo "→ Moving to project directory"
             cd /home/ubuntu/BitLink
 
-            echo "→ Logging into GHCR"
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            docker pull ghcr.io/$OWNER_LC/bitlink-backend:${{ github.event.workflow_run.head_sha }}
 
-            echo "→ Pulling backend image"
-            docker pull ghcr.io/$OWNER_LC/bitlink-backend:${{ github.sha }}
+            sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:${{ github.event.workflow_run.head_sha }}|" docker-compose.yaml
 
-            echo "→ Updating docker-compose image tag"
-            sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:${{ github.sha }}|" docker-compose.yaml
-
-            echo "→ Restarting backend container"
             docker compose up -d backend
-
-            echo "Backend deployed successfully"
