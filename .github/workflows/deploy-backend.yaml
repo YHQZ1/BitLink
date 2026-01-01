@@ -1,0 +1,40 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set lowercase repo owner
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
+      - name: Deploy backend on EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "→ Moving to project directory"
+            cd /home/ubuntu/BitLink
+
+            echo "→ Logging into GHCR"
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+
+            echo "→ Pulling backend image"
+            docker pull ghcr.io/$OWNER_LC/bitlink-backend:${{ github.sha }}
+
+            echo "→ Updating docker-compose image tag"
+            sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:${{ github.sha }}|" docker-compose.yaml
+
+            echo "→ Restarting backend container"
+            docker compose up -d backend
+
+            echo "Backend deployed successfully"
