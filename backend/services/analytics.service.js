@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Analytics from "../models/Analytics.js";
 import Link from "../models/Link.js";
 import { UAParser } from "ua-parser-js";
@@ -39,6 +40,7 @@ export const trackAnalytics = async (link, req) => {
       : ua.device.type === "tablet"
       ? "Tablet"
       : "Desktop";
+
   const referrer = req.get("Referer") || "Direct";
 
   await Analytics.create({
@@ -54,7 +56,12 @@ export const trackAnalytics = async (link, req) => {
   });
 };
 
-export const getLinkAnalytics = async (userId, linkId, range = "all") => {
+export const getLinkAnalytics = async (
+  userId,
+  linkId,
+  range = "all",
+  timeZone = "UTC"
+) => {
   if (!mongoose.Types.ObjectId.isValid(linkId)) throw new Error();
 
   const link = await Link.findOne({ _id: linkId, user: userId });
@@ -69,17 +76,21 @@ export const getLinkAnalytics = async (userId, linkId, range = "all") => {
 
   return {
     totalClicks: data.length,
-    clicksOverTime: getClicksOverTime(data, range),
+    clicksOverTime: getClicksOverTime(data, range, timeZone),
     referrers: getTrafficSources(data),
     countries: getGeographicData(data),
     devices: getDeviceDistribution(data),
     browsers: getBrowsers(data),
-    peakHours: getPeakHours(data),
+    peakHours: getPeakHours(data, timeZone),
     link: sanitizeLink(link),
   };
 };
 
-export const getGlobalAnalytics = async (userId, range = "30d") => {
+export const getGlobalAnalytics = async (
+  userId,
+  range = "30d",
+  timeZone = "UTC"
+) => {
   const { startDate, endDate } = getDateRange(range);
 
   const links = await Link.find({ user: userId });
@@ -177,16 +188,32 @@ const sanitizeLink = (link) => ({
   lastAccessed: link.lastAccessed,
 });
 
-const getClicksOverTime = (data, range) => {
+const getClicksOverTime = (data, range, timeZone) => {
   const grouped = {};
+
   data.forEach((e) => {
     const d = new Date(e.timestamp);
-    const key =
+
+    const dateKey =
       range === "7d"
-        ? d.toISOString().slice(0, 13) + ":00"
-        : d.toISOString().split("T")[0];
-    grouped[key] = (grouped[key] || 0) + 1;
+        ? new Intl.DateTimeFormat("en-CA", {
+            hour: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour12: false,
+            timeZone,
+          }).format(d)
+        : new Intl.DateTimeFormat("en-CA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            timeZone,
+          }).format(d);
+
+    grouped[dateKey] = (grouped[dateKey] || 0) + 1;
   });
+
   return Object.entries(grouped).map(([date, clicks]) => ({ date, clicks }));
 };
 
@@ -256,12 +283,19 @@ const getBrowsers = (data) => {
   }));
 };
 
-const getPeakHours = (data) => {
+const getPeakHours = (data, timeZone) => {
   const h = {};
 
   data.forEach((e) => {
     const d = new Date(e.timestamp);
-    const hour = d.getHours();
+
+    const hour = Number(
+      new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        hour12: false,
+        timeZone,
+      }).format(d)
+    );
 
     h[hour] = (h[hour] || 0) + 1;
   });
