@@ -7,11 +7,13 @@ import {
   updateLink,
   deleteLink,
   migrateGuestLinksController,
+  redirectToOriginal,
 } from "../controllers/link.controller.js";
 
 const router = Router();
 
 router.post("/guest/shorten", createGuestLinkController);
+router.get("/r/:code", redirectToOriginal);
 
 router.use(protect);
 

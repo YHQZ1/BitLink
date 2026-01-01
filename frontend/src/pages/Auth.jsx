@@ -18,6 +18,33 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
+const GitHubLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+    <path d="M12 .5C5.73.5.5 5.74.5 12.02c0 5.11 3.29 9.44 7.86 10.97.57.1.78-.25.78-.55v-2.02c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.02 1.75 2.67 1.24 3.32.95.1-.74.4-1.24.72-1.52-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.57.23 2.73.11 3.02.73.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .3.2.65.79.54A11.52 11.52 0 0 0 23.5 12C23.5 5.74 18.27.5 12 .5Z" />
+  </svg>
+);
+
+const GoogleLogo = () => (
+  <svg viewBox="0 0 48 48" className="w-5 h-5">
+    <path
+      fill="#EA4335"
+      d="M24 9.5c3.54 0 6.7 1.23 9.19 3.63l6.84-6.84C35.79 2.54 30.23 0 24 0 14.64 0 6.55 5.38 2.67 13.22l7.97 6.19C12.48 13.47 17.77 9.5 24 9.5z"
+    />
+    <path
+      fill="#4285F4"
+      d="M46.1 24.5c0-1.64-.15-3.21-.43-4.73H24v9.02h12.43c-.54 2.9-2.18 5.36-4.64 7.04l7.18 5.57C43.44 37.09 46.1 31.36 46.1 24.5z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M10.64 28.41A14.5 14.5 0 0 1 9.5 24c0-1.53.27-3 .77-4.41l-7.97-6.19A23.9 23.9 0 0 0 0 24c0 3.86.92 7.51 2.3 10.78l8.34-6.37z"
+    />
+    <path
+      fill="#34A853"
+      d="M24 48c6.23 0 11.45-2.06 15.27-5.6l-7.18-5.57c-2 1.35-4.57 2.15-8.09 2.15-6.23 0-11.52-3.97-13.36-9.39l-8.34 6.37C6.55 42.62 14.64 48 24 48z"
+    />
+  </svg>
+);
+
 const OAuthButton = ({ provider, icon: Icon, label, onClick }) => (
   <button
     onClick={() => onClick(provider)}
@@ -195,17 +222,17 @@ export default function Auth() {
           )}
 
           {/* OAuth Buttons */}
-          <div className="space-y-3 mb-8">
+          <div className="grid grid-cols-2 gap-3 mb-8">
             <OAuthButton
               provider="GitHub"
-              icon={Github}
-              label="Continue with GitHub"
+              icon={GitHubLogo}
+              label="GitHub"
               onClick={handleOAuth}
             />
             <OAuthButton
               provider="Google"
-              icon={Chrome}
-              label="Continue with Google"
+              icon={GoogleLogo}
+              label="Google"
               onClick={handleOAuth}
             />
           </div>
@@ -370,9 +397,9 @@ export default function Auth() {
             <div className="grid grid-cols-3 gap-8">
               <div>
                 <div className="text-2xl font-light text-[#76B900] mb-1">
-                  10M+
+                  50B+
                 </div>
-                <div className="text-xs text-neutral-500">Links Created</div>
+                <div className="text-xs text-neutral-500">Address Space</div>
               </div>
               <div>
                 <div className="text-2xl font-light text-[#76B900] mb-1">

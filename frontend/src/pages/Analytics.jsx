@@ -7,10 +7,6 @@ import {
   BarChart3,
   Link2,
   MousePointerClick,
-  Users,
-  Globe,
-  Smartphone,
-  Crown,
   ExternalLink,
   Activity,
 } from "lucide-react";
@@ -79,6 +75,8 @@ export default function Analytics() {
   const fetchGlobalAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
+
       const response = await api.get("/api/analytics/global", {
         params: { range: timeRange },
       });
@@ -86,28 +84,37 @@ export default function Analytics() {
       const data = response.data;
       const totalClicks = data.totalClicks || 0;
 
-      const calculatePercentages = (items) =>
-        items.map((item) => ({
+      const calculatePercentages = (items) => {
+        if (!items || !Array.isArray(items)) return [];
+        return items.map((item) => ({
           ...item,
           percentage:
             totalClicks > 0 ? Math.round((item.count / totalClicks) * 100) : 0,
         }));
+      };
+
+      const trafficSources = Array.isArray(data.trafficSources)
+        ? data.trafficSources
+        : [];
+      const geographicData = Array.isArray(data.geographicData)
+        ? data.geographicData
+        : [];
+      const deviceDistribution = Array.isArray(data.deviceDistribution)
+        ? data.deviceDistribution
+        : [];
 
       setGlobalStats({
         ...data,
-        trafficSources: calculatePercentages(data.trafficSources || []),
-        geographicData: calculatePercentages(data.geographicData || []),
-        deviceDistribution: calculatePercentages(
-          (data.deviceDistribution || []).map((d) => ({
-            ...d,
-            device: d.deviceType || d.device,
-          }))
-        ),
+        trafficSources: calculatePercentages(trafficSources),
+        geographicData: calculatePercentages(geographicData),
+        deviceDistribution: calculatePercentages(deviceDistribution),
       });
 
-      setTopLinks(data.topLinks || []);
+      setTopLinks(Array.isArray(data.topLinks) ? data.topLinks : []);
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      setError(
+        err.response?.data?.error || err.message || "Failed to load analytics"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -156,12 +163,24 @@ export default function Analytics() {
     );
   }
 
+  if (!globalStats) {
+    return (
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+          <div className="text-center py-20">
+            <p className="text-neutral-400">No analytics data available</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
 
       <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-        {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
@@ -170,7 +189,6 @@ export default function Analytics() {
           <span>Back to Homepage</span>
         </button>
 
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-light text-white mb-3">
             Global Analytics
@@ -180,7 +198,6 @@ export default function Analytics() {
           </p>
         </div>
 
-        {/* Time Range Selector */}
         <div className="flex flex-wrap gap-3 mb-8">
           {timeRangeOptions.map(({ value, label }) => (
             <button
@@ -197,32 +214,30 @@ export default function Analytics() {
           ))}
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           <StatCard
             title="Total Links"
-            value={globalStats?.totalLinks || 0}
+            value={globalStats.totalLinks || 0}
             icon={Link2}
           />
           <StatCard
             title="Total Clicks"
-            value={(globalStats?.totalClicks || 0).toLocaleString()}
+            value={(globalStats.totalClicks || 0).toLocaleString()}
             icon={MousePointerClick}
           />
           <StatCard
             title="Avg per Link"
-            value={globalStats?.avgClicks || 0}
+            value={globalStats.avgClicks || 0}
             icon={TrendingUp}
           />
           <StatCard
             title="Active Links"
-            value={globalStats?.activeLinks || 0}
+            value={globalStats.activeLinks || 0}
             icon={BarChart3}
             subtext="Last 30 days"
           />
         </div>
 
-        {/* Top Performing Links - Full Width */}
         <div className="border border-neutral-800 p-8 bg-[#0D0F13] mb-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
@@ -277,16 +292,14 @@ export default function Analytics() {
           )}
         </div>
 
-        {/* Data Grid - 3 Columns */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Traffic Sources */}
           <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
               <h3 className="text-xl font-light text-white">Traffic Sources</h3>
             </div>
             <div className="space-y-1">
-              {globalStats?.trafficSources?.length > 0 ? (
+              {globalStats.trafficSources?.length > 0 ? (
                 globalStats.trafficSources.map((source, index) => (
                   <DataRow
                     key={index}
@@ -304,14 +317,13 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Top Countries */}
           <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
               <h3 className="text-xl font-light text-white">Top Countries</h3>
             </div>
             <div className="space-y-1">
-              {globalStats?.geographicData?.length > 0 ? (
+              {globalStats.geographicData?.length > 0 ? (
                 globalStats.geographicData.map((country, index) => (
                   <DataRow
                     key={index}
@@ -329,14 +341,13 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Device Distribution */}
           <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
               <h3 className="text-xl font-light text-white">Devices</h3>
             </div>
             <div className="space-y-1">
-              {globalStats?.deviceDistribution?.length > 0 ? (
+              {globalStats.deviceDistribution?.length > 0 ? (
                 globalStats.deviceDistribution.map((device, index) => (
                   <DataRow
                     key={index}

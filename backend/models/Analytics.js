@@ -36,5 +36,6 @@ const analyticsSchema = new mongoose.Schema(
 );
 
 analyticsSchema.index({ link: 1, timestamp: -1 });
+analyticsSchema.index({ timestamp: -1 });
 
 export default mongoose.model("Analytics", analyticsSchema);

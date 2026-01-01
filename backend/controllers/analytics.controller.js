@@ -9,7 +9,7 @@ export const getLinkAnalyticsController = async (req, res) => {
     const data = await getLinkAnalytics(
       req.user.id,
       req.params.id,
-      req.query.range
+      req.query.range || "all"
     );
     res.json(data);
   } catch {
@@ -19,7 +19,10 @@ export const getLinkAnalyticsController = async (req, res) => {
 
 export const getGlobalAnalyticsController = async (req, res) => {
   try {
-    const data = await getGlobalAnalytics(req.user.id, req.query.range);
+    const data = await getGlobalAnalytics(
+      req.user.id,
+      req.query.range || "30d"
+    );
     res.json(data);
   } catch {
     res.status(400).json({ error: "Failed to fetch global analytics" });

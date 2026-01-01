@@ -60,4 +60,13 @@ linkSchema.pre("save", function (next) {
   next();
 });
 
+linkSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  obj.id = obj._id;
+  delete obj._id;
+  delete obj.__v;
+  delete obj.sessionId;
+  return obj;
+};
+
 export default mongoose.model("Link", linkSchema);

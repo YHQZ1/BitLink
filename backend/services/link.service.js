@@ -30,13 +30,7 @@ export const createGuestLink = async (data) => {
   if (!originalUrl || !sessionId) throw new Error();
 
   const existing = await Link.find({ sessionId, user: null });
-  if (existing.length >= 1) {
-    throw {
-      error:
-        "Guest users can only create one link. Please sign up to create more links.",
-      requiresAuth: true,
-    };
-  }
+  if (existing.length >= 1) throw new Error();
 
   if (customAlias) {
     const exists = await Link.findOne({ shortCode: customAlias });
@@ -71,9 +65,7 @@ export const updateUserLink = async (userId, linkId, data) => {
 
   const { originalUrl, customAlias } = data;
 
-  if (originalUrl) {
-    link.originalUrl = originalUrl;
-  }
+  if (originalUrl) link.originalUrl = originalUrl;
 
   if (customAlias && customAlias !== link.shortCode) {
     const exists = await Link.findOne({
@@ -83,7 +75,6 @@ export const updateUserLink = async (userId, linkId, data) => {
     if (exists) throw new Error();
 
     link.shortCode = customAlias;
-
     const baseUrl = process.env.BASE_URL;
     link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${customAlias}`);
   }
@@ -99,6 +90,7 @@ export const deleteUserLink = async (userId, linkId) => {
   if (!link) throw new Error();
 
   await Link.deleteOne({ _id: linkId });
+  await mongoose.model("Analytics").deleteMany({ link: linkId });
 };
 
 export const migrateGuestLinks = async (userId, sessionId) => {
@@ -106,18 +98,10 @@ export const migrateGuestLinks = async (userId, sessionId) => {
 
   const result = await Link.updateMany(
     { sessionId, user: null },
-    {
-      $set: {
-        user: userId,
-        isGuestLink: false,
-        sessionId: null,
-      },
-    }
+    { $set: { user: userId, isGuestLink: false, sessionId: null } }
   );
 
-  return {
-    migratedCount: result.modifiedCount || 0,
-  };
+  return { migratedCount: result.modifiedCount || 0 };
 };
 
 export const resolveRedirect = async (code, req) => {
