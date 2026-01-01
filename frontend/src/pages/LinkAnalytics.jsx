@@ -56,49 +56,54 @@ const Toast = ({ isVisible, type, message, onClose }) => {
 };
 
 const StatCard = ({ title, value, icon: Icon, subtext }) => (
-  <div className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors">
-    <div className="flex items-center justify-between mb-4">
-      <span className="text-neutral-400 text-xs uppercase tracking-wider">
+  <div className="group">
+    <div className="flex items-center gap-2 mb-3">
+      <Icon className="w-3.5 h-3.5 text-[#76B900]" />
+      <span className="text-neutral-500 text-xs uppercase tracking-widest font-medium">
         {title}
       </span>
-      <Icon className="w-4 h-4 text-[#76B900]" />
     </div>
-    <div className="text-4xl font-light text-white mb-1">{value}</div>
-    {subtext && <div className="text-xs text-neutral-500 mt-2">{subtext}</div>}
+    <div className="text-5xl font-extralight text-white tracking-tight">
+      {value}
+    </div>
+    {subtext && <div className="text-xs text-neutral-600 mt-2">{subtext}</div>}
   </div>
 );
 
-const DataSection = ({
-  title,
-  icon: Icon,
-  data,
-  dataKey,
-  labelKey = "name",
-}) => (
-  <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+const DataRow = ({ label, count }) => (
+  <div className="flex items-center justify-between py-4 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
+    <span className="text-neutral-300 text-sm flex-1 truncate group-hover:text-white transition-colors">
+      {label}
+    </span>
+    <span className="text-white font-light text-sm tabular-nums flex-shrink-0">
+      {count}
+    </span>
+  </div>
+);
+
+const DataSection = ({ title, data, labelKey = "name" }) => (
+  <div>
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-      <h3 className="text-xl font-light text-white">{title}</h3>
+      <h3 className="text-xl font-extralight text-white tracking-tight">
+        {title}
+      </h3>
+      <div className="h-px flex-1 bg-neutral-900"></div>
     </div>
-    <div className="space-y-3">
+    <div className="space-y-1">
       {data.length > 0 ? (
         data.map((item, index) => (
-          <div
+          <DataRow
             key={index}
-            className="flex items-center justify-between gap-4 py-2 border-b border-neutral-800 last:border-0"
-          >
-            <span className="text-neutral-300 text-sm truncate flex-1">
-              {item[labelKey] || item.deviceType || item.device || item.source}
-            </span>
-            <span className="text-[#76B900] font-medium text-sm flex-shrink-0">
-              {item.count}
-            </span>
-          </div>
+            label={
+              item[labelKey] || item.deviceType || item.device || item.source
+            }
+            count={item.count}
+          />
         ))
       ) : (
-        <p className="text-neutral-500 text-sm text-center py-8">
-          No data available
-        </p>
+        <div className="text-center py-12 border border-dashed border-neutral-900">
+          <p className="text-neutral-600 text-xs">No data available</p>
+        </div>
       )}
     </div>
   </div>
@@ -258,58 +263,32 @@ export default function LinkAnalytics() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
+          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Dashboard</span>
         </button>
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-light text-white mb-3">
-            Link Analytics
-          </h1>
-          <p className="text-neutral-400 text-lg">
-            Track performance and engagement metrics
-          </p>
-        </div>
-
-        {/* Link Info & Time Range */}
-        <div className="border border-neutral-800 bg-[#0D0F13] p-8 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-3">
-                <a
-                  href={link.shortUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors cursor-pointer text-lg font-medium"
-                >
-                  <span className="break-all">{link.shortUrl}</span>
-                  <ExternalLink className="w-4 h-4 flex-shrink-0" />
-                </a>
-                <button
-                  onClick={() => copyToClipboard(link.shortUrl)}
-                  className="text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer p-1"
-                  aria-label="Copy to clipboard"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-neutral-400 text-sm break-all">
-                {link.originalUrl}
+        <div className="mb-16">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+                Link Analytics
+              </h1>
+              <p className="text-neutral-500 text-base">
+                Performance metrics and engagement data
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2">
               {timeRangeOptions.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => setTimeRange(value)}
-                  className={`px-4 py-2 font-medium transition-colors cursor-pointer text-sm ${
+                  className={`px-4 py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
                     timeRange === value
                       ? "bg-[#76B900] text-black"
-                      : "border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900]"
+                      : "text-neutral-500 hover:text-white"
                   }`}
                 >
                   {label}
@@ -317,10 +296,35 @@ export default function LinkAnalytics() {
               ))}
             </div>
           </div>
+
+          {/* Link Info */}
+          <div className="py-8 border-y border-neutral-900/50">
+            <div className="flex items-center gap-3 mb-3">
+              <a
+                href={link.shortUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors cursor-pointer text-lg font-medium group/link"
+              >
+                <span className="break-all">{link.shortUrl}</span>
+                <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
+              </a>
+              <button
+                onClick={() => copyToClipboard(link.shortUrl)}
+                className="text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer p-1"
+                aria-label="Copy to clipboard"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-neutral-500 text-sm break-all">
+              {link.originalUrl}
+            </p>
+          </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-10 py-12 border-b border-neutral-900/50 mb-20">
           <StatCard
             title="Total Clicks"
             value={totalClicks.toLocaleString()}
@@ -340,58 +344,92 @@ export default function LinkAnalytics() {
         </div>
 
         {/* Data Sections Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12 mb-20">
           <DataSection
             title="Traffic Sources"
-            icon={Users}
             data={referrers}
             labelKey="source"
           />
           <DataSection
             title="Top Countries"
-            icon={Globe}
             data={countries}
             labelKey="country"
           />
-          <DataSection title="Devices" icon={Smartphone} data={devices} />
-          <DataSection
-            title="Browsers"
-            icon={Globe}
-            data={browsers}
-            labelKey="browser"
-          />
+          <DataSection title="Devices" data={devices} />
+          <DataSection title="Browsers" data={browsers} labelKey="browser" />
         </div>
 
         {/* Peak Hours */}
-        <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-            <h3 className="text-xl font-light text-white">Peak Hours</h3>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {peakHours.length > 0 ? (
-              peakHours.map((hour, index) => (
-                <div
-                  key={index}
-                  className="border border-neutral-800 p-4 text-center hover:border-neutral-700 transition-colors"
-                >
-                  <div className="text-[#76B900] font-light text-3xl mb-2">
-                    {hour.clicks}
-                  </div>
-                  <div className="text-neutral-300 text-sm font-medium mb-1">
-                    {hour.hour}
-                  </div>
-                  <div className="text-neutral-500 text-xs">
-                    {index === 0 ? "Peak" : `#${index + 1}`}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-neutral-500 text-sm col-span-full text-center py-8">
-                No peak hours data available
-              </p>
+        <div>
+          <div className="flex items-center gap-3 mb-8">
+            <h3 className="text-2xl font-extralight text-white tracking-tight">
+              Peak Hours
+            </h3>
+            <div className="h-px flex-1 bg-neutral-900"></div>
+            {peakHours.length > 0 && (
+              <span className="text-xs text-neutral-600 uppercase tracking-wider">
+                Most active times
+              </span>
             )}
           </div>
+          {peakHours.length > 0 ? (
+            <div className="space-y-4">
+              {peakHours.map((hour, index) => {
+                const maxClicks = peakHours[0]?.clicks || 1;
+                const percentage = (hour.clicks / maxClicks) * 100;
+
+                // Format hour from 24h to 12h format
+                const formatHour = (hourStr) => {
+                  const hourNum = parseInt(hourStr);
+                  if (isNaN(hourNum)) return hourStr;
+                  const period = hourNum >= 12 ? "PM" : "AM";
+                  const displayHour = hourNum % 12 || 12;
+                  return `${displayHour}:00 ${period}`;
+                };
+
+                return (
+                  <div
+                    key={index}
+                    className="group py-4 border-b border-neutral-900/50 last:border-0 hover:bg-neutral-900/20 transition-all px-2 -mx-2"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4">
+                        <span className="text-neutral-600 text-xs w-6 text-center">
+                          #{index + 1}
+                        </span>
+                        <div>
+                          <div className="text-white text-base font-light">
+                            {formatHour(hour.hour)}
+                          </div>
+                          <div className="text-neutral-600 text-xs mt-0.5">
+                            {index === 0 ? "Peak activity" : "High activity"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-extralight text-white tabular-nums">
+                          {hour.clicks}
+                        </div>
+                        <div className="text-xs text-neutral-600">clicks</div>
+                      </div>
+                    </div>
+                    <div className="relative h-2 bg-neutral-900 overflow-hidden">
+                      <div
+                        className="absolute left-0 top-0 h-full bg-[#76B900] transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-16 border border-dashed border-neutral-900">
+              <p className="text-neutral-600 text-sm">
+                No peak hours data available
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

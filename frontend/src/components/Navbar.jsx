@@ -5,8 +5,8 @@ import { Menu, X, LogOut, User } from "lucide-react";
 const NavLink = ({ onClick, children, isActive }) => (
   <button
     onClick={onClick}
-    className={`text-base transition-colors cursor-pointer font-medium ${
-      isActive ? "text-[#76B900]" : "text-neutral-400 hover:text-white"
+    className={`text-sm transition-colors cursor-pointer font-light tracking-wide ${
+      isActive ? "text-[#76B900]" : "text-neutral-500 hover:text-white"
     }`}
   >
     {children}
@@ -70,22 +70,20 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
   }, [userDropdownOpen, mobileMenuOpen]);
 
   return (
-    <nav className="fixed w-full bg-[#0B0D10]/95 backdrop-blur-sm border-b border-neutral-800 z-50">
+    <nav className="fixed w-full bg-[#0B0D10]/95 backdrop-blur-sm border-b border-neutral-900/50 z-50">
       <div className="max-w-[1600px] mx-auto px-5 md:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <button
-            onClick={() => navigate("/home")}
-            className="flex items-center gap-3 cursor-pointer"
-          >
-            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
-            <span className="text-[20px] font-medium tracking-tight text-white">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="BitLink" className="w-7 h-7" />
+            <span className="text-lg font-extralight tracking-tight text-white">
               BitLink
             </span>
-          </button>
+          </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-12">
+          <div className="hidden md:flex items-center gap-8">
+            <NavLink onClick={() => navigate("/home")}>Home</NavLink>
             <NavLink onClick={() => navigate("/analytics")}>Analytics</NavLink>
 
             {/* User Button */}
@@ -93,38 +91,38 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
               <button
                 ref={userButtonRef}
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-3 px-4 py-2 border border-neutral-800 hover:border-[#76B900] transition-colors cursor-pointer"
+                className="flex items-center gap-3 text-neutral-400 hover:text-white transition-colors cursor-pointer group"
               >
-                <div className="w-8 h-8 bg-[#76B900] flex items-center justify-center text-black font-semibold">
+                <span className="text-sm font-light">{userName}</span>
+                <div className="w-7 h-7 bg-neutral-900 flex items-center justify-center text-white font-light text-xs">
                   {userName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-base text-white font-medium">
-                  {userName}
-                </span>
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-14 w-64 bg-[#0D0F13] border border-neutral-800 shadow-2xl">
-                  <div className="p-4 border-b border-neutral-800">
-                    <p className="text-base text-white font-medium mb-1">
+                <div className="absolute right-0 top-12 w-56 bg-[#0D0F13] border border-neutral-900 shadow-2xl">
+                  <div className="p-4 border-b border-neutral-900">
+                    <p className="text-sm text-white font-light mb-1">
                       {userName}
                     </p>
-                    <p className="text-sm text-neutral-500">{userEmail}</p>
+                    <p className="text-xs text-neutral-600 truncate">
+                      {userEmail}
+                    </p>
                   </div>
 
                   <div className="p-2">
                     <button
                       onClick={handleEditProfile}
-                      className="flex items-center gap-3 w-full px-4 py-3 text-base text-neutral-300 hover:bg-[#76B900]/10 hover:text-[#76B900] transition-colors cursor-pointer"
+                      className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer font-light"
                     >
-                      <User className="w-5 h-5" />
+                      <User className="w-4 h-4" />
                       <span>Profile</span>
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 w-full px-4 py-3 text-base text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-neutral-400 hover:text-red-500 transition-colors cursor-pointer font-light"
                     >
-                      <LogOut className="w-5 h-5" />
+                      <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
                     </button>
                   </div>
@@ -140,9 +138,9 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             )}
           </button>
         </div>
@@ -152,52 +150,52 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
       {mobileMenuOpen && (
         <div
           ref={mobileMenuRef}
-          className="md:hidden bg-[#0B0D10]/95 backdrop-blur-sm border-t border-neutral-800"
+          className="md:hidden bg-[#0B0D10]/95 backdrop-blur-sm border-t border-neutral-900/50"
         >
           <div className="px-5 py-6">
             {/* User Info */}
-            <div className="flex items-center gap-4 pb-6 border-b border-neutral-800">
-              <div className="w-12 h-12 bg-[#76B900] flex items-center justify-center text-black font-semibold text-lg">
+            <div className="flex items-center gap-4 pb-6 border-b border-neutral-900/50">
+              <div className="w-10 h-10 bg-neutral-900 flex items-center justify-center text-white font-light text-sm">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-base text-white font-medium truncate">
+                <p className="text-sm text-white font-light truncate">
                   {userName}
                 </p>
-                <p className="text-sm text-neutral-500 truncate">{userEmail}</p>
+                <p className="text-xs text-neutral-600 truncate">{userEmail}</p>
               </div>
             </div>
 
             {/* Navigation Links */}
-            <div className="py-6 space-y-2">
+            <div className="py-6 space-y-1">
               <button
                 onClick={() => handleNavigation("/home")}
-                className="block w-full text-left px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+                className="block w-full text-left px-3 py-2.5 text-sm font-light text-neutral-400 hover:text-white transition-colors cursor-pointer"
               >
                 Dashboard
               </button>
               <button
                 onClick={() => handleNavigation("/analytics")}
-                className="block w-full text-left px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+                className="block w-full text-left px-3 py-2.5 text-sm font-light text-neutral-400 hover:text-white transition-colors cursor-pointer"
               >
                 Analytics
               </button>
             </div>
 
             {/* User Actions */}
-            <div className="pt-6 border-t border-neutral-800 space-y-2">
+            <div className="pt-6 border-t border-neutral-900/50 space-y-1">
               <button
                 onClick={handleEditProfile}
-                className="flex items-center gap-3 w-full px-4 py-3 text-base font-medium text-neutral-400 hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer"
+                className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-light text-neutral-400 hover:text-white transition-colors cursor-pointer"
               >
-                <User className="w-5 h-5" />
+                <User className="w-4 h-4" />
                 <span>Profile</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-4 py-3 text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-light text-neutral-400 hover:text-red-500 transition-colors cursor-pointer"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4" />
                 <span>Sign Out</span>
               </button>
             </div>

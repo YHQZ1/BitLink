@@ -258,10 +258,19 @@ const getBrowsers = (data) => {
 
 const getPeakHours = (data) => {
   const h = {};
+
   data.forEach((e) => {
     const d = new Date(e.timestamp);
-    const hour = d.getUTCHours();
+    const hour = d.getHours();
+
     h[hour] = (h[hour] || 0) + 1;
   });
-  return Object.entries(h).map(([hour, clicks]) => ({ hour, clicks }));
+
+  return Object.entries(h)
+    .map(([hour, clicks]) => ({
+      hour: Number(hour),
+      clicks,
+    }))
+    .sort((a, b) => b.clicks - a.clicks)
+    .slice(0, 5);
 };

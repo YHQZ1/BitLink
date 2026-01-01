@@ -12,8 +12,10 @@ export const createLink = async (req, res) => {
   try {
     const link = await createUserLink(req.user.id, req.body);
     res.status(201).json(link);
-  } catch {
-    res.status(400).json({ error: "Failed to create link" });
+  } catch (err) {
+    res.status(400).json({
+      error: err.message || "Failed to create link",
+    });
   }
 };
 

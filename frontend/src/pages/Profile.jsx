@@ -221,98 +221,103 @@ export default function Profile() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
+          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Homepage</span>
         </button>
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-light text-white mb-3">
+        <div className="mb-16">
+          <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
             Account Settings
           </h1>
-          <p className="text-neutral-400 text-lg">
+          <p className="text-neutral-500 text-base">
             Manage your profile and security settings
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-[320px_1fr] gap-16">
           {/* Left Column - Account Info */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-12">
             {/* Profile Card */}
-            <div className="border border-neutral-800 p-8 bg-[#0D0F13] text-center">
-              <div className="w-24 h-24 bg-[#76B900] flex items-center justify-center text-black text-3xl font-semibold mx-auto mb-4">
+            <div className="text-center pb-12 border-b border-neutral-900/50">
+              <div className="w-24 h-24 bg-neutral-900 flex items-center justify-center text-white text-3xl font-extralight mx-auto mb-6">
                 {currentUser.name.charAt(0).toUpperCase()}
               </div>
-              <h2 className="text-xl font-medium text-white mb-1">
+              <h2 className="text-xl font-light text-white mb-2">
                 {currentUser.name}
               </h2>
-              <p className="text-neutral-400 text-sm mb-6">
-                {currentUser.email}
-              </p>
-              <div className="border-t border-neutral-800 pt-6 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-400 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Joined
-                  </span>
-                  <span className="text-neutral-300">
-                    {currentUser.createdAt
-                      ? new Date(currentUser.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </span>
-                </div>
-                <div className="flex items-start justify-between text-sm">
-                  <span className="text-neutral-400 flex items-center gap-2">
-                    <Hash className="w-4 h-4" />
-                    ID
-                  </span>
-                  <span className="text-neutral-300 text-xs font-mono text-right break-all">
-                    {currentUser.id || "N/A"}
-                  </span>
-                </div>
-              </div>
+              <p className="text-neutral-600 text-sm">{currentUser.email}</p>
             </div>
 
-            {/* Security Badge */}
-            <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
-              <div className="flex items-center gap-3 mb-3">
-                <Shield className="w-5 h-5 text-[#76B900]" />
-                <h3 className="text-base font-medium text-white">Security</h3>
+            {/* Account Details */}
+            <div className="space-y-6">
+              <div className="pb-6 border-b border-neutral-900/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-3.5 h-3.5 text-neutral-600" />
+                  <span className="text-xs text-neutral-600 uppercase tracking-wider">
+                    Joined
+                  </span>
+                </div>
+                <p className="text-neutral-400 text-sm font-light">
+                  {currentUser.createdAt
+                    ? new Date(currentUser.createdAt).toLocaleDateString()
+                    : "N/A"}
+                </p>
               </div>
-              <p className="text-neutral-400 text-sm">
-                Your account is protected with password authentication. Update
-                your password regularly to maintain security.
-              </p>
+
+              <div className="pb-6 border-b border-neutral-900/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Hash className="w-3.5 h-3.5 text-neutral-600" />
+                  <span className="text-xs text-neutral-600 uppercase tracking-wider">
+                    User ID
+                  </span>
+                </div>
+                <p className="text-neutral-400 text-xs font-mono break-all font-light">
+                  {currentUser.id || "N/A"}
+                </p>
+              </div>
+
+              <div className="pb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-3.5 h-3.5 text-[#76B900]" />
+                  <span className="text-xs text-neutral-600 uppercase tracking-wider">
+                    Security
+                  </span>
+                </div>
+                <p className="text-neutral-600 text-xs font-light leading-relaxed">
+                  Your account is protected with password authentication
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Right Column - Forms */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-16">
             {/* Profile Information Form */}
-            <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-                <h2 className="text-xl font-light text-white">
+            <div>
+              <div className="flex items-center gap-3 mb-8">
+                <h2 className="text-2xl font-extralight text-white tracking-tight">
                   Profile Information
                 </h2>
+                <div className="h-px flex-1 bg-neutral-900"></div>
               </div>
 
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 {/* Name Field */}
                 <div>
-                  <label className="text-neutral-300 text-sm font-medium mb-2 block">
+                  <label className="text-neutral-500 text-xs uppercase tracking-widest mb-3 block font-medium">
                     Full Name
                   </label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <User className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border border-neutral-700 pl-12 pr-4 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-neutral-900 pl-8 pr-0 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors font-light"
                       placeholder="Enter your name"
                     />
                   </div>
@@ -320,70 +325,72 @@ export default function Profile() {
 
                 {/* Email Field */}
                 <div>
-                  <label className="text-neutral-300 text-sm font-medium mb-2 block">
+                  <label className="text-neutral-500 text-xs uppercase tracking-widest mb-3 block font-medium">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border border-neutral-700 pl-12 pr-4 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-neutral-900 pl-8 pr-0 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors font-light"
                       placeholder="Enter your email"
                     />
                   </div>
                 </div>
 
                 {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={
-                    isSaving ||
-                    (formData.name === currentUser.name &&
-                      formData.email === currentUser.email)
-                  }
-                  className="flex items-center justify-center gap-2 bg-[#76B900] text-black px-6 py-3 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer w-full sm:w-auto"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Save Changes</span>
-                    </>
-                  )}
-                </button>
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={
+                      isSaving ||
+                      (formData.name === currentUser.name &&
+                        formData.email === currentUser.email)
+                    }
+                    className="flex items-center justify-center gap-2 bg-[#76B900] text-black px-8 py-3 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm uppercase tracking-wider"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
 
             {/* Password Form */}
-            <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-                <h2 className="text-xl font-light text-white">
+            <div className="pt-16 border-t border-neutral-900">
+              <div className="flex items-center gap-3 mb-8">
+                <h2 className="text-2xl font-extralight text-white tracking-tight">
                   Change Password
                 </h2>
+                <div className="h-px flex-1 bg-neutral-900"></div>
               </div>
 
               <form onSubmit={handleUpdatePassword} className="space-y-6">
                 {/* Current Password */}
                 <div>
-                  <label className="text-neutral-300 text-sm font-medium mb-2 block">
+                  <label className="text-neutral-500 text-xs uppercase tracking-widest mb-3 block font-medium">
                     Current Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
                     <input
                       type={showCurrentPassword ? "text" : "password"}
                       name="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border border-neutral-700 pl-12 pr-12 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-neutral-900 pl-8 pr-10 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors font-light"
                       placeholder="Enter current password"
                     />
                     <button
@@ -391,7 +398,7 @@ export default function Profile() {
                       onClick={() =>
                         setShowCurrentPassword(!showCurrentPassword)
                       }
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 cursor-pointer"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-400 cursor-pointer"
                     >
                       {showCurrentPassword ? (
                         <EyeOff className="w-4 h-4" />
@@ -404,23 +411,23 @@ export default function Profile() {
 
                 {/* New Password */}
                 <div>
-                  <label className="text-neutral-300 text-sm font-medium mb-2 block">
+                  <label className="text-neutral-500 text-xs uppercase tracking-widest mb-3 block font-medium">
                     New Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
                     <input
                       type={showNewPassword ? "text" : "password"}
                       name="newPassword"
                       value={formData.newPassword}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border border-neutral-700 pl-12 pr-12 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-neutral-900 pl-8 pr-10 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors font-light"
                       placeholder="Enter new password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 cursor-pointer"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-400 cursor-pointer"
                     >
                       {showNewPassword ? (
                         <EyeOff className="w-4 h-4" />
@@ -430,7 +437,7 @@ export default function Profile() {
                     </button>
                   </div>
                   {formData.newPassword && formData.newPassword.length < 6 && (
-                    <p className="text-yellow-500 text-xs mt-2">
+                    <p className="text-yellow-500 text-xs mt-2 font-light">
                       Password must be at least 6 characters
                     </p>
                   )}
@@ -438,17 +445,17 @@ export default function Profile() {
 
                 {/* Confirm Password */}
                 <div>
-                  <label className="text-neutral-300 text-sm font-medium mb-2 block">
+                  <label className="text-neutral-500 text-xs uppercase tracking-widest mb-3 block font-medium">
                     Confirm New Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" />
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border border-neutral-700 pl-12 pr-12 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors"
+                      className="w-full bg-transparent border-b border-neutral-900 pl-8 pr-10 py-3 text-white placeholder-neutral-600 focus:border-[#76B900] outline-none transition-colors font-light"
                       placeholder="Confirm new password"
                     />
                     <button
@@ -456,7 +463,7 @@ export default function Profile() {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 cursor-pointer"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-400 cursor-pointer"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="w-4 h-4" />
@@ -467,36 +474,38 @@ export default function Profile() {
                   </div>
                   {formData.confirmPassword &&
                     formData.newPassword !== formData.confirmPassword && (
-                      <p className="text-red-500 text-xs mt-2">
+                      <p className="text-red-500 text-xs mt-2 font-light">
                         Passwords do not match
                       </p>
                     )}
                 </div>
 
                 {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={
-                    isSaving ||
-                    !formData.currentPassword ||
-                    !formData.newPassword ||
-                    formData.newPassword.length < 6 ||
-                    formData.newPassword !== formData.confirmPassword
-                  }
-                  className="flex items-center justify-center gap-2 bg-[#76B900] text-black px-6 py-3 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer w-full sm:w-auto"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                      <span>Updating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      <span>Update Password</span>
-                    </>
-                  )}
-                </button>
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={
+                      isSaving ||
+                      !formData.currentPassword ||
+                      !formData.newPassword ||
+                      formData.newPassword.length < 6 ||
+                      formData.newPassword !== formData.confirmPassword
+                    }
+                    className="flex items-center justify-center gap-2 bg-[#76B900] text-black px-8 py-3 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm uppercase tracking-wider"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        <span>Updating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4" />
+                        <span>Update Password</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

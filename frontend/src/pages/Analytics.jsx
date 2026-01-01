@@ -21,29 +21,35 @@ const timeRangeOptions = [
 ];
 
 const StatCard = ({ title, value, icon: Icon, subtext }) => (
-  <div className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors">
-    <div className="flex items-center justify-between mb-4">
-      <span className="text-neutral-400 text-xs uppercase tracking-wider">
+  <div className="group">
+    <div className="flex items-center gap-2 mb-3">
+      <Icon className="w-3.5 h-3.5 text-[#76B900]" />
+      <span className="text-neutral-500 text-xs uppercase tracking-widest font-medium">
         {title}
       </span>
-      <Icon className="w-4 h-4 text-[#76B900]" />
     </div>
-    <div className="text-4xl font-light text-white mb-1">{value}</div>
-    {subtext && <div className="text-xs text-neutral-500 mt-2">{subtext}</div>}
+    <div className="text-5xl font-extralight text-white tracking-tight">
+      {value}
+    </div>
+    {subtext && <div className="text-xs text-neutral-600 mt-2">{subtext}</div>}
   </div>
 );
 
 const DataRow = ({ label, count, percentage, rank }) => (
-  <div className="flex items-center gap-4 py-3 border-b border-neutral-800 last:border-0">
+  <div className="flex items-center gap-4 py-4 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
     {rank && (
-      <div className="w-6 h-6 flex items-center justify-center bg-[#76B900]/10 text-[#76B900] text-xs font-medium flex-shrink-0">
+      <div className="w-5 text-neutral-600 text-xs font-medium flex-shrink-0 text-center">
         {rank}
       </div>
     )}
-    <span className="text-neutral-300 text-sm flex-1 truncate">{label}</span>
-    <div className="flex items-center gap-4 flex-shrink-0">
-      <span className="text-[#76B900] font-medium text-sm">{count}</span>
-      <span className="text-neutral-500 text-xs w-12 text-right">
+    <span className="text-neutral-300 text-sm flex-1 truncate group-hover:text-white transition-colors">
+      {label}
+    </span>
+    <div className="flex items-center gap-6 flex-shrink-0">
+      <span className="text-white font-light text-sm tabular-nums">
+        {count}
+      </span>
+      <span className="text-neutral-600 text-xs w-10 text-right tabular-nums">
         {percentage}%
       </span>
     </div>
@@ -183,120 +189,124 @@ export default function Analytics() {
       <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
+          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Homepage</span>
         </button>
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-light text-white mb-3">
-            Global Analytics
-          </h1>
-          <p className="text-neutral-400 text-lg">
-            Overview of all your links and their performance
-          </p>
+        <div className="mb-16">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+                Analytics
+              </h1>
+              <p className="text-neutral-500 text-base">
+                Performance overview across all your links
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {timeRangeOptions.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setTimeRange(value)}
+                  className={`px-4 py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
+                    timeRange === value
+                      ? "bg-[#76B900] text-black"
+                      : "text-neutral-500 hover:text-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-10 py-12 border-y border-neutral-900/50">
+            <StatCard
+              title="Total Links"
+              value={globalStats.totalLinks || 0}
+              icon={Link2}
+            />
+            <StatCard
+              title="Total Clicks"
+              value={(globalStats.totalClicks || 0).toLocaleString()}
+              icon={MousePointerClick}
+            />
+            <StatCard
+              title="Avg per Link"
+              value={globalStats.avgClicks || 0}
+              icon={TrendingUp}
+            />
+            <StatCard
+              title="Active Links"
+              value={globalStats.activeLinks || 0}
+              icon={BarChart3}
+              subtext="Last 30 days"
+            />
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-3 mb-8">
-          {timeRangeOptions.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => setTimeRange(value)}
-              className={`px-5 py-2.5 font-medium transition-colors cursor-pointer text-sm ${
-                timeRange === value
-                  ? "bg-[#76B900] text-black"
-                  : "border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          <StatCard
-            title="Total Links"
-            value={globalStats.totalLinks || 0}
-            icon={Link2}
-          />
-          <StatCard
-            title="Total Clicks"
-            value={(globalStats.totalClicks || 0).toLocaleString()}
-            icon={MousePointerClick}
-          />
-          <StatCard
-            title="Avg per Link"
-            value={globalStats.avgClicks || 0}
-            icon={TrendingUp}
-          />
-          <StatCard
-            title="Active Links"
-            value={globalStats.activeLinks || 0}
-            icon={BarChart3}
-            subtext="Last 30 days"
-          />
-        </div>
-
-        <div className="border border-neutral-800 p-8 bg-[#0D0F13] mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-            <h3 className="text-xl font-light text-white">
+        <div className="mb-20">
+          <div className="flex items-center gap-3 mb-8">
+            <h3 className="text-2xl font-extralight text-white tracking-tight">
               Top Performing Links
             </h3>
+            <div className="h-px flex-1 bg-neutral-900"></div>
           </div>
 
           {topLinks.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="space-y-6">
               {topLinks.map((link, index) => (
-                <div
-                  key={link.id}
-                  className="border border-neutral-800 p-5 hover:border-neutral-700 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="w-10 h-10 flex items-center justify-center bg-[#76B900]/10 text-[#76B900] font-medium flex-shrink-0">
-                        #{index + 1}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <a
-                          href={link.shortUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 mb-1 transition-colors cursor-pointer"
-                        >
-                          <span className="truncate text-sm font-medium">
-                            {link.shortUrl}
-                          </span>
-                          <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-                        </a>
-                        <p className="text-xs text-neutral-500 truncate">
-                          {link.originalUrl}
-                        </p>
-                      </div>
+                <div key={link.id} className="group relative">
+                  <div className="flex items-center gap-6 py-6 border-b border-neutral-900/50 hover:border-neutral-800 transition-all">
+                    <div className="w-8 text-neutral-600 text-sm font-light flex-shrink-0 text-center group-hover:text-[#76B900] transition-colors">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <a
+                        href={link.shortUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 mb-2 transition-colors cursor-pointer group/link"
+                      >
+                        <span className="truncate text-sm font-medium">
+                          {link.shortUrl}
+                        </span>
+                        <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
+                      </a>
+                      <p className="text-xs text-neutral-600 truncate">
+                        {link.originalUrl}
+                      </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-2xl font-light text-white">
+                      <div className="text-3xl font-extralight text-white tabular-nums">
                         {link.clicks.toLocaleString()}
                       </div>
-                      <div className="text-xs text-neutral-500">clicks</div>
+                      <div className="text-xs text-neutral-600 uppercase tracking-wider mt-1">
+                        clicks
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-neutral-500 text-sm text-center py-8">
-              No links yet. Create your first link to see performance data.
-            </p>
+            <div className="text-center py-16 border border-dashed border-neutral-900">
+              <p className="text-neutral-600 text-sm">
+                No links yet. Create your first link to see performance data.
+              </p>
+            </div>
           )}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+        <div className="grid lg:grid-cols-3 gap-16">
+          <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-              <h3 className="text-xl font-light text-white">Traffic Sources</h3>
+              <h3 className="text-xl font-extralight text-white tracking-tight">
+                Traffic Sources
+              </h3>
+              <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.trafficSources?.length > 0 ? (
@@ -310,17 +320,21 @@ export default function Analytics() {
                   />
                 ))
               ) : (
-                <p className="text-neutral-500 text-sm text-center py-8">
-                  No traffic data yet
-                </p>
+                <div className="text-center py-12 border border-dashed border-neutral-900">
+                  <p className="text-neutral-600 text-xs">
+                    No traffic data yet
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
-          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+          <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-              <h3 className="text-xl font-light text-white">Top Countries</h3>
+              <h3 className="text-xl font-extralight text-white tracking-tight">
+                Top Countries
+              </h3>
+              <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.geographicData?.length > 0 ? (
@@ -334,17 +348,21 @@ export default function Analytics() {
                   />
                 ))
               ) : (
-                <p className="text-neutral-500 text-sm text-center py-8">
-                  Geographic data will appear as links get clicks
-                </p>
+                <div className="text-center py-12 border border-dashed border-neutral-900">
+                  <p className="text-neutral-600 text-xs">
+                    Geographic data will appear as links get clicks
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
-          <div className="border border-neutral-800 p-6 bg-[#0D0F13]">
+          <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-              <h3 className="text-xl font-light text-white">Devices</h3>
+              <h3 className="text-xl font-extralight text-white tracking-tight">
+                Devices
+              </h3>
+              <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.deviceDistribution?.length > 0 ? (
@@ -358,9 +376,9 @@ export default function Analytics() {
                   />
                 ))
               ) : (
-                <p className="text-neutral-500 text-sm text-center py-8">
-                  No device data yet
-                </p>
+                <div className="text-center py-12 border border-dashed border-neutral-900">
+                  <p className="text-neutral-600 text-xs">No device data yet</p>
+                </div>
               )}
             </div>
           </div>

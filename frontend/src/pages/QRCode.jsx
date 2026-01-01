@@ -43,11 +43,13 @@ const Toast = ({ isVisible, type, message, onClose }) => {
 };
 
 const StatCard = ({ value, label }) => (
-  <div className="border border-neutral-800 p-4">
-    <div className="text-xs text-neutral-400 uppercase tracking-wider mb-2">
+  <div className="group">
+    <div className="text-xs text-neutral-500 uppercase tracking-widest font-medium mb-2">
       {label}
     </div>
-    <div className="text-2xl font-light text-white">{value}</div>
+    <div className="text-3xl font-extralight text-white tracking-tight tabular-nums">
+      {value}
+    </div>
   </div>
 );
 
@@ -184,39 +186,43 @@ export default function QRCode() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-400 hover:text-white mb-8 transition-colors cursor-pointer text-sm"
+          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Dashboard</span>
         </button>
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-light text-white mb-3">QR Code</h1>
-          <p className="text-neutral-400 text-lg">
+        <div className="mb-16">
+          <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+            QR Code
+          </h1>
+          <p className="text-neutral-500 text-base">
             Download and share your QR code
           </p>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 mb-20">
           {/* QR Code Display */}
-          <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-              <h2 className="text-xl font-light text-white">QR Code</h2>
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <h2 className="text-2xl font-extralight text-white tracking-tight">
+                QR Code
+              </h2>
+              <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
 
-            <div className="bg-white p-2 mb-6 flex items-center justify-center mx-auto w-fit">
+            <div className="bg-white p-2 mb-8 flex items-center justify-center mx-auto w-fit">
               {link?.qrCode ? (
                 <img
                   src={link.qrCode}
                   alt="QR Code"
-                  className="w-64 h-64"
+                  className="w-80 h-80"
                   style={{ imageRendering: "pixelated" }}
                 />
               ) : (
-                <div className="w-64 h-64 bg-neutral-200 flex items-center justify-center">
+                <div className="w-80 h-80 bg-neutral-200 flex items-center justify-center">
                   <p className="text-neutral-600">QR Code not available</p>
                 </div>
               )}
@@ -226,7 +232,7 @@ export default function QRCode() {
               <button
                 onClick={downloadQRCode}
                 disabled={!link?.qrCode}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#76B900] text-black py-3 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#76B900] text-black py-4 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm uppercase tracking-wider"
               >
                 <Download className="w-4 h-4" />
                 <span>Download</span>
@@ -234,7 +240,7 @@ export default function QRCode() {
               <button
                 onClick={() => copyToClipboard(link?.qrCode)}
                 disabled={!link?.qrCode}
-                className="px-4 border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="px-5 text-neutral-400 hover:text-[#76B900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Copy className="w-4 h-4" />
               </button>
@@ -242,27 +248,29 @@ export default function QRCode() {
           </div>
 
           {/* Link Information */}
-          <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-              <h2 className="text-xl font-light text-white">Link Details</h2>
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <h2 className="text-2xl font-extralight text-white tracking-tight">
+                Link Details
+              </h2>
+              <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Short URL */}
-              <div>
-                <label className="text-neutral-400 text-xs uppercase tracking-wider block mb-2">
+              <div className="pb-8 border-b border-neutral-900/50">
+                <label className="text-neutral-500 text-xs uppercase tracking-widest block mb-3 font-medium">
                   Short URL
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <a
                     href={link?.shortUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors flex-1 break-all cursor-pointer"
+                    className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors flex-1 break-all cursor-pointer text-lg font-light group/link"
                   >
                     <span>{link?.shortUrl}</span>
-                    <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                    <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
                   </a>
                   <button
                     onClick={() => copyToClipboard(link?.shortUrl)}
@@ -274,37 +282,37 @@ export default function QRCode() {
               </div>
 
               {/* Original URL */}
-              <div>
-                <label className="text-neutral-400 text-xs uppercase tracking-wider block mb-2">
+              <div className="pb-8 border-b border-neutral-900/50">
+                <label className="text-neutral-500 text-xs uppercase tracking-widest block mb-3 font-medium">
                   Original URL
                 </label>
-                <p className="text-neutral-300 text-sm break-all">
+                <p className="text-neutral-400 text-sm break-all font-light">
                   {link?.originalUrl}
                 </p>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4 pt-4">
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-x-12 gap-y-8 py-8 border-b border-neutral-900/50">
                 <StatCard value={link?.clicks || 0} label="Total Clicks" />
                 <StatCard value={link?.createdAt} label="Created" />
               </div>
 
-              {/* Actions */}
-              <div className="pt-4 border-t border-neutral-800">
-                <label className="text-neutral-400 text-xs uppercase tracking-wider block mb-3">
+              {/* Quick Actions */}
+              <div>
+                <label className="text-neutral-500 text-xs uppercase tracking-widest block mb-4 font-medium">
                   Quick Actions
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => copyToClipboard(link?.shortUrl)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-neutral-400 hover:text-[#76B900] hover:bg-neutral-900/20 transition-all cursor-pointer text-sm border-b border-neutral-900/50 hover:border-[#76B900]/50"
                   >
                     <Copy className="w-4 h-4" />
                     <span>Copy Link</span>
                   </button>
                   <button
                     onClick={() => navigate(`/analytics/${link?.id}`)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 border border-neutral-800 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] hover:bg-[#76B900]/10 transition-colors cursor-pointer text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-neutral-400 hover:text-[#76B900] hover:bg-neutral-900/20 transition-all cursor-pointer text-sm border-b border-neutral-900/50 hover:border-[#76B900]/50"
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span>Analytics</span>
@@ -316,19 +324,21 @@ export default function QRCode() {
         </div>
 
         {/* Usage Tips */}
-        <div className="border border-neutral-800 p-8 bg-[#0D0F13]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-            <h2 className="text-xl font-light text-white">Usage Tips</h2>
+        <div className="border-t border-neutral-900 pt-16">
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="text-2xl font-extralight text-white tracking-tight">
+              Usage Tips
+            </h2>
+            <div className="h-px flex-1 bg-neutral-900"></div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
             {usageTips.map((tip, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 text-neutral-300 text-sm"
+                className="flex items-start gap-3 text-neutral-400 text-sm hover:text-white transition-colors group"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#76B900] mt-2 flex-shrink-0"></div>
-                <span>{tip}</span>
+                <div className="w-1 h-1 rounded-full bg-[#76B900] mt-2 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
+                <span className="font-light">{tip}</span>
               </div>
             ))}
           </div>

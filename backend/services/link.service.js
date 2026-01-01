@@ -2,10 +2,14 @@ import Link from "../models/Link.js";
 import QRCode from "qrcode";
 import mongoose from "mongoose";
 import { trackAnalytics } from "./analytics.service.js";
+import { isValidUrl } from "../utils/validateUrl.js";
 
 export const createUserLink = async (userId, data) => {
   const { originalUrl, customAlias } = data;
-  if (!originalUrl) throw new Error();
+
+  if (!originalUrl || !isValidUrl(originalUrl)) {
+    throw new Error("Invalid URL");
+  }
 
   if (customAlias) {
     const exists = await Link.findOne({ shortCode: customAlias });
@@ -27,7 +31,9 @@ export const createUserLink = async (userId, data) => {
 
 export const createGuestLink = async (data) => {
   const { originalUrl, customAlias, sessionId } = data;
-  if (!originalUrl || !sessionId) throw new Error();
+  if (!originalUrl || !isValidUrl(originalUrl) || !sessionId) {
+    throw new Error("Invalid URL");
+  }
 
   const existing = await Link.find({ sessionId, user: null });
   if (existing.length >= 1) throw new Error();
@@ -65,7 +71,12 @@ export const updateUserLink = async (userId, linkId, data) => {
 
   const { originalUrl, customAlias } = data;
 
-  if (originalUrl) link.originalUrl = originalUrl;
+  if (originalUrl) {
+    if (!isValidUrl(originalUrl)) {
+      throw new Error("Invalid URL");
+    }
+    link.originalUrl = originalUrl;
+  }
 
   if (customAlias && customAlias !== link.shortCode) {
     const exists = await Link.findOne({
