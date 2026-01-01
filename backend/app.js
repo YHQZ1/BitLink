@@ -44,7 +44,7 @@ export function createApp() {
 
   app.get("/r/:code", redirectToOriginal);
 
-  app.use((err, req, res, next) => {
+  app.use((err, req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   });
 

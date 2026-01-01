@@ -223,7 +223,9 @@ export default function LandingPage() {
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="BitLink" className="w-10 h-10" />
-            <span className="text-[20px] font-medium tracking-tight">Bit</span>
+            <span className="text-[20px] font-medium tracking-tight">
+              BitLink
+            </span>
           </div>
           <div className="hidden md:flex gap-12 text-[20px] font-medium tracking-tight">
             <button
