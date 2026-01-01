@@ -26,7 +26,7 @@ jobs:
             set -e
 
             echo "→ Moving to project directory"
-            cd /home/ubuntu/bitLink
+            cd /home/ubuntu/bitlink
 
             echo "→ Logging into GHCR"
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
