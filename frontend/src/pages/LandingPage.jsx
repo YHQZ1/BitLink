@@ -222,7 +222,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="BitLink" className="w-10 h-10" />
+            <img src="/logo.png" alt="Bit" className="w-10 h-10" />
             <span className="text-[20px] font-medium tracking-tight">
               BitLink
             </span>
