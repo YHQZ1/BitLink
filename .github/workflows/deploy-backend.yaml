@@ -41,3 +41,6 @@ jobs:
             docker compose up -d backend
 
             echo "Backend deployed successfully"
+      - name: Trigger Vercel frontend deploy
+        run: |
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
