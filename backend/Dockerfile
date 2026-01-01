@@ -1,9 +1,22 @@
-FROM node:24
+FROM node:18-alpine
+
+# Set working directory inside the container
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --production
+# Copy dependency manifests first (enables layer caching)
+COPY package.json package-lock.json ./
+
+# Install only production dependencies, deterministically
+RUN npm ci --only=production
+
+# Copy application source code
 COPY . .
 
+# Safety net: ensure secrets are never baked into the image
+RUN rm -f bitlink-key.pem || true
+
+# Expose backend port
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# Start the application
+CMD ["node", "server.js"]

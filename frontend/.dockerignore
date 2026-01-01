@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+.vite
+.cache
+
+.git
+.gitignore
+Dockerfile
+docker-compose.yaml
+
+README.md
+coverage
+*.log
+
+.env
+.env.*

@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+bitlink-key.pem
+
+.git
+.gitignore
+Dockerfile
+docker-compose.yaml
+
+coverage
+logs
+*.log
+
+README.md
+server-start.txt
