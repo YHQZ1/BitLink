@@ -80,10 +80,10 @@ const features = [
 ];
 
 const stats = [
-  { value: "10M+", label: "Links Created" },
-  { value: "62⁶", label: "ID Space" },
+  { value: "50B+", label: "ID Space" },
   { value: "99.9%", label: "Uptime" },
   { value: "<100ms", label: "Response Time" },
+  { value: "Daily", label: "Active Redirects" },
 ];
 
 const useCases = [
@@ -123,7 +123,6 @@ const pricingPlans = [
     name: "Pro",
     price: "$9",
     period: "per month",
-    popular: true,
     features: [
       "Unlimited links",
       "Advanced analytics",
@@ -642,17 +641,8 @@ export default function LandingPage() {
           {pricingPlans.map((plan, i) => (
             <div
               key={i}
-              className={`border p-8 relative flex flex-col ${
-                plan.popular
-                  ? "border-[#76B900] bg-[#76B900]/5"
-                  : "border-neutral-800"
-              }`}
+              className="border border-neutral-800 p-8 flex flex-col"
             >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#76B900] text-black text-xs px-3 py-1 font-medium">
-                  MOST POPULAR
-                </div>
-              )}
               <div className="mb-6">
                 <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
@@ -662,6 +652,7 @@ export default function LandingPage() {
                   </span>
                 </div>
               </div>
+
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, j) => (
                   <li key={j} className="flex items-start gap-3 text-sm">
@@ -670,13 +661,10 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
+
               <button
                 onClick={() => navigate("/auth")}
-                className={`mt-auto w-full py-3 cursor-pointer transition-colors ${
-                  plan.popular
-                    ? "bg-[#76B900] text-black hover:bg-[#8FD400]"
-                    : "border border-neutral-700 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900]"
-                }`}
+                className="mt-auto w-full py-3 border border-neutral-700 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] transition-colors cursor-pointer"
               >
                 {plan.name === "Free"
                   ? "Start free"

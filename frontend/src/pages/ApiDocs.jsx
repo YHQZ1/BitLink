@@ -222,7 +222,7 @@ export default function ApiDocs() {
                     <div>
                       <h3 className="text-sm font-medium mb-2">Base URL</h3>
                       <code className="text-sm text-neutral-300 break-all">
-                        https://api.bitlink.xyz
+                        https://api.bitlk.in
                       </code>
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export default function ApiDocs() {
                 </h3>
                 <CodeBlock
                   language="bash"
-                  code={`curl -X POST https://api.bitlink.xyz/api/auth/login \\
+                  code={`curl -X POST https://api.bitlk.in/api/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{
     "email": "user@example.com",
@@ -258,7 +258,7 @@ export default function ApiDocs() {
                 </h3>
                 <CodeBlock
                   language="bash"
-                  code={`curl -X GET https://api.bitlink.xyz/api/links \\
+                  code={`curl -X GET https://api.bitlk.in/api/links \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`}
                 />
 
@@ -325,7 +325,7 @@ export default function ApiDocs() {
                     code={`{
   "id": "507f1f77bcf86cd799439011",
   "originalUrl": "https://example.com/very-long-url",
-  "shortUrl": "https://bitlink.xyz/r/my-link",
+  "shortUrl": "https://api.bitlk.in/r/my-link",
   "shortCode": "my-link",
   "clicks": 0,
   "createdAt": "2025-01-15T10:30:00.000Z",
@@ -386,7 +386,7 @@ export default function ApiDocs() {
                     code={`{
   "id": "507f1f77bcf86cd799439011",
   "originalUrl": "https://example.com/article",
-  "shortUrl": "https://bitlink.xyz/r/article-2025",
+  "shortUrl": "https://api.bitlk.in/r/article-2025",
   "shortCode": "article-2025",
   "clicks": 0,
   "createdAt": "2025-01-15T10:30:00.000Z",
@@ -417,7 +417,7 @@ export default function ApiDocs() {
   {
     "id": "507f1f77bcf86cd799439011",
     "originalUrl": "https://example.com",
-    "shortUrl": "https://bitlink.xyz/r/abc123",
+    "shortUrl": "https://api.bitlk.in/r/abc123",
     "shortCode": "abc123",
     "clicks": 147,
     "createdAt": "2025-01-10T08:00:00.000Z",
@@ -467,7 +467,7 @@ export default function ApiDocs() {
                     code={`{
   "id": "507f1f77bcf86cd799439011",
   "originalUrl": "https://example.com/updated",
-  "shortUrl": "https://bitlink.xyz/r/new-alias",
+  "shortUrl": "https://api.bitlk.in/r/new-alias",
   "shortCode": "new-alias",
   "clicks": 147,
   "createdAt": "2025-01-10T08:00:00.000Z",
@@ -608,7 +608,7 @@ export default function ApiDocs() {
   "link": {
     "id": "507f1f77bcf86cd799439011",
     "shortCode": "abc123",
-    "shortUrl": "https://bitlink.xyz/r/abc123",
+    "shortUrl": "https://api.bitlk.in/r/abc123",
     "originalUrl": "https://example.com",
     "clicks": 1247,
     "createdAt": "2025-01-10T08:00:00.000Z",
@@ -658,7 +658,7 @@ export default function ApiDocs() {
     {
       "id": "507f1f77bcf86cd799439011",
       "shortCode": "abc123",
-      "shortUrl": "https://bitlink.xyz/r/abc123",
+      "shortUrl": "https://api.bitlk.in/r/abc123",
       "originalUrl": "https://example.com",
       "clicks": 1247,
       "createdAt": "2025-01-10T08:00:00.000Z",
@@ -767,7 +767,7 @@ export default function ApiDocs() {
                   </h4>
                   <CodeBlock
                     language="bash"
-                    code={`curl -I https://bitlink.xyz/r/abc123
+                    code={`curl -I https://api.bitlk.in/r/abc123
 
 # HTTP/1.1 302 Found
 # Location: https://example.com`}
@@ -977,7 +977,7 @@ export default function ApiDocs() {
                       Check real-time API status and uptime
                     </p>
                     <a
-                      href="https://status.bitlink.xyz"
+                      https:href="#"
                       className="text-sm text-[#76B900] hover:text-[#8FD400] flex items-center gap-2"
                     >
                       status.bitlink.xyz
