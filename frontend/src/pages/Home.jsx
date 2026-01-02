@@ -21,20 +21,35 @@ import {
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
 
-const isValidUrl = (value) => {
+const normalizeAndValidateUrl = (input) => {
+  if (!input) return null;
+
+  let value = input.trim();
+
+  if (!/^https?:\/\//i.test(value)) {
+    value = "https://" + value;
+  }
+
   try {
     const url = new URL(value);
-    return ["http:", "https:"].includes(url.protocol);
-  } catch {
-    return false;
-  }
-};
 
-const normalizeUrl = (value) => {
-  if (!/^https?:\/\//i.test(value)) {
-    return `https://${value}`;
+    if (!["http:", "https:"].includes(url.protocol)) return null;
+
+    const hostname = url.hostname;
+
+    if (
+      !hostname ||
+      !hostname.includes(".") ||
+      hostname.startsWith(".") ||
+      hostname.endsWith(".")
+    ) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
   }
-  return value;
 };
 
 const Toast = ({ isVisible, type, message, onClose }) => {
@@ -372,10 +387,10 @@ export default function Home() {
       return;
     }
 
-    const normalizedUrl = normalizeUrl(url);
+    const normalizedUrl = normalizeAndValidateUrl(url);
 
-    if (!isValidUrl(normalizedUrl)) {
-      showToast("error", "Please enter a valid URL (http or https)");
+    if (!normalizedUrl) {
+      showToast("error", "Please enter a valid URL");
       return;
     }
 
@@ -409,10 +424,15 @@ export default function Home() {
   const handleSaveEdit = async (linkId) => {
     try {
       const requestBody = {};
-      if (editOriginalUrl && !isValidUrl(editOriginalUrl)) {
-        showToast("error", "Invalid URL");
-        return;
+      if (editOriginalUrl) {
+        const normalized = normalizeAndValidateUrl(editOriginalUrl);
+        if (!normalized) {
+          showToast("error", "Invalid URL");
+          return;
+        }
+        requestBody.originalUrl = normalized;
       }
+
       if (editCustomAlias) requestBody.customAlias = editCustomAlias;
 
       const response = await api.put(`/api/links/${linkId}`, requestBody);

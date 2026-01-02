@@ -23,6 +23,37 @@ import {
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
+const normalizeAndValidateUrl = (input) => {
+  if (!input) return null;
+
+  let value = input.trim();
+
+  if (!/^https?:\/\//i.test(value)) {
+    value = "https://" + value;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (!["http:", "https:"].includes(url.protocol)) return null;
+
+    const hostname = url.hostname;
+
+    if (
+      !hostname ||
+      !hostname.includes(".") ||
+      hostname.startsWith(".") ||
+      hostname.endsWith(".")
+    ) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+};
+
 const ShortenedUrlDisplay = ({ url, onCopy }) => (
   <div className="py-6 border-t border-neutral-900/50 mt-6">
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
@@ -170,9 +201,9 @@ export default function LandingPage() {
   const handleShorten = async () => {
     if (!url) return;
 
-    try {
-      new URL(url);
-    } catch {
+    const normalizedUrl = normalizeAndValidateUrl(url);
+
+    if (!normalizedUrl) {
       return;
     }
 
@@ -183,7 +214,7 @@ export default function LandingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          originalUrl: url,
+          originalUrl: normalizedUrl,
           sessionId: guestSessionId,
         }),
       });
@@ -201,7 +232,7 @@ export default function LandingPage() {
 
       setShortenedUrl({
         shortUrl: link.shortUrl,
-        originalUrl: link.originalUrl || url,
+        originalUrl: link.originalUrl || normalizedUrl,
         createdAt: link.createdAt || new Date().toISOString(),
         clicks: link.clicks ?? 0,
       });
