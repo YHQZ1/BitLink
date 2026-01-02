@@ -3,6 +3,9 @@ import QRCode from "qrcode";
 import mongoose from "mongoose";
 import { trackAnalytics } from "./analytics.service.js";
 import { isValidUrl } from "../utils/validateUrl.js";
+import redis from "../lib/redis.js";
+
+const REDIRECT_CACHE_TTL = 60 * 60 * 24;
 
 export const createUserLink = async (userId, data) => {
   const { originalUrl, customAlias } = data;
@@ -75,10 +78,14 @@ export const updateUserLink = async (userId, linkId, data) => {
     if (!isValidUrl(originalUrl)) {
       throw new Error("Invalid URL");
     }
+
     link.originalUrl = originalUrl;
+    await redis.del(`link:${link.shortCode}`);
   }
 
   if (customAlias && customAlias !== link.shortCode) {
+    const oldShortCode = link.shortCode;
+
     const exists = await Link.findOne({
       shortCode: customAlias,
       _id: { $ne: linkId },
@@ -86,8 +93,11 @@ export const updateUserLink = async (userId, linkId, data) => {
     if (exists) throw new Error();
 
     link.shortCode = customAlias;
+
     const baseUrl = process.env.BASE_URL;
     link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${customAlias}`);
+
+    await redis.del(`link:${oldShortCode}`);
   }
 
   await link.save();
@@ -100,6 +110,7 @@ export const deleteUserLink = async (userId, linkId) => {
   const link = await Link.findOne({ _id: linkId, user: userId });
   if (!link) throw new Error();
 
+  await redis.del(`link:${link.shortCode}`);
   await Link.deleteOne({ _id: linkId });
   await mongoose.model("Analytics").deleteMany({ link: linkId });
 };
@@ -116,7 +127,19 @@ export const migrateGuestLinks = async (userId, sessionId) => {
 };
 
 export const resolveRedirect = async (code, req) => {
-  const link = await Link.findOne({ shortCode: code });
+  const cacheKey = `link:${code}`;
+
+  const cached = await redis.get(cacheKey);
+
+  if (cached) {
+    const { originalUrl } = JSON.parse(cached);
+
+    trackAnalyticsFromCache(code, req).catch(() => {});
+
+    return originalUrl;
+  }
+
+  const link = await Link.findOne({ shortCode: code, isActive: true });
   if (!link) throw new Error();
 
   if (link.expiresAt && link.expiresAt < new Date()) {
@@ -131,9 +154,30 @@ export const resolveRedirect = async (code, req) => {
   link.isActive = true;
 
   await link.save();
+
+  await redis.set(
+    cacheKey,
+    JSON.stringify({
+      originalUrl: link.originalUrl,
+    }),
+    { EX: REDIRECT_CACHE_TTL }
+  );
+
   await trackAnalytics(link, req);
 
   return link.originalUrl;
+};
+
+const trackAnalyticsFromCache = async (shortCode, req) => {
+  const link = await Link.findOne({ shortCode });
+  if (!link) return;
+
+  link.clicks += 1;
+  link.lastAccessed = new Date();
+  link.lastActivity = new Date();
+
+  await link.save();
+  await trackAnalytics(link, req);
 };
 
 const sanitizeLink = (link) => ({
