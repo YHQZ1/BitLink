@@ -1,97 +1,149 @@
 # BitLink
 
-BitLink is a production-oriented URL shortening and analytics platform built with a strong emphasis on backend architecture, scalability, and clean code separation. The system supports authenticated and guest workflows, detailed analytics, and OAuth-based identity unification, designed from a system-design perspective rather than a CRUD application mindset.
+BitLink is a production-grade URL shortening and analytics platform engineered with a **system-design-first mindset**. It focuses on scalability, fault tolerance, and clean architectural boundaries rather than being a basic CRUD demo.
+
+The platform supports authenticated and guest workflows, deep analytics, QR codes, and a horizontally scalable backend backed by modern infrastructure patterns.
 
 ---
 
 ## Overview
 
-BitLink enables users to create short links, manage them through a dashboard, and analyze traffic patterns at both link-level and account-level granularity. The backend is fully refactored into a service-driven architecture and designed to scale horizontally with caching, load balancing, and async processing in mind.
+BitLink allows users to create, manage, and analyze short links through a performant dashboard. It provides **per-link and global analytics**, real-time redirect handling, and a backend designed to scale under high traffic.
+
+The system is containerized, cache-aware, rate-limited, CDN-friendly, and built to evolve into a Kubernetes-orchestrated environment with full observability and infrastructure-as-code.
 
 ---
 
-## Core Capabilities
+## Core Features
 
 ### Authentication & Identity
-- Email/password authentication
+
+- Email and password authentication
 - OAuth 2.0 with GitHub and Google
-- Single logical user mapped across providers via email
-- JWT-based stateless auth
-- Limited guest usage with post-signup migration
+- Unified user identity across providers (email-based)
+- JWT-based stateless authentication
+- Limited guest usage with post-signup link migration
 
 ### Link Management
-- Custom aliases with collision handling
-- QR code generation
-- Link updates, deletion, expiration
-- Active/inactive link tracking
-- Guest link migration after authentication
+
+- URL shortening with custom aliases
+- Collision handling and validation
+- QR code generation per link
+- Link expiration and status management
+- Guest link ownership migration after authentication
 
 ### Analytics
+
 - Event-based click tracking
-- Device, browser, OS detection
-- Geo-resolution (country, city)
-- Referrer categorization
-- Per-link and global analytics
-- Time-window filtering and peak-hour analysis
+- Device, browser, and OS detection
+- Geo-location resolution (country, city)
+- Referrer and source classification
+- Per-link and account-level analytics
+- Time-range filtering and peak activity analysis
+
+### Dashboards
+
+- Centralized analytics dashboard
+- Per-link performance views
+- Traffic trends and usage insights
+- Optimized aggregation queries for large datasets
 
 ---
 
-## Architecture
-
-### High-Level Design
-
-- Frontend: React (Vite) on Vercel  
-- Backend: Node.js + Express on Render  
-- Database: MongoDB (Mongoose)  
-- Auth: JWT + OAuth 2.0  
-- Analytics: Write-optimized event model  
+## High-Level Architecture
 
 ```
-
-Client → Frontend → Backend API → Database
-
+Client
+  ↓
+CDN
+  ↓
+Reverse Proxy / Load Balancer
+  ↓
+Backend API (Dockerized, Stateless)
+  ↓
+Cache (Hot paths)
+  ↓
+MongoDB Atlas
 ```
 
-The backend is stateless and suitable for horizontal scaling behind a load balancer.
+Redirects are optimized for **low latency**, while analytics writes are handled asynchronously to avoid blocking the request path.
 
 ---
 
-## Backend Design
+## Tech Stack
+
+### Frontend
+
+- React (Vite)
+- Deployed on Vercel
+- Custom domain with HTTPS
+
+### Backend
+
+- Node.js + Express
+- Dockerized services
+- Hosted on AWS
+- Stateless architecture for horizontal scaling
+
+### Database
+
+- MongoDB Atlas
+- Indexed collections for analytics and redirects
+- Aggregation pipelines for reporting
+
+### Infrastructure & System Design
+
+- CDN for edge caching and faster redirects
+- Reverse proxy and load balancing
+- Redis-backed caching for hot links
+- API-level and redirect-level rate limiting
+- Asynchronous processing via queues
+- Environment-based configuration
+
+### Observability & IaC (Ongoing / Upcoming)
+
+- Metrics and dashboards with Prometheus and Grafana
+- Kubernetes-based orchestration and load balancing
+- Terraform for infrastructure as code
+- Centralized logging and monitoring
+
+---
+
+## Backend Design Principles
 
 The backend follows strict separation of concerns:
 
-- **Controllers**: HTTP lifecycle only
-- **Services**: Business logic and invariants
-- **Utilities**: Stateless helpers (UA parsing, geo lookup)
-- **Models**: Schema definitions and database constraints
+- **Controllers** – HTTP lifecycle and request validation only
+- **Services** – Core business logic and invariants
+- **Models** – Database schemas and constraints
+- **Utilities** – Stateless helpers (UA parsing, geo lookup, etc.)
 
-A previously monolithic controller (~1000 lines) was decomposed into focused services, improving maintainability, testability, and extensibility.
+A previously monolithic controller layer was fully refactored into focused services, improving maintainability, testability, and scalability.
 
 ---
 
 ## Analytics Flow
 
-1. Short link is resolved
-2. Redirect is validated and executed
-3. Analytics event is recorded asynchronously
-4. Link metadata is updated (clicks, last activity)
-5. Redirect proceeds regardless of analytics outcome
+1. Short link request is received
+2. Cache is checked for redirect metadata
+3. Redirect is validated and executed
+4. Analytics event is queued asynchronously
+5. Link metadata is updated independently
 
-Redirect latency is never blocked by analytics writes.
+Analytics failures **never block redirects**.
 
 ---
 
-## Scalability & System Design
+## Scalability & Performance
 
-The system is designed and implemented with:
+BitLink is designed with real-world traffic in mind:
 
-- Redis-backed caching for hot redirects
-- Rate limiting at the API and redirect layer
-- Asynchronous analytics processing
-- Stateless backend instances behind a load balancer
 - CDN-friendly redirect endpoints
-- MongoDB indexing and aggregation optimization
-- Clear upgrade path to message queues and stream processing
+- Redis caching for high-frequency links
+- Stateless backend instances behind a load balancer
+- Rate limiting to prevent abuse
+- Optimized MongoDB indexes and aggregations
+- Clear migration path to Kubernetes and advanced queueing
 
 ---
 
@@ -99,28 +151,29 @@ The system is designed and implemented with:
 
 - Bcrypt password hashing
 - Signed and verified JWTs
-- OAuth tokens never exposed client-side
-- Strict CORS configuration
+- OAuth tokens never exposed to the client
+- Strict CORS and request validation
 - Authorization enforced on all protected routes
-- Guest access constrained by session rules
+- Controlled guest access with server-side constraints
 
 ---
 
 ## Deployment
 
-- Frontend: Vercel
-- Backend: Render
-- Database: External MongoDB
-- Environment-based configuration
-- Dockerized services for local and production parity
+- Frontend: Vercel (custom domain)
+- Backend: AWS (Dockerized)
+- Database: MongoDB Atlas
+- CDN, proxy, and load balancer in front of backend
+- Environment-driven configuration for all services
 
 ---
 
 ## Purpose
 
 BitLink was built to:
+
 - Apply real system-design principles to a real product
-- Design analytics pipelines beyond simple counters
-- Implement OAuth correctly in production
-- Practice backend refactoring at scale
+- Design analytics beyond simple counters
+- Build a production-ready redirect pipeline
+- Practice scalable backend architecture
 - Think in terms of traffic, failure modes, and growth

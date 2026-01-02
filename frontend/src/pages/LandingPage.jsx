@@ -24,33 +24,35 @@ import {
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const ShortenedUrlDisplay = ({ url, onCopy }) => (
-  <div className="border border-neutral-800 p-4 mt-6">
-    <div className="flex items-center justify-between gap-4">
+  <div className="py-6 border-t border-neutral-900/50 mt-6">
+    <div className="flex items-center justify-between gap-4 mb-2">
       <a
         href={url.shortUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[#76B900] text-sm break-all flex items-center gap-1"
+        className="text-[#76B900] text-sm break-all flex items-center gap-2 hover:text-[#8FD400] transition-colors"
       >
         {url.shortUrl}
         <ExternalLink className="w-3 h-3" />
       </a>
       <button
         onClick={() => onCopy(url.shortUrl)}
-        className="text-neutral-400 hover:text-[#76B900] cursor-pointer"
+        className="text-neutral-500 hover:text-[#76B900] cursor-pointer transition-colors"
       >
         <Copy className="w-4 h-4" />
       </button>
     </div>
-    <p className="text-xs text-neutral-500 mt-2 break-all">{url.originalUrl}</p>
-    <div className="flex gap-6 text-xs text-neutral-500 mt-3">
-      <span className="flex items-center gap-1">
+    <p className="text-xs text-neutral-600 mb-3 break-all font-light">
+      {url.originalUrl}
+    </p>
+    <div className="flex gap-6 text-xs text-neutral-700">
+      <span className="flex items-center gap-1.5">
         <Calendar className="w-3 h-3" />
         {new Date(url.createdAt).toLocaleDateString()}
       </span>
-      <span className="flex items-center gap-1">
+      <span className="flex items-center gap-1.5">
         <MousePointerClick className="w-3 h-3" />
-        {url.clicks || 0} clicks
+        <span className="text-[#76B900]">{url.clicks || 0}</span> clicks
       </span>
     </div>
   </div>
@@ -219,24 +221,24 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-      <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
+      <nav className="fixed top-0 w-full border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="BitLink" className="w-10 h-10" />
-            <span className="text-[20px] font-medium tracking-tight">
+            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+            <span className="text-lg font-extralight tracking-tight text-white">
               BitLink
             </span>
           </div>
-          <div className="hidden md:flex gap-12 text-[20px] font-medium tracking-tight">
+          <div className="hidden md:flex gap-8 text-base font-light">
             <button
               onClick={() => scrollToSection("features")}
-              className="cursor-pointer text-neutral-400 hover:text-white transition-colors"
+              className="cursor-pointer text-neutral-500 hover:text-white transition-colors"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("docs")}
-              className="cursor-pointer text-neutral-400 hover:text-white transition-colors"
+              className="cursor-pointer text-neutral-500 hover:text-white transition-colors"
             >
               Docs
             </button>
@@ -248,44 +250,48 @@ export default function LandingPage() {
             </button>
           </div>
           <button
-            className="md:hidden"
+            className="md:hidden text-neutral-400 hover:text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </nav>
 
       {mobileMenuOpen && (
-        <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-40">
-          <div className="px-5 py-4 flex flex-col gap-4 text-sm">
+        <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-40">
+          <div className="px-5 py-6 flex flex-col gap-3">
             <button
               onClick={() => scrollToSection("features")}
-              className="text-neutral-400 hover:text-white text-left"
+              className="text-neutral-400 hover:text-white text-left transition-colors"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("docs")}
-              className="text-neutral-400 hover:text-white text-left"
+              className="text-neutral-400 hover:text-white text-left transition-colors"
             >
               Docs
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="text-[#76B900] text-left"
+              className="text-[#76B900] text-left hover:text-[#8FD400] transition-colors"
             >
-              Get Started
+              Sign In
             </button>
           </div>
         </div>
       )}
 
-      {/* Hero Section */}
-      <section className="pt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+      {/* Hero Section - Asymmetric */}
+      <section className="pt-32 pb-24 px-5 md:px-8 max-w-[1600px] mx-auto">
+        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-16 items-start">
           <div>
-            <h1 className="text-5xl md:text-6xl font-light leading-tight">
+            <h1 className="text-6xl md:text-7xl font-thin leading-[0.95] tracking-tight mb-8">
               Short links.
               <br />
               Real analytics.
@@ -293,26 +299,29 @@ export default function LandingPage() {
               <span className="text-[#76B900]">Zero noise.</span>
             </h1>
 
-            <p className="text-neutral-400 mt-6 max-w-xl text-lg">
+            <p className="text-neutral-500 max-w-lg text-base font-light leading-relaxed mb-12">
               A fast, minimal URL shortener built for developers and teams who
               care about clarity and control.
             </p>
 
-            <div className="mt-10 max-w-xl">
-              <div className="flex gap-3">
+            <div className="max-w-xl">
+              <label className="text-[#76B900] text-xs uppercase tracking-[0.3em] mb-4 block">
+                Try it now
+              </label>
+              <div className="flex gap-3 mb-2">
                 <input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleShorten()}
-                  placeholder="https://example.com"
-                  className="flex-1 bg-transparent border border-neutral-700 px-4 py-3 text-sm focus:border-[#76B900] outline-none"
+                  placeholder="https://example.com/your-long-url"
+                  className="flex-1 bg-transparent border-b-2 border-neutral-800 px-0 py-4 text-white placeholder-neutral-800 text-sm font-light focus:border-[#76B900] outline-none transition-colors"
                 />
                 <button
                   onClick={handleShorten}
                   disabled={isLoading}
-                  className="px-6 py-3 border border-[#76B900] text-[#76B900] hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer disabled:opacity-50"
+                  className="border-2 border-[#76B900] text-[#76B900] px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer disabled:opacity-50 text-xs uppercase tracking-widest font-medium"
                 >
-                  {isLoading ? "..." : "Shorten"}
+                  {isLoading ? "..." : "Go"}
                 </button>
               </div>
 
@@ -320,97 +329,78 @@ export default function LandingPage() {
                 <ShortenedUrlDisplay
                   url={shortenedUrl}
                   onCopy={copyToClipboard}
-                  className="cursor-pointer"
                 />
               )}
 
               {authRequired && (
-                <div className="mt-4 border border-neutral-800 px-4 py-3 text-sm flex items-center justify-between">
-                  <span className="text-neutral-400">
+                <div className="mt-6 py-4 border-t border-neutral-900/50 text-sm flex items-center justify-between">
+                  <span className="text-neutral-600 font-light">
                     Free limit reached. Sign in to continue.
                   </span>
                   <button
                     onClick={() => navigate("/auth")}
-                    className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors whitespace-nowrap"
+                    className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors whitespace-nowrap flex items-center gap-2"
                   >
-                    Login →
+                    Login <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Dashboard Preview Card */}
-          <div className="hidden lg:block h-full">
-            <div className="border border-neutral-800 p-6 bg-gradient-to-br from-[#0D0F13] to-[#0B0D10] h-full flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#76B900]"></div>
-                  <span className="text-xs text-neutral-400">
-                    Live Analytics
-                  </span>
-                </div>
-                <div className="text-xs text-neutral-500">Last 7 days</div>
+          {/* Dashboard Preview */}
+          <div className="hidden lg:block">
+            <div className="border-l-2 border-neutral-900 pl-8">
+              <div className="flex items-baseline gap-3 mb-8">
+                <div className="w-2 h-2 bg-[#76B900]"></div>
+                <span className="text-xs text-neutral-600 uppercase tracking-wider">
+                  Live Dashboard
+                </span>
               </div>
 
               {/* Mini Chart */}
-              <div className="h-32 mb-6">
+              <div className="h-24 mb-8 opacity-70">
                 <svg
                   viewBox="0 0 100 40"
                   preserveAspectRatio="none"
                   className="w-full h-full"
                 >
                   <path
-                    d="
-        M0 28
-        L10 24
-        L20 26
-        L30 20
-        L40 22
-        L50 18
-        L60 21
-        L70 14
-        L80 17
-        L90 13
-        L100 15
-      "
+                    d="M0 28 L10 24 L20 26 L30 20 L40 22 L50 18 L60 21 L70 14 L80 17 L90 13 L100 15"
                     fill="none"
                     stroke="#76B900"
-                    strokeWidth="0.8"
+                    strokeWidth="1"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    opacity="0.9"
                   />
                 </svg>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="border border-neutral-800 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <MousePointerClick className="w-3 h-3 text-[#76B900]" />
-                    <span className="text-xs text-neutral-400">
-                      Total Clicks
-                    </span>
+              {/* Stats */}
+              <div className="space-y-6 mb-8">
+                <div className="border-l-2 border-[#76B900] pl-4">
+                  <div className="text-4xl font-thin text-white tabular-nums mb-1">
+                    12,847
                   </div>
-                  <div className="text-2xl font-light">12,847</div>
+                  <div className="text-xs text-neutral-600 uppercase tracking-wider">
+                    Total Clicks
+                  </div>
                   <div className="text-xs text-[#76B900] mt-1">+23.5%</div>
                 </div>
-                <div className="border border-neutral-800 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Link2 className="w-3 h-3 text-[#76B900]" />
-                    <span className="text-xs text-neutral-400">
-                      Active Links
-                    </span>
+                <div className="border-l-2 border-neutral-800 pl-4">
+                  <div className="text-4xl font-thin text-white tabular-nums mb-1">
+                    284
                   </div>
-                  <div className="text-2xl font-light">284</div>
-                  <div className="text-xs text-[#76B900] mt-1">+12</div>
+                  <div className="text-xs text-neutral-600 uppercase tracking-wider">
+                    Active Links
+                  </div>
+                  <div className="text-xs text-[#76B900] mt-1">+12 new</div>
                 </div>
               </div>
 
               {/* Recent Links */}
-              <div className="flex-1">
-                <div className="text-xs text-neutral-400 mb-3">
+              <div>
+                <div className="text-xs text-neutral-700 mb-4 uppercase tracking-wider">
                   Recent Activity
                 </div>
                 <div className="space-y-3">
@@ -421,11 +411,13 @@ export default function LandingPage() {
                   ].map((link, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between text-xs border-l-2 border-[#76B900]/20 pl-3 py-1"
+                      className="flex items-center justify-between text-xs py-2 border-b border-neutral-900/50"
                     >
-                      <span className="text-neutral-300">{link.short}</span>
-                      <span className="text-neutral-500">
-                        {link.clicks} clicks
+                      <span className="text-neutral-400 font-light">
+                        {link.short}
+                      </span>
+                      <span className="text-neutral-700 tabular-nums">
+                        {link.clicks}
                       </span>
                     </div>
                   ))}
@@ -437,14 +429,16 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="mt-24 px-5 md:px-8 max-w-[1600px] mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto border-y border-neutral-900">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {stats.map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-3xl md:text-4xl font-light text-[#76B900] mb-2">
+              <div className="text-5xl font-thin text-[#76B900] mb-2 tracking-tighter">
                 {stat.value}
               </div>
-              <div className="text-sm text-neutral-400">{stat.label}</div>
+              <div className="text-xs text-neutral-600 uppercase tracking-wider">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
@@ -453,50 +447,57 @@ export default function LandingPage() {
       {/* Features Section */}
       <section
         id="features"
-        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
       >
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-light mb-4">
-            Everything you need to manage links
+        <div className="mb-16">
+          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+            Everything you need
           </h2>
-          <p className="text-neutral-400 max-w-2xl mx-auto">
-            Powerful features designed to give you complete control over your
-            shortened URLs
-          </p>
+          <div className="flex items-baseline gap-4">
+            <div className="h-px w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+              Features
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
           {features.map((f, i) => (
-            <div
-              key={i}
-              className="border border-neutral-800 p-6 hover:border-neutral-700 transition-colors"
-            >
+            <div key={i} className="border-l-2 border-neutral-900 pl-6 py-2">
               <div className="text-[#76B900] mb-4">{f.icon}</div>
-              <h3 className="text-sm font-medium mb-2">{f.title}</h3>
-              <p className="text-xs text-neutral-400">{f.desc}</p>
+              <h3 className="text-base font-light mb-2 text-white">
+                {f.title}
+              </h3>
+              <p className="text-xs text-neutral-600 font-light leading-relaxed">
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Use Cases Section */}
-      <section className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-light mb-4">
-            Built for teams of all sizes
+      <section className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto border-t border-neutral-900">
+        <div className="mb-16">
+          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+            Built for everyone
           </h2>
-          <p className="text-neutral-400 max-w-2xl mx-auto">
-            Whether you're a solo creator or enterprise team, BitLink scales
-            with your needs
-          </p>
+          <div className="flex items-baseline gap-4">
+            <div className="h-px w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+              Use Cases
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-16">
           {useCases.map((useCase, i) => (
-            <div key={i} className="border border-neutral-800 p-8">
-              <div className="text-[#76B900] mb-4">{useCase.icon}</div>
-              <h3 className="text-xl font-medium mb-3">{useCase.title}</h3>
-              <p className="text-neutral-400 leading-relaxed">
+            <div key={i}>
+              <div className="text-[#76B900] mb-6">{useCase.icon}</div>
+              <h3 className="text-xl font-light mb-4 tracking-tight">
+                {useCase.title}
+              </h3>
+              <p className="text-neutral-600 leading-relaxed text-sm font-light">
                 {useCase.description}
               </p>
             </div>
@@ -507,116 +508,127 @@ export default function LandingPage() {
       {/* Docs/API Section */}
       <section
         id="docs"
-        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20 border-t border-neutral-900"
       >
-        <div className="border border-neutral-800 p-8 md:p-12">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: Copy */}
-            <div>
-              <div className="flex items-center gap-2 text-[#76B900] mb-4">
-                <Code className="w-5 h-5" />
-                <span className="text-sm font-medium">Developer First</span>
-              </div>
-
-              <h2 className="text-3xl md:text-4xl font-light mb-6">
-                A clean, predictable API
-              </h2>
-
-              <p className="text-neutral-400 mb-6 leading-relaxed">
-                BitLink exposes a simple REST API for creating and resolving
-                short links. Designed to be stateless, secure, and easy to
-                integrate into any workflow.
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>JSON-based REST endpoints</span>
-                </li>
-                <li className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Guest and authenticated link creation</span>
-                </li>
-                <li className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Built-in rate limiting and validation</span>
-                </li>
-                <li className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0" />
-                  <span>Per-link analytics and QR generation</span>
-                </li>
-              </ul>
-
-              <button
-                onClick={() => navigate("/api-docs")}
-                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer flex items-center gap-2"
-              >
-                View API Docs
-                <ArrowRight className="w-4 h-4" />
-              </button>
+        <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 items-start">
+          {/* Left: Copy */}
+          <div>
+            <div className="flex items-center gap-2 text-[#76B900] mb-8">
+              <Code className="w-4 h-4" />
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Developer First
+              </span>
             </div>
 
-            {/* Right: Code snippet */}
-            <div className="bg-[#0D0F13] border border-neutral-800 p-6 rounded font-mono text-xs">
-              <div className="text-neutral-500 mb-4">
-                // Create a short link (guest)
+            <h2 className="text-5xl font-thin mb-6 tracking-tight leading-tight">
+              A clean, predictable API
+            </h2>
+
+            <p className="text-neutral-600 mb-8 leading-relaxed font-light">
+              BitLink exposes a simple REST API for creating and resolving short
+              links. Designed to be stateless, secure, and easy to integrate
+              into any workflow.
+            </p>
+
+            <ul className="space-y-4 mb-12 border-l-2 border-neutral-900 pl-6">
+              <li className="flex items-start gap-3 text-sm font-light">
+                <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                <span className="text-neutral-500">
+                  JSON-based REST endpoints
+                </span>
+              </li>
+              <li className="flex items-start gap-3 text-sm font-light">
+                <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                <span className="text-neutral-500">
+                  Guest and authenticated link creation
+                </span>
+              </li>
+              <li className="flex items-start gap-3 text-sm font-light">
+                <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                <span className="text-neutral-500">
+                  Built-in rate limiting and validation
+                </span>
+              </li>
+              <li className="flex items-start gap-3 text-sm font-light">
+                <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                <span className="text-neutral-500">
+                  Per-link analytics and QR generation
+                </span>
+              </li>
+            </ul>
+
+            <button
+              onClick={() => navigate("/api-docs")}
+              className="border-2 border-[#76B900] text-[#76B900] px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer flex items-center gap-2 text-xs uppercase tracking-widest font-medium"
+            >
+              View API Docs
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Right: Code snippet */}
+          <div className="bg-neutral-900/30 border border-neutral-900 p-8 font-mono text-xs">
+            <div className="text-neutral-600 mb-6 font-light">
+              // Create a short link (guest)
+            </div>
+
+            <div className="space-y-1 mb-8">
+              <div>
+                <span className="text-[#76B900]">POST</span>{" "}
+                <span className="text-neutral-500">
+                  /api/links/guest/shorten
+                </span>
               </div>
 
-              <div className="space-y-1">
-                <div>
-                  <span className="text-[#76B900]">POST</span>{" "}
-                  /api/links/guest/shorten
-                </div>
+              <div className="text-neutral-500">{`{`}</div>
 
-                <div className="text-neutral-400">{`{`}</div>
+              <div className="pl-4 text-neutral-500">
+                <span className="text-[#76B900]">"originalUrl"</span>:{" "}
+                <span className="text-orange-400">"https://example.com"</span>,
+              </div>
 
-                <div className="pl-4 text-neutral-400">
-                  <span className="text-[#76B900]">"originalUrl"</span>:{" "}
-                  <span className="text-orange-400">"https://example.com"</span>
+              <div className="pl-4 text-neutral-500">
+                <span className="text-[#76B900]">"customAlias"</span>:{" "}
+                <span className="text-orange-400">"my-link"</span>,
+              </div>
+
+              <div className="pl-4 text-neutral-500">
+                <span className="text-[#76B900]">"sessionId"</span>:{" "}
+                <span className="text-orange-400">"guest_x9a2k1d"</span>
+              </div>
+
+              <div className="text-neutral-500">{`}`}</div>
+            </div>
+
+            <div className="border-t border-neutral-900 pt-6">
+              <div className="text-neutral-600 mb-6 font-light">
+                // Response
+              </div>
+
+              <div className="space-y-1 text-neutral-500">
+                <div>{`{`}</div>
+
+                <div className="pl-4">
+                  <span className="text-[#76B900]">"shortUrl"</span>:{" "}
+                  <span className="text-orange-400">
+                    "https://api.bitlk.in/r/my-link"
+                  </span>
                   ,
                 </div>
 
-                <div className="pl-4 text-neutral-400">
-                  <span className="text-[#76B900]">"customAlias"</span>:{" "}
+                <div className="pl-4">
+                  <span className="text-[#76B900]">"shortCode"</span>:{" "}
                   <span className="text-orange-400">"my-link"</span>,
                 </div>
 
-                <div className="pl-4 text-neutral-400">
-                  <span className="text-[#76B900]">"sessionId"</span>:{" "}
-                  <span className="text-orange-400">"guest_x9a2k1d"</span>
+                <div className="pl-4">
+                  <span className="text-[#76B900]">"qrCode"</span>:{" "}
+                  <span className="text-orange-400">
+                    "data:image/png;base64,..."
+                  </span>
                 </div>
 
-                <div className="text-neutral-400">{`}`}</div>
-              </div>
-
-              <div className="border-t border-neutral-800 mt-6 pt-6">
-                <div className="text-neutral-500 mb-4">// Response</div>
-
-                <div className="space-y-1 text-neutral-400">
-                  <div>{`{`}</div>
-
-                  <div className="pl-4">
-                    <span className="text-[#76B900]">"shortUrl"</span>:{" "}
-                    <span className="text-orange-400">
-                      "https://api.bitlk.in/r/my-link"
-                    </span>
-                    ,
-                  </div>
-
-                  <div className="pl-4">
-                    <span className="text-[#76B900]">"shortCode"</span>:{" "}
-                    <span className="text-orange-400">"my-link"</span>,
-                  </div>
-
-                  <div className="pl-4">
-                    <span className="text-[#76B900]">"qrCode"</span>:{" "}
-                    <span className="text-orange-400">
-                      "data:image/png;base64,..."
-                    </span>
-                  </div>
-
-                  <div>{`}`}</div>
-                </div>
+                <div>{`}`}</div>
               </div>
             </div>
           </div>
@@ -626,15 +638,18 @@ export default function LandingPage() {
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="mt-32 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20 border-t border-neutral-900"
       >
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-light mb-4">
-            Simple, transparent pricing
+        <div className="mb-16">
+          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+            Simple pricing
           </h2>
-          <p className="text-neutral-400 max-w-2xl mx-auto">
-            Start free and scale as you grow. No hidden fees, no surprises.
-          </p>
+          <div className="flex items-baseline gap-4">
+            <div className="h-px w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+              Transparent & Fair
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
