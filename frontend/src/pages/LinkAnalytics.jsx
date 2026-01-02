@@ -145,9 +145,16 @@ export default function LinkAnalytics() {
   const fetchLinkAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
+
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       const response = await api.get(`/api/analytics/link/${linkId}`, {
-        params: { range: timeRange },
+        params: {
+          range: timeRange,
+          timeZone,
+        },
       });
+
       setAnalyticsData(response.data);
     } catch (err) {
       setError(err.response?.data?.error || err.message);

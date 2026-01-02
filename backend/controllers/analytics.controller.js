@@ -6,11 +6,15 @@ import {
 
 export const getLinkAnalyticsController = async (req, res) => {
   try {
+    const { range = "all", timeZone = "UTC" } = req.query;
+
     const data = await getLinkAnalytics(
       req.user.id,
       req.params.id,
-      req.query.range || "all"
+      range,
+      timeZone
     );
+
     res.json(data);
   } catch {
     res.status(400).json({ error: "Failed to fetch link analytics" });

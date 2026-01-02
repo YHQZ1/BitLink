@@ -143,6 +143,8 @@ const sanitizeLink = (link) => ({
   shortCode: link.shortCode,
   clicks: link.clicks,
   createdAt: link.createdAt,
+  lastAccessed: link.lastAccessed || null,
+  lastActivity: link.lastActivity || null,
   isGuestLink: link.isGuestLink || false,
   qrCode: link.qrCode || null,
 });
