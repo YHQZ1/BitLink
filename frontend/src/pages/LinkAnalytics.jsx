@@ -26,7 +26,6 @@ const timeRangeOptions = [
   { value: "all", label: "All Time" },
 ];
 
-// Toast Notification Component
 const Toast = ({ isVisible, type, message, onClose }) => {
   useEffect(() => {
     if (isVisible) {
@@ -41,7 +40,7 @@ const Toast = ({ isVisible, type, message, onClose }) => {
   const bgColor = type === "success" ? "bg-[#76B900]" : "bg-red-500";
 
   return (
-    <div className="fixed top-20 right-5 z-50 animate-slide-in">
+    <div className="fixed top-20 right-4 sm:right-5 z-50 animate-slide-in">
       <div
         className={`${bgColor} text-black px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md shadow-lg`}
       >
@@ -57,21 +56,23 @@ const Toast = ({ isVisible, type, message, onClose }) => {
 
 const StatCard = ({ title, value, icon: Icon, subtext }) => (
   <div className="group">
-    <div className="flex items-center gap-2 mb-3">
+    <div className="flex items-center gap-2 mb-2">
       <Icon className="w-3.5 h-3.5 text-[#76B900]" />
       <span className="text-neutral-500 text-xs uppercase tracking-widest font-medium">
         {title}
       </span>
     </div>
-    <div className="text-5xl font-extralight text-white tracking-tight">
+    <div className="text-4xl sm:text-5xl font-extralight text-white tracking-tight">
       {value}
     </div>
-    {subtext && <div className="text-xs text-neutral-600 mt-2">{subtext}</div>}
+    {subtext && (
+      <div className="text-xs text-neutral-600 mt-1.5">{subtext}</div>
+    )}
   </div>
 );
 
 const DataRow = ({ label, count }) => (
-  <div className="flex items-center justify-between py-4 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
+  <div className="flex items-center justify-between py-3 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
     <span className="text-neutral-300 text-sm flex-1 truncate group-hover:text-white transition-colors">
       {label}
     </span>
@@ -83,8 +84,8 @@ const DataRow = ({ label, count }) => (
 
 const DataSection = ({ title, data, labelKey = "name" }) => (
   <div>
-    <div className="flex items-center gap-3 mb-6">
-      <h3 className="text-xl font-extralight text-white tracking-tight">
+    <div className="flex items-center gap-3 mb-5">
+      <h3 className="text-lg sm:text-xl font-extralight text-white tracking-tight">
         {title}
       </h3>
       <div className="h-px flex-1 bg-neutral-900"></div>
@@ -101,7 +102,7 @@ const DataSection = ({ title, data, labelKey = "name" }) => (
           />
         ))
       ) : (
-        <div className="text-center py-12 border border-dashed border-neutral-900">
+        <div className="text-center py-8 lg:py-10 border border-dashed border-neutral-900">
           <p className="text-neutral-600 text-xs">No data available</p>
         </div>
       )}
@@ -179,8 +180,8 @@ export default function LinkAnalytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-          <div className="text-center py-20">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
+          <div className="text-center py-12 lg:py-16">
             <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-neutral-400">Loading analytics...</p>
           </div>
@@ -193,14 +194,14 @@ export default function LinkAnalytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
-            <div className="border border-red-500/30 bg-red-500/10 p-8 text-center">
-              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-              <p className="text-red-400 mb-6 text-lg">{error}</p>
+            <div className="border border-red-500/30 bg-red-500/10 p-6 text-center">
+              <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
               <button
                 onClick={handleBack}
-                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium"
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
               >
                 Go Back
               </button>
@@ -215,16 +216,16 @@ export default function LinkAnalytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
-            <div className="border border-neutral-800 bg-[#0D0F13] p-8 text-center">
-              <AlertCircle className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-              <p className="text-neutral-400 mb-6 text-lg">
+            <div className="border border-neutral-800 bg-[#0D0F13] p-6 text-center">
+              <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-neutral-400 mx-auto mb-4" />
+              <p className="text-neutral-400 mb-6 text-sm sm:text-lg">
                 No analytics data available
               </p>
               <button
                 onClick={handleBack}
-                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium"
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
               >
                 Go Back
               </button>
@@ -266,33 +267,24 @@ export default function LinkAnalytics() {
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Toast {...toast} onClose={closeToast} />
 
-      <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-        {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Dashboard</span>
-        </button>
-
+      <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
         {/* Header */}
-        <div className="mb-16">
-          <div className="flex items-end justify-between mb-8">
+        <div className="mb-10 lg:mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extralight text-white mb-2 tracking-tight">
                 Link Analytics
               </h1>
-              <p className="text-neutral-500 text-base">
+              <p className="text-neutral-500 text-sm sm:text-base">
                 Performance metrics and engagement data
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {timeRangeOptions.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => setTimeRange(value)}
-                  className={`px-4 py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
                     timeRange === value
                       ? "bg-[#76B900] text-black"
                       : "text-neutral-500 hover:text-white"
@@ -305,13 +297,13 @@ export default function LinkAnalytics() {
           </div>
 
           {/* Link Info */}
-          <div className="py-8 border-y border-neutral-900/50">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="py-5 lg:py-6 border-y border-neutral-900/50">
+            <div className="flex items-center gap-3 mb-2">
               <a
                 href={link.shortUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors cursor-pointer text-lg font-medium group/link"
+                className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors cursor-pointer text-base sm:text-lg font-medium group/link"
               >
                 <span className="break-all">{link.shortUrl}</span>
                 <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
@@ -331,7 +323,7 @@ export default function LinkAnalytics() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-10 py-12 border-b border-neutral-900/50 mb-20">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-12 gap-y-6 lg:gap-y-8 py-6 lg:py-8 border-b border-neutral-900/50 mb-10 lg:mb-12">
           <StatCard
             title="Total Clicks"
             value={totalClicks.toLocaleString()}
@@ -351,7 +343,7 @@ export default function LinkAnalytics() {
         </div>
 
         {/* Data Sections Grid */}
-        <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 lg:gap-y-10 mb-10 lg:mb-12">
           <DataSection
             title="Traffic Sources"
             data={referrers}
@@ -368,8 +360,8 @@ export default function LinkAnalytics() {
 
         {/* Peak Hours */}
         <div>
-          <div className="flex items-center gap-3 mb-8">
-            <h3 className="text-2xl font-extralight text-white tracking-tight">
+          <div className="flex items-center gap-3 mb-5 lg:mb-6">
+            <h3 className="text-xl sm:text-2xl font-extralight text-white tracking-tight">
               Peak Hours
             </h3>
             <div className="h-px flex-1 bg-neutral-900"></div>
@@ -380,12 +372,11 @@ export default function LinkAnalytics() {
             )}
           </div>
           {peakHours.length > 0 ? (
-            <div className="space-y-4">
-              {peakHours.map((hour, index) => {
+            <div className="space-y-3">
+              {peakHours.slice(0, 5).map((hour, index) => {
                 const maxClicks = peakHours[0]?.clicks || 1;
                 const percentage = (hour.clicks / maxClicks) * 100;
 
-                // Format hour from 24h to 12h format
                 const formatHour = (hourStr) => {
                   const hourNum = parseInt(hourStr);
                   if (isNaN(hourNum)) return hourStr;
@@ -397,15 +388,15 @@ export default function LinkAnalytics() {
                 return (
                   <div
                     key={index}
-                    className="group py-4 border-b border-neutral-900/50 last:border-0 hover:bg-neutral-900/20 transition-all px-2 -mx-2"
+                    className="group py-3 border-b border-neutral-900/50 last:border-0 hover:bg-neutral-900/20 transition-all px-2 -mx-2"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-4">
                         <span className="text-neutral-600 text-xs w-6 text-center">
                           #{index + 1}
                         </span>
                         <div>
-                          <div className="text-white text-base font-light">
+                          <div className="text-white text-sm sm:text-base font-light">
                             {formatHour(hour.hour)}
                           </div>
                           <div className="text-neutral-600 text-xs mt-0.5">
@@ -414,7 +405,7 @@ export default function LinkAnalytics() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-extralight text-white tabular-nums">
+                        <div className="text-xl sm:text-2xl font-extralight text-white tabular-nums">
                           {hour.clicks}
                         </div>
                         <div className="text-xs text-neutral-600">clicks</div>
@@ -431,7 +422,7 @@ export default function LinkAnalytics() {
               })}
             </div>
           ) : (
-            <div className="text-center py-16 border border-dashed border-neutral-900">
+            <div className="text-center py-10 lg:py-12 border border-dashed border-neutral-900">
               <p className="text-neutral-600 text-sm">
                 No peak hours data available
               </p>

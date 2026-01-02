@@ -22,21 +22,23 @@ const timeRangeOptions = [
 
 const StatCard = ({ title, value, icon: Icon, subtext }) => (
   <div className="group">
-    <div className="flex items-center gap-2 mb-3">
+    <div className="flex items-center gap-2 mb-2">
       <Icon className="w-3.5 h-3.5 text-[#76B900]" />
       <span className="text-neutral-500 text-xs uppercase tracking-widest font-medium">
         {title}
       </span>
     </div>
-    <div className="text-5xl font-extralight text-white tracking-tight">
+    <div className="text-4xl sm:text-5xl font-extralight text-white tracking-tight">
       {value}
     </div>
-    {subtext && <div className="text-xs text-neutral-600 mt-2">{subtext}</div>}
+    {subtext && (
+      <div className="text-xs text-neutral-600 mt-1.5">{subtext}</div>
+    )}
   </div>
 );
 
 const DataRow = ({ label, count, percentage, rank }) => (
-  <div className="flex items-center gap-4 py-4 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
+  <div className="flex items-center gap-4 py-3 border-b border-neutral-900/50 last:border-0 group hover:bg-neutral-900/20 transition-all px-2 -mx-2">
     {rank && (
       <div className="w-5 text-neutral-600 text-xs font-medium flex-shrink-0 text-center">
         {rank}
@@ -45,7 +47,7 @@ const DataRow = ({ label, count, percentage, rank }) => (
     <span className="text-neutral-300 text-sm flex-1 truncate group-hover:text-white transition-colors">
       {label}
     </span>
-    <div className="flex items-center gap-6 flex-shrink-0">
+    <div className="flex items-center gap-4 sm:gap-6 flex-shrink-0">
       <span className="text-white font-light text-sm tabular-nums">
         {count}
       </span>
@@ -137,8 +139,8 @@ export default function Analytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-          <div className="text-center py-20">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
+          <div className="text-center py-12 lg:py-16">
             <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-neutral-400">Loading analytics...</p>
           </div>
@@ -151,14 +153,14 @@ export default function Analytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
-            <div className="border border-red-500/30 bg-red-500/10 p-8 text-center">
-              <Activity className="w-12 h-12 text-red-400 mx-auto mb-4" />
-              <p className="text-red-400 mb-6 text-lg">{error}</p>
+            <div className="border border-red-500/30 bg-red-500/10 p-6 text-center">
+              <Activity className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
               <button
                 onClick={handleBack}
-                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium"
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
               >
                 Go Back
               </button>
@@ -173,8 +175,8 @@ export default function Analytics() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-          <div className="text-center py-20">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
+          <div className="text-center py-12 lg:py-16">
             <p className="text-neutral-400">No analytics data available</p>
           </div>
         </div>
@@ -186,31 +188,23 @@ export default function Analytics() {
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
 
-      <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Homepage</span>
-        </button>
-
-        <div className="mb-16">
-          <div className="flex items-end justify-between mb-8">
+      <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
+        <div className="mb-10 lg:mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extralight text-white mb-2 tracking-tight">
                 Analytics
               </h1>
-              <p className="text-neutral-500 text-base">
+              <p className="text-neutral-500 text-sm sm:text-base">
                 Performance overview across all your links
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {timeRangeOptions.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => setTimeRange(value)}
-                  className={`px-4 py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-medium transition-all cursor-pointer uppercase tracking-wider ${
                     timeRange === value
                       ? "bg-[#76B900] text-black"
                       : "text-neutral-500 hover:text-white"
@@ -222,7 +216,7 @@ export default function Analytics() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-10 py-12 border-y border-neutral-900/50">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-12 gap-y-6 lg:gap-y-8 py-6 lg:py-8 border-y border-neutral-900/50">
             <StatCard
               title="Total Links"
               value={globalStats.totalLinks || 0}
@@ -247,20 +241,20 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="mb-20">
-          <div className="flex items-center gap-3 mb-8">
-            <h3 className="text-2xl font-extralight text-white tracking-tight">
+        <div className="mb-12 lg:mb-16">
+          <div className="flex items-center gap-3 mb-5 lg:mb-6">
+            <h3 className="text-xl sm:text-2xl font-extralight text-white tracking-tight">
               Top Performing Links
             </h3>
             <div className="h-px flex-1 bg-neutral-900"></div>
           </div>
 
           {topLinks.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-3 lg:space-y-4">
               {topLinks.map((link, index) => (
                 <div key={link.id} className="group relative">
-                  <div className="flex items-center gap-6 py-6 border-b border-neutral-900/50 hover:border-neutral-800 transition-all">
-                    <div className="w-8 text-neutral-600 text-sm font-light flex-shrink-0 text-center group-hover:text-[#76B900] transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 py-4 sm:py-5 border-b border-neutral-900/50 hover:border-neutral-800 transition-all">
+                    <div className="w-8 text-neutral-600 text-sm font-light flex-shrink-0 group-hover:text-[#76B900] transition-colors">
                       {String(index + 1).padStart(2, "0")}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -268,7 +262,7 @@ export default function Analytics() {
                         href={link.shortUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 mb-2 transition-colors cursor-pointer group/link"
+                        className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 mb-1.5 transition-colors cursor-pointer group/link"
                       >
                         <span className="truncate text-sm font-medium">
                           {link.shortUrl}
@@ -279,11 +273,11 @@ export default function Analytics() {
                         {link.originalUrl}
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-3xl font-extralight text-white tabular-nums">
+                    <div className="text-left sm:text-right flex-shrink-0">
+                      <div className="text-2xl sm:text-3xl font-extralight text-white tabular-nums">
                         {link.clicks.toLocaleString()}
                       </div>
-                      <div className="text-xs text-neutral-600 uppercase tracking-wider mt-1">
+                      <div className="text-xs text-neutral-600 uppercase tracking-wider mt-0.5">
                         clicks
                       </div>
                     </div>
@@ -292,7 +286,7 @@ export default function Analytics() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 border border-dashed border-neutral-900">
+            <div className="text-center py-10 lg:py-12 border border-dashed border-neutral-900">
               <p className="text-neutral-600 text-sm">
                 No links yet. Create your first link to see performance data.
               </p>
@@ -300,27 +294,29 @@ export default function Analytics() {
           )}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <h3 className="text-xl font-extralight text-white tracking-tight">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-lg sm:text-xl font-extralight text-white tracking-tight">
                 Traffic Sources
               </h3>
               <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.trafficSources?.length > 0 ? (
-                globalStats.trafficSources.map((source, index) => (
-                  <DataRow
-                    key={index}
-                    rank={index + 1}
-                    label={source.source}
-                    count={source.count}
-                    percentage={source.percentage}
-                  />
-                ))
+                globalStats.trafficSources
+                  .slice(0, 5)
+                  .map((source, index) => (
+                    <DataRow
+                      key={index}
+                      rank={index + 1}
+                      label={source.source}
+                      count={source.count}
+                      percentage={source.percentage}
+                    />
+                  ))
               ) : (
-                <div className="text-center py-12 border border-dashed border-neutral-900">
+                <div className="text-center py-8 lg:py-10 border border-dashed border-neutral-900">
                   <p className="text-neutral-600 text-xs">
                     No traffic data yet
                   </p>
@@ -330,25 +326,27 @@ export default function Analytics() {
           </div>
 
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <h3 className="text-xl font-extralight text-white tracking-tight">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-lg sm:text-xl font-extralight text-white tracking-tight">
                 Top Countries
               </h3>
               <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.geographicData?.length > 0 ? (
-                globalStats.geographicData.map((country, index) => (
-                  <DataRow
-                    key={index}
-                    rank={index + 1}
-                    label={country.country}
-                    count={country.count}
-                    percentage={country.percentage}
-                  />
-                ))
+                globalStats.geographicData
+                  .slice(0, 5)
+                  .map((country, index) => (
+                    <DataRow
+                      key={index}
+                      rank={index + 1}
+                      label={country.country}
+                      count={country.count}
+                      percentage={country.percentage}
+                    />
+                  ))
               ) : (
-                <div className="text-center py-12 border border-dashed border-neutral-900">
+                <div className="text-center py-8 lg:py-10 border border-dashed border-neutral-900">
                   <p className="text-neutral-600 text-xs">
                     Geographic data will appear as links get clicks
                   </p>
@@ -358,25 +356,27 @@ export default function Analytics() {
           </div>
 
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <h3 className="text-xl font-extralight text-white tracking-tight">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-lg sm:text-xl font-extralight text-white tracking-tight">
                 Devices
               </h3>
               <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
             <div className="space-y-1">
               {globalStats.deviceDistribution?.length > 0 ? (
-                globalStats.deviceDistribution.map((device, index) => (
-                  <DataRow
-                    key={index}
-                    rank={index + 1}
-                    label={device.device}
-                    count={device.count}
-                    percentage={device.percentage}
-                  />
-                ))
+                globalStats.deviceDistribution
+                  .slice(0, 5)
+                  .map((device, index) => (
+                    <DataRow
+                      key={index}
+                      rank={index + 1}
+                      label={device.device}
+                      count={device.count}
+                      percentage={device.percentage}
+                    />
+                  ))
               ) : (
-                <div className="text-center py-12 border border-dashed border-neutral-900">
+                <div className="text-center py-8 lg:py-10 border border-dashed border-neutral-900">
                   <p className="text-neutral-600 text-xs">No device data yet</p>
                 </div>
               )}

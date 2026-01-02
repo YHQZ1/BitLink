@@ -5,8 +5,6 @@ import {
   Lock,
   ArrowRight,
   ArrowLeft,
-  Github,
-  Chrome,
   Eye,
   EyeOff,
   User,
@@ -78,7 +76,7 @@ const InputField = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full bg-transparent border border-neutral-800 focus:border-[#76B900] pl-12 pr-4 py-3 text-white placeholder-neutral-600 outline-none transition-all"
+        className="w-full bg-transparent border border-neutral-800 focus:border-[#76B900] pl-12 pr-10 py-3 text-white placeholder-neutral-600 outline-none transition-all"
         placeholder={placeholder}
         required={required}
         minLength={type === "password" ? "6" : undefined}
@@ -136,7 +134,7 @@ export default function Auth() {
         setMessage(
           isSignUp ? "Account created successfully!" : "Login successful!"
         );
-        setTimeout(() => navigate("/home"), 1000);
+        setTimeout(() => navigate("/"), 1000);
       } else {
         setMessage(data.error || "Something went wrong!");
       }
@@ -173,35 +171,48 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex">
+      {/* Mobile Header */}
+      <nav className="lg:hidden fixed top-0 w-full border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-16">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+              <span className="text-lg font-extralight text-white">
+                BitLink
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+              <button
+                onClick={() => navigate("/")}
+                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
+              >
+                Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Left Side - Auth Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 py-12 lg:py-0 mt-16 lg:mt-0">
         <div className="w-full max-w-md">
           <button
             onClick={() =>
               window.history.length > 1 ? navigate(-1) : navigate("/")
             }
-            className="flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors mb-8 cursor-pointer"
+            className="hidden lg:flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors mb-8 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
-          {/* Logo */}
-          <div
-            onClick={() => navigate("/")}
-            className="flex items-center gap-3 mb-12 cursor-pointer group"
-          >
-            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
-            <span className="text-xl font-medium tracking-tight group-hover:text-[#76B900] transition-colors">
-              BitLink
-            </span>
-          </div>
 
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-light mb-3">
+          <div className="mb-6 lg:mb-8">
+            <h1 className="text-3xl lg:text-4xl font-light mb-3">
               {isSignUp ? "Create account" : "Welcome back"}
             </h1>
-            <p className="text-neutral-400">
+            <p className="text-neutral-400 text-sm lg:text-base">
               {isSignUp
                 ? "Start shortening and tracking your links"
                 : "Sign in to access your dashboard"}
@@ -222,7 +233,7 @@ export default function Auth() {
           )}
 
           {/* OAuth Buttons */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
+          <div className="grid grid-cols-2 gap-3 mb-6 lg:mb-8">
             <OAuthButton
               provider="GitHub"
               icon={GitHubLogo}
@@ -238,14 +249,14 @@ export default function Auth() {
           </div>
 
           {/* Divider */}
-          <div className="flex items-center mb-8">
+          <div className="flex items-center mb-6 lg:mb-8">
             <div className="flex-1 border-t border-neutral-800"></div>
             <span className="mx-4 text-neutral-500 text-sm">or</span>
             <div className="flex-1 border-t border-neutral-800"></div>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-5">
             {isSignUp && (
               <InputField
                 label="Full Name"
@@ -286,7 +297,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#76B900] hover:bg-[#8FD400] disabled:bg-neutral-800 disabled:text-neutral-500 text-black font-medium py-3 transition-all flex items-center justify-center gap-2 group disabled:cursor-not-allowed mt-8 cursor-pointer"
+              className="w-full bg-[#76B900] hover:bg-[#8FD400] disabled:bg-neutral-800 disabled:text-neutral-500 text-black font-medium py-3 transition-all flex items-center justify-center gap-2 group disabled:cursor-not-allowed mt-6 lg:mt-8 cursor-pointer"
             >
               <span>
                 {loading
@@ -300,7 +311,7 @@ export default function Auth() {
           </form>
 
           {/* Toggle Auth Mode */}
-          <div className="mt-8 text-center text-sm">
+          <div className="mt-6 lg:mt-8 text-center text-sm">
             <span className="text-neutral-400">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}
             </span>{" "}
@@ -335,7 +346,7 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Feature Showcase */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#0D0F13] to-[#0B0D10] border-l border-neutral-800 items-center justify-center p-12">
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#0D0F13] to-[#0B0D10] border-l border-neutral-800 items-center justify-center p-8 lg:p-12">
         <div className="max-w-lg">
           {/* Animated Feature Cards */}
           <div className="mb-12">

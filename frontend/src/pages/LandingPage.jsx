@@ -25,7 +25,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const ShortenedUrlDisplay = ({ url, onCopy }) => (
   <div className="py-6 border-t border-neutral-900/50 mt-6">
-    <div className="flex items-center justify-between gap-4 mb-2">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
       <a
         href={url.shortUrl}
         target="_blank"
@@ -33,11 +33,11 @@ const ShortenedUrlDisplay = ({ url, onCopy }) => (
         className="text-[#76B900] text-sm break-all flex items-center gap-2 hover:text-[#8FD400] transition-colors"
       >
         {url.shortUrl}
-        <ExternalLink className="w-3 h-3" />
+        <ExternalLink className="w-3 h-3 flex-shrink-0" />
       </a>
       <button
         onClick={() => onCopy(url.shortUrl)}
-        className="text-neutral-500 hover:text-[#76B900] cursor-pointer transition-colors"
+        className="text-neutral-500 hover:text-[#76B900] cursor-pointer transition-colors self-start sm:self-auto"
       >
         <Copy className="w-4 h-4" />
       </button>
@@ -45,7 +45,7 @@ const ShortenedUrlDisplay = ({ url, onCopy }) => (
     <p className="text-xs text-neutral-600 mb-3 break-all font-light">
       {url.originalUrl}
     </p>
-    <div className="flex gap-6 text-xs text-neutral-700">
+    <div className="flex flex-wrap gap-4 sm:gap-6 text-xs text-neutral-700">
       <span className="flex items-center gap-1.5">
         <Calendar className="w-3 h-3" />
         {new Date(url.createdAt).toLocaleDateString()}
@@ -222,64 +222,80 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
       <nav className="fixed top-0 w-full border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
-            <span className="text-lg font-extralight tracking-tight text-white">
-              BitLink
-            </span>
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-16">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
+              <span className="text-lg font-extralight text-white">
+                BitLink
+              </span>
+            </div>
+
+            {/* Mobile-only horizontal scroll */}
+            <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide md:hidden">
+              <button
+                onClick={() => scrollToSection("features")}
+                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => scrollToSection("docs")}
+                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
+              >
+                Docs
+              </button>
+              <button
+                onClick={() => navigate("/auth")}
+                className="text-sm text-[#76B900] hover:text-[#8FD400] whitespace-nowrap px-2 py-2"
+              >
+                Sign In
+              </button>
+            </div>
+
+            {/* Desktop menu */}
+            <div className="hidden md:flex gap-8 text-base font-light">
+              <button
+                onClick={() => scrollToSection("features")}
+                className="text-neutral-500 hover:text-white"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => scrollToSection("docs")}
+                className="text-neutral-500 hover:text-white"
+              >
+                Docs
+              </button>
+              <button
+                onClick={() => navigate("/auth")}
+                className="text-[#76B900] hover:text-[#8FD400]"
+              >
+                Sign In
+              </button>
+            </div>
           </div>
-          <div className="hidden md:flex gap-8 text-base font-light">
-            <button
-              onClick={() => scrollToSection("features")}
-              className="cursor-pointer text-neutral-500 hover:text-white transition-colors"
-            >
-              Features
-            </button>
-            <button
-              onClick={() => scrollToSection("docs")}
-              className="cursor-pointer text-neutral-500 hover:text-white transition-colors"
-            >
-              Docs
-            </button>
-            <button
-              onClick={() => navigate("/auth")}
-              className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors"
-            >
-              Sign In
-            </button>
-          </div>
-          <button
-            className="md:hidden text-neutral-400 hover:text-white"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
         </div>
       </nav>
 
       {mobileMenuOpen && (
         <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-40">
-          <div className="px-5 py-6 flex flex-col gap-3">
+          <div className="px-4 py-6 flex flex-col gap-3">
             <button
               onClick={() => scrollToSection("features")}
-              className="text-neutral-400 hover:text-white text-left transition-colors"
+              className="text-neutral-400 hover:text-white text-left transition-colors py-2"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("docs")}
-              className="text-neutral-400 hover:text-white text-left transition-colors"
+              className="text-neutral-400 hover:text-white text-left transition-colors py-2"
             >
               Docs
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="text-[#76B900] text-left hover:text-[#8FD400] transition-colors"
+              className="text-[#76B900] text-left hover:text-[#8FD400] transition-colors py-2"
             >
               Sign In
             </button>
@@ -287,11 +303,10 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Hero Section - Asymmetric */}
-      <section className="pt-32 pb-24 px-5 md:px-8 max-w-[1600px] mx-auto">
-        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-16 items-start">
+      <section className="pt-32 pb-24 w-full px-8 sm:px-12 lg:px-16 mx-auto">
+        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-start">
           <div>
-            <h1 className="text-6xl md:text-7xl font-thin leading-[0.95] tracking-tight mb-8">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-thin leading-[0.95] tracking-tight mb-6 sm:mb-8">
               Short links.
               <br />
               Real analytics.
@@ -299,27 +314,27 @@ export default function LandingPage() {
               <span className="text-[#76B900]">Zero noise.</span>
             </h1>
 
-            <p className="text-neutral-500 max-w-lg text-base font-light leading-relaxed mb-12">
+            <p className="text-neutral-500 max-w-lg text-sm sm:text-base font-light leading-relaxed mb-8 sm:mb-12">
               A fast, minimal URL shortener built for developers and teams who
               care about clarity and control.
             </p>
 
             <div className="max-w-xl">
-              <label className="text-[#76B900] text-xs uppercase tracking-[0.3em] mb-4 block">
+              <label className="text-[#76B900] text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 block">
                 Try it now
               </label>
-              <div className="flex gap-3 mb-2">
+              <div className="flex flex-col sm:flex-row gap-3 mb-2">
                 <input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleShorten()}
                   placeholder="https://example.com/your-long-url"
-                  className="flex-1 bg-transparent border-b-2 border-neutral-800 px-0 py-4 text-white placeholder-neutral-800 text-sm font-light focus:border-[#76B900] outline-none transition-colors"
+                  className="flex-1 bg-transparent border-b-2 border-neutral-800 px-0 py-3 sm:py-4 text-white placeholder-neutral-800 text-sm font-light focus:border-[#76B900] outline-none transition-colors"
                 />
                 <button
                   onClick={handleShorten}
                   disabled={isLoading}
-                  className="border-2 border-[#76B900] text-[#76B900] px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer disabled:opacity-50 text-xs uppercase tracking-widest font-medium"
+                  className="border-2 border-[#76B900] text-[#76B900] px-6 sm:px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer disabled:opacity-50 text-xs uppercase tracking-widest font-medium"
                 >
                   {isLoading ? "..." : "Go"}
                 </button>
@@ -333,7 +348,7 @@ export default function LandingPage() {
               )}
 
               {authRequired && (
-                <div className="mt-6 py-4 border-t border-neutral-900/50 text-sm flex items-center justify-between">
+                <div className="mt-6 py-4 border-t border-neutral-900/50 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <span className="text-neutral-600 font-light">
                     Free limit reached. Sign in to continue.
                   </span>
@@ -348,7 +363,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Dashboard Preview */}
           <div className="hidden lg:block">
             <div className="border-l-2 border-neutral-900 pl-8">
               <div className="flex items-baseline gap-3 mb-8">
@@ -358,7 +372,6 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              {/* Mini Chart */}
               <div className="h-24 mb-8 opacity-70">
                 <svg
                   viewBox="0 0 100 40"
@@ -376,7 +389,6 @@ export default function LandingPage() {
                 </svg>
               </div>
 
-              {/* Stats */}
               <div className="space-y-6 mb-8">
                 <div className="border-l-2 border-[#76B900] pl-4">
                   <div className="text-4xl font-thin text-white tabular-nums mb-1">
@@ -398,7 +410,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Recent Links */}
               <div>
                 <div className="text-xs text-neutral-700 mb-4 uppercase tracking-wider">
                   Recent Activity
@@ -428,12 +439,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto border-y border-neutral-900">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+      <section className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto border-y border-neutral-900">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
           {stats.map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-5xl font-thin text-[#76B900] mb-2 tracking-tighter">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-thin text-[#76B900] mb-2 tracking-tighter">
                 {stat.value}
               </div>
               <div className="text-xs text-neutral-600 uppercase tracking-wider">
@@ -444,27 +454,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section
         id="features"
-        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20"
+        className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto scroll-mt-20"
       >
-        <div className="mb-16">
-          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-4 tracking-tight">
             Everything you need
           </h2>
           <div className="flex items-baseline gap-4">
-            <div className="h-px w-20 bg-[#76B900]"></div>
-            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+            <div className="h-px w-12 sm:w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-xs sm:text-sm uppercase tracking-widest">
               Features
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 lg:gap-x-12 gap-y-8">
           {features.map((f, i) => (
-            <div key={i} className="border-l-2 border-neutral-900 pl-6 py-2">
-              <div className="text-[#76B900] mb-4">{f.icon}</div>
+            <div
+              key={i}
+              className="border-l-2 border-neutral-900 pl-4 sm:pl-6 py-2"
+            >
+              <div className="text-[#76B900] mb-3 sm:mb-4">{f.icon}</div>
               <h3 className="text-base font-light mb-2 text-white">
                 {f.title}
               </h3>
@@ -476,28 +488,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Use Cases Section */}
-      <section className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto border-t border-neutral-900">
-        <div className="mb-16">
-          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+      <section className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto border-t border-neutral-900">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-4 tracking-tight">
             Built for everyone
           </h2>
           <div className="flex items-baseline gap-4">
-            <div className="h-px w-20 bg-[#76B900]"></div>
-            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+            <div className="h-px w-12 sm:w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-xs sm:text-sm uppercase tracking-widest">
               Use Cases
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {useCases.map((useCase, i) => (
             <div key={i}>
-              <div className="text-[#76B900] mb-6">{useCase.icon}</div>
-              <h3 className="text-xl font-light mb-4 tracking-tight">
+              <div className="text-[#76B900] mb-4 sm:mb-6">{useCase.icon}</div>
+              <h3 className="text-lg sm:text-xl font-light mb-3 sm:mb-4 tracking-tight">
                 {useCase.title}
               </h3>
-              <p className="text-neutral-600 leading-relaxed text-sm font-light">
+              <p className="text-neutral-600 leading-relaxed text-xs sm:text-sm font-light">
                 {useCase.description}
               </p>
             </div>
@@ -505,32 +516,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Docs/API Section */}
       <section
         id="docs"
-        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20 border-t border-neutral-900"
+        className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto scroll-mt-20 border-t border-neutral-900"
       >
-        <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 items-start">
-          {/* Left: Copy */}
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-16 items-start">
           <div>
-            <div className="flex items-center gap-2 text-[#76B900] mb-8">
+            <div className="flex items-center gap-2 text-[#76B900] mb-6 sm:mb-8">
               <Code className="w-4 h-4" />
               <span className="text-xs font-medium uppercase tracking-wider">
                 Developer First
               </span>
             </div>
 
-            <h2 className="text-5xl font-thin mb-6 tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-6 tracking-tight leading-tight">
               A clean, predictable API
             </h2>
 
-            <p className="text-neutral-600 mb-8 leading-relaxed font-light">
+            <p className="text-neutral-600 mb-6 sm:mb-8 leading-relaxed font-light text-sm sm:text-base">
               BitLink exposes a simple REST API for creating and resolving short
               links. Designed to be stateless, secure, and easy to integrate
               into any workflow.
             </p>
 
-            <ul className="space-y-4 mb-12 border-l-2 border-neutral-900 pl-6">
+            <ul className="space-y-4 mb-8 sm:mb-12 border-l-2 border-neutral-900 pl-4 sm:pl-6">
               <li className="flex items-start gap-3 text-sm font-light">
                 <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
                 <span className="text-neutral-500">
@@ -559,20 +568,19 @@ export default function LandingPage() {
 
             <button
               onClick={() => navigate("/api-docs")}
-              className="border-2 border-[#76B900] text-[#76B900] px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer flex items-center gap-2 text-xs uppercase tracking-widest font-medium"
+              className="border-2 border-[#76B900] text-[#76B900] px-6 sm:px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer flex items-center gap-2 text-xs uppercase tracking-widest font-medium"
             >
               View API Docs
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Right: Code snippet */}
-          <div className="bg-neutral-900/30 border border-neutral-900 p-8 font-mono text-xs">
+          <div className="bg-neutral-900/30 border border-neutral-900 p-6 sm:p-8 font-mono text-xs overflow-x-auto">
             <div className="text-neutral-600 mb-6 font-light">
               // Create a short link (guest)
             </div>
 
-            <div className="space-y-1 mb-8">
+            <div className="space-y-1 mb-6 sm:mb-8 min-w-[300px]">
               <div>
                 <span className="text-[#76B900]">POST</span>{" "}
                 <span className="text-neutral-500">
@@ -635,43 +643,49 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
       <section
         id="pricing"
-        className="py-16 px-5 md:px-8 max-w-[1600px] mx-auto scroll-mt-20 border-t border-neutral-900"
+        className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto scroll-mt-20 border-t border-neutral-900"
       >
-        <div className="mb-16">
-          <h2 className="text-5xl font-thin mb-4 tracking-tight">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-4 tracking-tight">
             Simple pricing
           </h2>
           <div className="flex items-baseline gap-4">
-            <div className="h-px w-20 bg-[#76B900]"></div>
-            <p className="text-neutral-600 text-sm uppercase tracking-widest">
+            <div className="h-px w-12 sm:w-20 bg-[#76B900]"></div>
+            <p className="text-neutral-600 text-xs sm:text-sm uppercase tracking-widest">
               Transparent & Fair
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {pricingPlans.map((plan, i) => (
             <div
               key={i}
-              className="border border-neutral-800 p-8 flex flex-col"
+              className="border border-neutral-800 p-6 sm:p-8 flex flex-col"
             >
-              <div className="mb-6">
-                <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-medium mb-2">
+                  {plan.name}
+                </h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-light">{plan.price}</span>
-                  <span className="text-neutral-400 text-sm">
+                  <span className="text-3xl sm:text-4xl font-light">
+                    {plan.price}
+                  </span>
+                  <span className="text-neutral-400 text-xs sm:text-sm">
                     /{plan.period}
                   </span>
                 </div>
               </div>
 
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-6 sm:mb-8">
                 {plan.features.map((feature, j) => (
-                  <li key={j} className="flex items-start gap-3 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
+                  <li
+                    key={j}
+                    className="flex items-start gap-3 text-xs sm:text-sm"
+                  >
+                    <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-[#76B900] flex-shrink-0 mt-0.5" />
                     <span className="text-neutral-300">{feature}</span>
                   </li>
                 ))}
@@ -679,7 +693,7 @@ export default function LandingPage() {
 
               <button
                 onClick={() => navigate("/auth")}
-                className="mt-auto w-full py-3 border border-neutral-700 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] transition-colors cursor-pointer"
+                className="mt-auto w-full py-3 border border-neutral-700 text-neutral-300 hover:border-[#76B900] hover:text-[#76B900] transition-colors cursor-pointer text-sm"
               >
                 {plan.name === "Free"
                   ? "Start free"
@@ -693,18 +707,15 @@ export default function LandingPage() {
       </section>
 
       <footer className="mt-32 border-t border-neutral-800">
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-16">
-          <div className="flex items-center justify-center gap-12">
-            {/* Left minimal decoration */}
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className="flex items-center justify-center">
             <div className="hidden lg:block flex-1">
-              <div className="h-px bg-gradient-to-r from-transparent to-neutral-800"></div>
+              <div className="h-px bg-gradient-to-r from-transparent via-transparent to-neutral-800"></div>
             </div>
 
-            {/* Center - Navigation */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 flex-shrink-0">
-              {/* Product */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium mb-4">Product</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 px-4 sm:px-8">
+              <div className="text-center sm:text-left">
+                <h4 className="text-sm font-medium mb-3 sm:mb-4">Product</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
                     <button
@@ -741,9 +752,8 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* Developers */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium mb-4">Developers</h4>
+              <div className="text-center sm:text-left">
+                <h4 className="text-sm font-medium mb-3 sm:mb-4">Developers</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
                     <button
@@ -766,9 +776,8 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* Company */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium mb-4">Company</h4>
+              <div className="text-center sm:text-left">
+                <h4 className="text-sm font-medium mb-3 sm:mb-4">Company</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
                     <button
@@ -789,9 +798,8 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* Legal */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium mb-4">Legal</h4>
+              <div className="text-center sm:text-left">
+                <h4 className="text-sm font-medium mb-3 sm:mb-4">Legal</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
                     <button
@@ -821,19 +829,19 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right minimal decoration */}
             <div className="hidden lg:block flex-1">
-              <div className="h-px bg-gradient-to-l from-transparent to-neutral-800"></div>
+              <div className="h-px bg-gradient-to-l from-transparent via-transparent to-neutral-800"></div>
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="mt-16 pt-6 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
+          <div className="mt-12 sm:mt-16 pt-6 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="BitLink" className="w-6 h-6" />
               <span>© 2025 BitLink</span>
             </div>
-            <span>Built for speed. Designed for scale.</span>
+            <span className="text-center sm:text-left">
+              Built for speed. Designed for scale.
+            </span>
           </div>
         </div>
       </footer>

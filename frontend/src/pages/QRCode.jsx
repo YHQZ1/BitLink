@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -13,7 +12,6 @@ import {
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
 
-// Toast Notification Component
 const Toast = ({ isVisible, type, message, onClose }) => {
   useEffect(() => {
     if (isVisible) {
@@ -28,7 +26,7 @@ const Toast = ({ isVisible, type, message, onClose }) => {
   const bgColor = type === "success" ? "bg-[#76B900]" : "bg-red-500";
 
   return (
-    <div className="fixed top-20 right-5 z-50 animate-slide-in">
+    <div className="fixed top-20 right-4 sm:right-5 z-50 animate-slide-in">
       <div
         className={`${bgColor} text-black px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md shadow-lg`}
       >
@@ -47,7 +45,7 @@ const StatCard = ({ value, label }) => (
     <div className="text-xs text-neutral-500 uppercase tracking-widest font-medium mb-2">
       {label}
     </div>
-    <div className="text-3xl font-extralight text-white tracking-tight tabular-nums">
+    <div className="text-2xl sm:text-3xl font-extralight text-white tracking-tight tabular-nums">
       {value}
     </div>
   </div>
@@ -145,8 +143,8 @@ export default function QRCode() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-          <div className="text-center py-20">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">
+          <div className="text-center py-12 lg:py-20">
             <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-neutral-400">Loading QR code...</p>
           </div>
@@ -159,14 +157,14 @@ export default function QRCode() {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
+        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">
           <div className="max-w-md mx-auto">
-            <div className="border border-red-500/30 bg-red-500/10 p-8 text-center">
-              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-              <p className="text-red-400 mb-6 text-lg">{error}</p>
+            <div className="border border-red-500/30 bg-red-500/10 p-6 sm:p-8 text-center">
+              <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
               <button
                 onClick={handleBack}
-                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium"
+                className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
               >
                 Go Back
               </button>
@@ -182,57 +180,50 @@ export default function QRCode() {
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Toast {...toast} onClose={closeToast} />
 
-      <div className="max-w-[1600px] mx-auto px-5 md:px-8 py-8 pt-24">
-        {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-neutral-500 hover:text-white mb-12 transition-colors cursor-pointer text-sm group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Dashboard</span>
-        </button>
-
+      <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">
         {/* Header */}
-        <div className="mb-16">
-          <h1 className="text-6xl font-extralight text-white mb-2 tracking-tight">
+        <div className="mb-12 lg:mb-16">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extralight text-white mb-2 tracking-tight">
             QR Code
           </h1>
-          <p className="text-neutral-500 text-base">
+          <p className="text-neutral-500 text-sm sm:text-base">
             Download and share your QR code
           </p>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 mb-20">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 mb-12 lg:mb-20">
           {/* QR Code Display */}
           <div>
-            <div className="flex items-center gap-3 mb-8">
-              <h2 className="text-2xl font-extralight text-white tracking-tight">
+            <div className="flex items-center gap-3 mb-6 lg:mb-8">
+              <h2 className="text-xl sm:text-2xl font-extralight text-white tracking-tight">
                 QR Code
               </h2>
               <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
 
-            <div className="bg-white p-2 mb-8 flex items-center justify-center mx-auto w-fit">
+            <div className="bg-white p-2 mb-6 lg:mb-8 flex items-center justify-center mx-auto w-full max-w-xs sm:max-w-sm lg:max-w-md">
               {link?.qrCode ? (
                 <img
                   src={link.qrCode}
                   alt="QR Code"
-                  className="w-80 h-80"
+                  className="w-full h-auto max-w-full"
                   style={{ imageRendering: "pixelated" }}
                 />
               ) : (
-                <div className="w-80 h-80 bg-neutral-200 flex items-center justify-center">
-                  <p className="text-neutral-600">QR Code not available</p>
+                <div className="w-full h-64 lg:h-80 bg-neutral-200 flex items-center justify-center">
+                  <p className="text-neutral-600 text-sm">
+                    QR Code not available
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={downloadQRCode}
                 disabled={!link?.qrCode}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#76B900] text-black py-4 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm uppercase tracking-wider"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#76B900] text-black py-3 sm:py-4 font-medium hover:bg-[#8FD400] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm uppercase tracking-wider"
               >
                 <Download className="w-4 h-4" />
                 <span>Download</span>
@@ -240,7 +231,7 @@ export default function QRCode() {
               <button
                 onClick={() => copyToClipboard(link?.qrCode)}
                 disabled={!link?.qrCode}
-                className="px-5 text-neutral-400 hover:text-[#76B900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="px-5 text-neutral-400 hover:text-[#76B900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer py-3 sm:py-4 border border-neutral-800 sm:border-0"
               >
                 <Copy className="w-4 h-4" />
               </button>
@@ -248,17 +239,17 @@ export default function QRCode() {
           </div>
 
           {/* Link Information */}
-          <div>
-            <div className="flex items-center gap-3 mb-8">
-              <h2 className="text-2xl font-extralight text-white tracking-tight">
+          <div className="mt-8 lg:mt-0">
+            <div className="flex items-center gap-3 mb-6 lg:mb-8">
+              <h2 className="text-xl sm:text-2xl font-extralight text-white tracking-tight">
                 Link Details
               </h2>
               <div className="h-px flex-1 bg-neutral-900"></div>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 lg:space-y-8">
               {/* Short URL */}
-              <div className="pb-8 border-b border-neutral-900/50">
+              <div className="pb-6 lg:pb-8 border-b border-neutral-900/50">
                 <label className="text-neutral-500 text-xs uppercase tracking-widest block mb-3 font-medium">
                   Short URL
                 </label>
@@ -267,14 +258,14 @@ export default function QRCode() {
                     href={link?.shortUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors flex-1 break-all cursor-pointer text-lg font-light group/link"
+                    className="text-[#76B900] hover:text-[#8FD400] flex items-center gap-2 transition-colors flex-1 break-all cursor-pointer text-base sm:text-lg font-light group/link"
                   >
                     <span>{link?.shortUrl}</span>
                     <ExternalLink className="w-4 h-4 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
                   </a>
                   <button
                     onClick={() => copyToClipboard(link?.shortUrl)}
-                    className="p-2 text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer"
+                    className="p-2 text-neutral-400 hover:text-[#76B900] transition-colors cursor-pointer flex-shrink-0"
                   >
                     <Copy className="w-4 h-4" />
                   </button>
@@ -282,7 +273,7 @@ export default function QRCode() {
               </div>
 
               {/* Original URL */}
-              <div className="pb-8 border-b border-neutral-900/50">
+              <div className="pb-6 lg:pb-8 border-b border-neutral-900/50">
                 <label className="text-neutral-500 text-xs uppercase tracking-widest block mb-3 font-medium">
                   Original URL
                 </label>
@@ -292,7 +283,7 @@ export default function QRCode() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-x-12 gap-y-8 py-8 border-b border-neutral-900/50">
+              <div className="grid grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-6 lg:gap-y-8 py-6 lg:py-8 border-b border-neutral-900/50">
                 <StatCard value={link?.clicks || 0} label="Total Clicks" />
                 <StatCard value={link?.createdAt} label="Created" />
               </div>
@@ -324,14 +315,14 @@ export default function QRCode() {
         </div>
 
         {/* Usage Tips */}
-        <div className="border-t border-neutral-900 pt-16">
-          <div className="flex items-center gap-3 mb-8">
-            <h2 className="text-2xl font-extralight text-white tracking-tight">
+        <div className="border-t border-neutral-900 pt-12 lg:pt-16">
+          <div className="flex items-center gap-3 mb-6 lg:mb-8">
+            <h2 className="text-xl sm:text-2xl font-extralight text-white tracking-tight">
               Usage Tips
             </h2>
             <div className="h-px flex-1 bg-neutral-900"></div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 lg:gap-x-12 gap-y-4 lg:gap-y-6">
             {usageTips.map((tip, index) => (
               <div
                 key={index}
