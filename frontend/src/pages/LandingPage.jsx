@@ -303,7 +303,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      <section className="pt-32 pb-24 w-full px-8 sm:px-12 lg:px-16 mx-auto">
+      <section className="pt-32 pb-12 w-full px-8 sm:px-12 lg:px-16 mx-auto">
         <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-start">
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-thin leading-[0.95] tracking-tight mb-6 sm:mb-8">
@@ -372,24 +372,99 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              <div className="h-24 mb-8 opacity-70">
+              <div className="h-72 w-full mb-10">
                 <svg
-                  viewBox="0 0 100 40"
+                  viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                   className="w-full h-full"
                 >
-                  <path
-                    d="M0 28 L10 24 L20 26 L30 20 L40 22 L50 18 L60 21 L70 14 L80 17 L90 13 L100 15"
+                  {/* subtle grid */}
+                  {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((x) => (
+                    <line
+                      key={`v-${x}`}
+                      x1={x}
+                      y1="0"
+                      x2={x}
+                      y2="100"
+                      stroke="#1f2937"
+                      strokeWidth="0.3"
+                    />
+                  ))}
+
+                  {[15, 30, 45, 60, 75, 90].map((y) => (
+                    <line
+                      key={`h-${y}`}
+                      x1="0"
+                      y1={y}
+                      x2="100"
+                      y2={y}
+                      stroke="#1f2937"
+                      strokeWidth="0.3"
+                    />
+                  ))}
+
+                  {/* primary — clicks */}
+                  <polyline
+                    points="
+        0,82
+        14,60
+        28,66
+        42,48
+        56,54
+        70,36
+        84,42
+        100,28
+      "
                     fill="none"
                     stroke="#76B900"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeWidth="1.2"
+                    strokeLinejoin="miter"
+                    strokeLinecap="square"
+                  />
+
+                  {/* secondary — unique users */}
+                  <polyline
+                    points="
+        0,40
+        14,26
+        28,44
+        42,58
+        56,46
+        70,64
+        84,52
+        100,66
+      "
+                    fill="none"
+                    stroke="#76B900"
+                    strokeWidth="0.9"
+                    strokeOpacity="0.55"
+                    strokeLinejoin="miter"
+                    strokeLinecap="square"
+                  />
+
+                  {/* tertiary — errors / drops (subtle red) */}
+                  <polyline
+                    points="
+        0,50
+        14,42
+        28,54
+        42,60
+        56,62
+        70,70
+        84,74
+        100,78
+      "
+                    fill="none"
+                    stroke="#9B1C1C"
+                    strokeWidth="0.8"
+                    strokeOpacity="0.6"
+                    strokeLinejoin="miter"
+                    strokeLinecap="square"
                   />
                 </svg>
               </div>
 
-              <div className="space-y-6 mb-8">
+              <div className="grid grid-cols-2 gap-8 mb-8">
                 <div className="border-l-2 border-[#76B900] pl-4">
                   <div className="text-4xl font-thin text-white tabular-nums mb-1">
                     12,847
@@ -399,6 +474,7 @@ export default function LandingPage() {
                   </div>
                   <div className="text-xs text-[#76B900] mt-1">+23.5%</div>
                 </div>
+
                 <div className="border-l-2 border-neutral-800 pl-4">
                   <div className="text-4xl font-thin text-white tabular-nums mb-1">
                     284
@@ -407,31 +483,6 @@ export default function LandingPage() {
                     Active Links
                   </div>
                   <div className="text-xs text-[#76B900] mt-1">+12 new</div>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-xs text-neutral-700 mb-4 uppercase tracking-wider">
-                  Recent Activity
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { short: "btlink/prod2024", clicks: 145 },
-                    { short: "btlink/launch", clicks: 89 },
-                    { short: "btlink/spring", clicks: 67 },
-                  ].map((link, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between text-xs py-2 border-b border-neutral-900/50"
-                    >
-                      <span className="text-neutral-400 font-light">
-                        {link.short}
-                      </span>
-                      <span className="text-neutral-700 tabular-nums">
-                        {link.clicks}
-                      </span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
