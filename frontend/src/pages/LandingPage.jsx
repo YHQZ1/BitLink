@@ -187,6 +187,8 @@ export default function LandingPage() {
   const [shortenedUrl, setShortenedUrl] = useState(null);
   const [guestSessionId, setGuestSessionId] = useState("");
   const [authRequired, setAuthRequired] = useState(false);
+  const [error, setError] = useState(null);
+  const [attempts, setAttempts] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -199,11 +201,21 @@ export default function LandingPage() {
   }, []);
 
   const handleShorten = async () => {
-    if (!url) return;
+    setError(null);
+
+    if (!url.trim()) {
+      setError("Please enter a URL.");
+      return;
+    }
 
     const normalizedUrl = normalizeAndValidateUrl(url);
-
     if (!normalizedUrl) {
+      setError("That doesn’t look like a valid URL.");
+      return;
+    }
+
+    if (attempts >= 3) {
+      setError("Too many attempts. Please sign in to continue.");
       return;
     }
 
@@ -222,22 +234,41 @@ export default function LandingPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data?.requiresAuth) {
-          setAuthRequired(true);
+        setAttempts((a) => a + 1);
+
+        switch (data.code) {
+          case "NO_URL":
+            setError("Please enter a URL.");
+            break;
+          case "INVALID_URL":
+            setError("Invalid URL format.");
+            break;
+          case "GUEST_LIMIT":
+            setAuthRequired(true);
+            setError(null);
+            break;
+          case "ALIAS_TAKEN":
+            setError("This custom alias is already taken.");
+            break;
+          default:
+            setError("Something went wrong. Try again.");
         }
         return;
       }
 
-      const link = data.data || data;
+      const link = data.data;
 
       setShortenedUrl({
         shortUrl: link.shortUrl,
-        originalUrl: link.originalUrl || normalizedUrl,
-        createdAt: link.createdAt || new Date().toISOString(),
+        originalUrl: link.originalUrl,
+        createdAt: link.createdAt,
         clicks: link.clicks ?? 0,
       });
 
       setUrl("");
+      setAttempts(0);
+    } catch {
+      setError("Network error. Please check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -357,7 +388,10 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-3 mb-2">
                 <input
                   value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  onChange={(e) => {
+                    setUrl(e.target.value);
+                    setError(null);
+                  }}
                   onKeyPress={(e) => e.key === "Enter" && handleShorten()}
                   placeholder="https://example.com/your-long-url"
                   className="flex-1 bg-transparent border-b-2 border-neutral-800 px-0 py-3 sm:py-4 text-white placeholder-neutral-800 text-sm font-light focus:border-[#76B900] outline-none transition-colors"
@@ -370,6 +404,9 @@ export default function LandingPage() {
                   {isLoading ? "..." : "Go"}
                 </button>
               </div>
+              {error && (
+                <p className="text-xs text-red-400 mt-2 font-light">{error}</p>
+              )}
 
               {shortenedUrl && (
                 <ShortenedUrlDisplay
@@ -379,7 +416,7 @@ export default function LandingPage() {
               )}
 
               {authRequired && (
-                <div className="mt-6 py-4 border-t border-neutral-900/50 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="mt-2 py-4 border-neutral-900/50 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <span className="text-neutral-600 font-light">
                     Free limit reached. Sign in to continue.
                   </span>

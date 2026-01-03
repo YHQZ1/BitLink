@@ -34,16 +34,29 @@ export const createUserLink = async (userId, data) => {
 
 export const createGuestLink = async (data) => {
   const { originalUrl, customAlias, sessionId } = data;
-  if (!originalUrl || !isValidUrl(originalUrl) || !sessionId) {
-    throw new Error("Invalid URL");
+
+  if (!originalUrl) {
+    throw new Error("NO_URL");
   }
 
-  const existing = await Link.find({ sessionId, user: null });
-  if (existing.length >= 1) throw new Error();
+  if (!isValidUrl(originalUrl)) {
+    throw new Error("INVALID_URL");
+  }
+
+  if (!sessionId) {
+    throw new Error("INVALID_SESSION");
+  }
+
+  const existing = await Link.countDocuments({ sessionId, user: null });
+  if (existing >= 1) {
+    throw new Error("GUEST_LIMIT");
+  }
 
   if (customAlias) {
     const exists = await Link.findOne({ shortCode: customAlias });
-    if (exists) throw new Error();
+    if (exists) {
+      throw new Error("ALIAS_TAKEN");
+    }
   }
 
   const link = new Link({

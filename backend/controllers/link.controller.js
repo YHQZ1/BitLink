@@ -22,9 +22,25 @@ export const createLink = async (req, res) => {
 export const createGuestLinkController = async (req, res) => {
   try {
     const link = await createGuestLink(req.body);
-    res.status(201).json(link);
-  } catch {
-    res.status(400).json({ error: "Failed to create guest link" });
+    res.status(201).json({ data: link });
+  } catch (err) {
+    const map = {
+      NO_URL: { status: 400, message: "No URL provided" },
+      INVALID_URL: { status: 400, message: "Invalid URL format" },
+      INVALID_SESSION: { status: 400, message: "Invalid guest session" },
+      GUEST_LIMIT: { status: 429, message: "Guest limit reached" },
+      ALIAS_TAKEN: { status: 409, message: "Custom alias already taken" },
+    };
+
+    const error = map[err.message] || {
+      status: 400,
+      message: "Failed to create guest link",
+    };
+
+    res.status(error.status).json({
+      error: error.message,
+      code: err.message || "UNKNOWN_ERROR",
+    });
   }
 };
 
