@@ -2,10 +2,9 @@ version: "3.9"
 
 services:
   backend:
-    image: bitlink-backend:latest
-    container_name: bitlink-backend
-    ports:
-      - "3000:3000"
+    image: ghcr.io/yhqz1/bitlink-backend:prod
     env_file:
-      - ./backend/.env
+      - ./backend.env
+    expose:
+      - "3000"
     restart: unless-stopped

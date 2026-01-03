@@ -38,7 +38,7 @@ jobs:
             sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:prod|" docker-compose.yaml
 
             echo "→ Restarting backend container"
-            docker compose up -d backend
+            docker compose up -d --scale backend=3
 
             echo "→ Cleaning up unused Docker images"
             docker image prune -af

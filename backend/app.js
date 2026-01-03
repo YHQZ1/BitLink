@@ -9,6 +9,7 @@ import { redirectToOriginal } from "./controllers/link.controller.js";
 
 export function createApp() {
   const app = express();
+  app.set("trust proxy", true);
 
   const allowedOrigins = new Set([
     "http://localhost:5173",
@@ -32,6 +33,13 @@ export function createApp() {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+
+  app.get("/", (req, res) => {
+    res.status(200).json({
+      service: "BitLink API",
+      status: "running",
+    });
+  });
 
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok" });
