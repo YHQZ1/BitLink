@@ -36,7 +36,7 @@ jobs:
 
             echo "→ Deploying with Docker Compose (safe recreate)"
             docker compose pull
-            docker compose up -d --scale backend=3 --force-recreate
+            docker compose up -d --scale backend=3
 
             echo "→ Cleaning up unused Docker images"
             docker image prune -af
