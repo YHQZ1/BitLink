@@ -37,7 +37,7 @@ export function createApp() {
   app.get("/", (req, res) => {
     res.status(200).json({
       service: "BitLink API",
-      status: "is running",
+      status: "running",
     });
   });
 
