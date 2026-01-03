@@ -29,18 +29,22 @@ jobs:
             cd /home/ubuntu/bitlink
 
             echo "→ Logging into GHCR"
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo "→ Pulling backend image"
-            docker pull ghcr.io/$OWNER_LC/bitlink-backend:${{ github.event.workflow_run.head_sha }}
+            docker pull ghcr.io/$OWNER_LC/bitlink-backend:prod
 
             echo "→ Updating docker-compose image"
-            sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:${{ github.event.workflow_run.head_sha }}|" docker-compose.yaml
+            sed -i "s|image: .*bitlink-backend:.*|image: ghcr.io/$OWNER_LC/bitlink-backend:prod|" docker-compose.yaml
 
             echo "→ Restarting backend container"
             docker compose up -d backend
 
+            echo "→ Cleaning up unused Docker images"
+            docker image prune -af
+
             echo "Backend deployed successfully"
+
       - name: Trigger Vercel frontend deploy
         run: |
           curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
