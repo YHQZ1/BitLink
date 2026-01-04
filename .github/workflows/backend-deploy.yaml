@@ -38,9 +38,11 @@ jobs:
             echo "Starting new container"
             docker run -d \
               --name bitlink-backend \
+              -p 127.0.0.1:3000:3000 \
               --env-file /home/ubuntu/Bitlink/.env \
               --restart unless-stopped \
               ghcr.io/$OWNER_LC/bitlink-backend:prod
+
 
             echo "Backend deployment successful"
 
