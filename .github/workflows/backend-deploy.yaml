@@ -35,8 +35,8 @@ jobs:
             git reset --hard origin/main
 
             echo "Deploying backend with replicas = $BACKEND_REPLICAS"
-            docker-compose pull backend
-            docker-compose up -d --scale backend=$BACKEND_REPLICAS
+            docker compose pull backend
+            docker compose up -d --scale backend=$BACKEND_REPLICAS
 
             echo "Backend deployment successful"
 
