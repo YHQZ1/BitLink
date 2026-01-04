@@ -1,0 +1,38 @@
+name: Deploy Backend to EC2
+
+on:
+  workflow_run:
+    workflows: ["Build Backend Image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy backend via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "Pulling latest image"
+            docker pull ghcr.io/${{ github.repository_owner }}/bitlink-backend:prod
+
+            echo "Stopping old container"
+            docker stop bitlink-backend || true
+            docker rm bitlink-backend || true
+
+            echo "Starting new container"
+            docker run -d \
+              --name bitlink-backend \
+              --env-file /home/ubuntu/Bitlink/.env \
+              --restart unless-stopped \
+              ghcr.io/${{ github.repository_owner }}/bitlink-backend:prod
+
+            echo "Deploy complete"
