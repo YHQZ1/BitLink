@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import os from "os";
 
 import authRoutes from "./routes/auth.routes.js";
 import linkRoutes from "./routes/link.routes.js";
@@ -44,6 +45,13 @@ export function createApp() {
 
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok" });
+  });
+
+  app.get("/_debug/instance", (req, res) => {
+    res.json({
+      hostname: os.hostname(),
+      pid: process.pid,
+    });
   });
 
   app.use("/api/auth", authRoutes);
