@@ -12,27 +12,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set lowercase repo owner
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Deploy backend via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: OWNER_LC
           script: |
             set -e
 
-            echo "Pulling latest image"
-            docker pull ghcr.io/${{ github.repository_owner }}/bitlink-backend:prod
+            docker pull ghcr.io/$OWNER_LC/bitlink-backend:prod
 
-            echo "Stopping old container"
             docker stop bitlink-backend || true
             docker rm bitlink-backend || true
 
-            echo "Starting new container"
             docker run -d \
               --name bitlink-backend \
               --env-file /home/ubuntu/Bitlink/.env \
               --restart unless-stopped \
-              ghcr.io/${{ github.repository_owner }}/bitlink-backend:prod
-
-            echo "Deploy complete"
+              ghcr.io/$OWNER_LC/bitlink-backend:prod
