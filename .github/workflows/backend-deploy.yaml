@@ -32,8 +32,8 @@ jobs:
 
             echo "Deploying backend with replicas = $BACKEND_REPLICAS"
 
-            docker compose pull backend
-            docker compose up -d --scale backend=$BACKEND_REPLICAS
+            docker-compose pull backend
+            docker-compose up -d --scale backend=$BACKEND_REPLICAS
             echo "Replica count is: $BACKEND_REPLICAS"
 
             echo "Backend deployment successful"
