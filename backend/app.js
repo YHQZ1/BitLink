@@ -13,17 +13,18 @@ export function createApp() {
 
   const allowedOrigins = new Set([
     "http://localhost:5173",
+    "https://bitlk.in",
     "https://www.bitlk.in",
   ]);
 
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin || allowedOrigins.has(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("CORS"));
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.has(origin)) {
+          return callback(null, true);
         }
+        return callback(new Error("Not allowed by CORS"));
       },
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
