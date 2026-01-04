@@ -25,13 +25,25 @@ jobs:
           script: |
             set -e
 
-            docker pull ghcr.io/$OWNER_LC/bitlink-backend:prod
-
+            echo "Stopping old container"
             docker stop bitlink-backend || true
             docker rm bitlink-backend || true
 
+            echo "Cleaning old images"
+            docker image prune -af
+
+            echo "Pulling new image"
+            docker pull ghcr.io/$OWNER_LC/bitlink-backend:prod
+
+            echo "Starting new container"
             docker run -d \
               --name bitlink-backend \
               --env-file /home/ubuntu/Bitlink/.env \
               --restart unless-stopped \
               ghcr.io/$OWNER_LC/bitlink-backend:prod
+
+            echo "Backend deployment successful"
+
+      - name: Trigger Vercel frontend deploy
+        run: |
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
