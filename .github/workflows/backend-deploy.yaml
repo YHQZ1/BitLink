@@ -11,6 +11,9 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
+    env:
+      BACKEND_REPLICAS: ${{ vars.BACKEND_REPLICAS }}
+
     steps:
       - name: Set lowercase repo owner
         run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
@@ -21,28 +24,17 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: OWNER_LC
+          envs: OWNER_LC,BACKEND_REPLICAS
           script: |
             set -e
 
-            echo "Stopping old container"
-            docker stop bitlink-backend || true
-            docker rm bitlink-backend || true
+            cd /home/ubuntu/Bitlink
 
-            echo "Cleaning old images"
-            docker image prune -af
+            echo "Deploying backend with replicas = $BACKEND_REPLICAS"
 
-            echo "Pulling new image"
-            docker pull ghcr.io/$OWNER_LC/bitlink-backend:prod
-
-            echo "Starting new container"
-            docker run -d \
-              --name bitlink-backend \
-              -p 127.0.0.1:3000:3000 \
-              --env-file /home/ubuntu/Bitlink/.env \
-              --restart unless-stopped \
-              ghcr.io/$OWNER_LC/bitlink-backend:prod
-
+            docker compose pull backend
+            docker compose up -d --scale backend=$BACKEND_REPLICAS
+            echo "Replica count is: $BACKEND_REPLICAS"
 
             echo "Backend deployment successful"
 
