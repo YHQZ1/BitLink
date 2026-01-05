@@ -1,14 +1,18 @@
 import { Queue } from "bullmq";
 
-const connection = {
-  url: process.env.REDIS_URL,
-};
+let analyticsQueue = null;
 
-export const analyticsQueue = new Queue("analytics", {
-  connection,
-});
+if (process.env.NODE_ENV !== "test") {
+  analyticsQueue = new Queue("analytics", {
+    connection: {
+      url: process.env.REDIS_URL,
+    },
+  });
+}
 
 export const enqueueTrackAnalytics = async (payload) => {
+  if (!analyticsQueue) return;
+
   await analyticsQueue.add("track_click", payload, {
     attempts: 5,
     backoff: {
