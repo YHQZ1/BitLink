@@ -45,9 +45,18 @@ export default function App() {
   const [backendUp, setBackendUp] = useState(null);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/health`)
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 2000);
+
+    fetch(`${BASE_URL}/health`, { signal: controller.signal })
       .then(() => setBackendUp(true))
-      .catch(() => setBackendUp(false));
+      .catch(() => setBackendUp(false))
+      .finally(() => clearTimeout(timeout));
+
+    return () => clearTimeout(timeout);
   }, []);
 
   if (backendUp === false) {
