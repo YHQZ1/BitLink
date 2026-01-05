@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config({ path: "../.env.production" });
-
 import { Worker } from "bullmq";
 import { UAParser } from "ua-parser-js";
 import geoip from "geoip-lite";
