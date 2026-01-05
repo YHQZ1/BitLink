@@ -21,3 +21,10 @@ services:
     expose:
       - "3000"
     restart: unless-stopped
+
+  queue-worker:
+    image: ghcr.io/yhqz1/bitlink-backend:prod
+    env_file:
+      - ./backend.env
+    command: ["node", "workers/analytics.worker.js"]
+    restart: unless-stopped

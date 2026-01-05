@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import { createApp } from "./app.js";
+import connectDB from "./lib/db.js";
 
 dotenv.config({
   path:
@@ -14,7 +14,7 @@ if (!process.env.BASE_URL || !process.env.CLIENT_URL) {
 }
 
 async function startServer() {
-  await mongoose.connect(process.env.MONGODB_URI);
+  await connectDB();
 
   const app = createApp();
   const port = Number(process.env.PORT) || 3000;

@@ -1,9 +1,9 @@
 import Link from "../models/Link.js";
 import QRCode from "qrcode";
 import mongoose from "mongoose";
-import { trackAnalytics } from "./analytics.service.js";
 import { isValidUrl } from "../utils/validateUrl.js";
 import redis from "../lib/redis.js";
+import { enqueueTrackAnalytics } from "../queues/analytics.queue.js";
 
 const REDIRECT_CACHE_TTL = 60 * 60 * 24;
 
@@ -176,7 +176,14 @@ export const resolveRedirect = async (code, req) => {
     { EX: REDIRECT_CACHE_TTL }
   );
 
-  await trackAnalytics(link, req);
+  enqueueTrackAnalytics({
+    linkId: link._id.toString(),
+    shortCode: link.shortCode,
+    ip: req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null,
+    userAgent: req.headers["user-agent"] || null,
+    referrer: req.get("Referer") || "Direct",
+    timestamp: Date.now(),
+  }).catch(() => {});
 
   return link.originalUrl;
 };
@@ -190,7 +197,14 @@ const trackAnalyticsFromCache = async (shortCode, req) => {
   link.lastActivity = new Date();
 
   await link.save();
-  await trackAnalytics(link, req);
+  enqueueTrackAnalytics({
+    linkId: link._id.toString(),
+    shortCode: link.shortCode,
+    ip: req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null,
+    userAgent: req.headers["user-agent"] || null,
+    referrer: req.get("Referer") || "Direct",
+    timestamp: Date.now(),
+  }).catch(() => {});
 };
 
 const sanitizeLink = (link) => ({
