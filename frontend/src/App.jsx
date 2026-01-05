@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ScrollToTop from "./components/ScrollToTop";
@@ -20,6 +21,10 @@ import Privacy from "./pages/Privacy";
 import Security from "./pages/Security";
 import About from "./pages/About";
 
+import SleepMode from "./pages/SleepMode";
+
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const protectedRoutes = [
   { path: "/home", component: Home },
   { path: "/profile", component: Profile },
@@ -37,6 +42,22 @@ const publicRoutes = [
 ];
 
 export default function App() {
+  const [backendUp, setBackendUp] = useState(null);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/health`)
+      .then(() => setBackendUp(true))
+      .catch(() => setBackendUp(false));
+  }, []);
+
+  if (backendUp === false) {
+    return <SleepMode />;
+  }
+
+  if (backendUp === null) {
+    return null;
+  }
+
   return (
     <Router>
       <ScrollToTop />
