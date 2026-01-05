@@ -10,9 +10,11 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:
       - backend
     restart: unless-stopped
+
 
   backend:
     image: ghcr.io/yhqz1/bitlink-backend:prod
