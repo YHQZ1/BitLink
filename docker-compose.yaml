@@ -20,6 +20,7 @@ services:
       - ./backend.env
     expose:
       - "3000"
+      - "9100"
     restart: unless-stopped
 
   queue-worker:
@@ -27,4 +28,24 @@ services:
     env_file:
       - ./backend.env
     command: ["node", "workers/analytics.worker.js"]
+    expose:
+      - "9101"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bitlink-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bitlink-grafana
+    ports:
+      - "3001:3000"
     restart: unless-stopped

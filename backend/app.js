@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import os from "os";
+import { httpRequestDuration, httpRequestCount } from "./lib/metrics.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import linkRoutes from "./routes/link.routes.js";
@@ -35,6 +36,34 @@ export function createApp() {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+
+  app.use((req, res, next) => {
+    const start = process.hrtime();
+
+    res.on("finish", () => {
+      const [sec, nano] = process.hrtime(start);
+      const duration = sec + nano / 1e9;
+
+      const route = req.route?.path || req.path || "unknown";
+
+      httpRequestDuration.observe(
+        {
+          method: req.method,
+          route,
+          status: res.statusCode,
+        },
+        duration
+      );
+
+      httpRequestCount.inc({
+        method: req.method,
+        route,
+        status: res.statusCode,
+      });
+    });
+
+    next();
+  });
 
   app.get("/", (req, res) => {
     res.status(200).json({
