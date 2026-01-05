@@ -1,6 +1,8 @@
+# Secrets & Credentials
 boot.txt
 *.pem
 
+# Environment Variables
 .env
 .env.*
 .env.local
@@ -10,6 +12,7 @@ boot.txt
 .env.development
 .env.*development
 
+# Logs & Debug Files
 logs
 *.log
 npm-debug.log*
@@ -18,18 +21,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Build Artifacts & Coverage
 node_modules/
 dist/
 build/
 dist-ssr/
 coverage/
 
+# Frontend Artifacts
 frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/dist-ssr/
 frontend/.env*
 
+# Backend Artifacts
 backend/node_modules/
 backend/dist/
 backend/build/
@@ -37,6 +43,7 @@ backend/logs/
 backend/.env*
 backend/server-start.txt
 
+# OS & Editor Junk
 .DS_Store
 Thumbs.db
 .vscode/
@@ -46,4 +53,13 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Runtime / Local Data
 dump.rdb
+
+# Terraform (Critical)
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfstate.*.backup
+terraform.tfvars
