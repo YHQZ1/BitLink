@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+import PageLoader from "../components/PageLoader";
 
 const Toast = ({ isVisible, type, message, onClose }) => {
   useEffect(() => {
@@ -198,24 +199,19 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-8 pt-24">
-          <div className="text-center py-12 lg:py-20">
-            <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-neutral-400">Loading profile...</p>
-          </div>
-        </div>
+        <PageLoader label="Loading Profile..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Toast {...toast} onClose={closeToast} />
 
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 pt-24">
+      <div className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* Back Button */}
         <button
           onClick={handleBack}

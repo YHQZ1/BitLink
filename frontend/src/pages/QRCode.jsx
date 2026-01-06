@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+import PageLoader from "../components/PageLoader";
 
 const Toast = ({ isVisible, type, message, onClose }) => {
   useEffect(() => {
@@ -141,24 +142,19 @@ export default function QRCode() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">
-          <div className="text-center py-12 lg:py-20">
-            <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-neutral-400">Loading QR code...</p>
-          </div>
-        </div>
+        <PageLoader label="Loading QR..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
         <Navbar userName={currentUser.name} userEmail={currentUser.email} />
-        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">
-          <div className="max-w-md mx-auto">
+        <div className="flex-1 flex items-center justify-center px-8">
+          <div className="max-w-md w-full">
             <div className="border border-red-500/30 bg-red-500/10 p-6 sm:p-8 text-center">
               <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
               <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
@@ -176,7 +172,7 @@ export default function QRCode() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Toast {...toast} onClose={closeToast} />
 

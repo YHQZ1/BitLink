@@ -4,22 +4,20 @@ import {
   Link2,
   QrCode,
   BarChart3,
-  Search,
   Copy,
   Edit2,
   Trash2,
   ExternalLink,
-  TrendingUp,
   MousePointerClick,
   Calendar,
   X,
   Save,
   CheckCircle,
   AlertCircle,
-  ChevronDown,
 } from "lucide-react";
 import api from "../lib/api";
 import Navbar from "../components/Navbar";
+import PageLoader from "../components/PageLoader";
 
 const normalizeAndValidateUrl = (input) => {
   if (!input) return null;
@@ -518,17 +516,15 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-neutral-800 border-t-[#76B900] rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-neutral-400">Loading your dashboard...</p>
-        </div>
+      <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
+        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <PageLoader label="Loading Homepage..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
       <Navbar userName={currentUser.name} userEmail={currentUser.email} />
       <Toast {...toast} onClose={closeToast} />
       <DeleteConfirmModal
