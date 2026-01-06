@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ScrollToTop from "./components/ScrollToTop";
+import BackendGate from "./components/BackendGate";
 
 import LandingPage from "./pages/LandingPage";
 import ApiDocs from "./pages/ApiDocs";
@@ -21,10 +21,6 @@ import Privacy from "./pages/Privacy";
 import Security from "./pages/Security";
 import About from "./pages/About";
 
-import SleepMode from "./pages/SleepMode";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
 const protectedRoutes = [
   { path: "/home", component: Home },
   { path: "/profile", component: Profile },
@@ -41,68 +37,36 @@ const publicRoutes = [
   { path: "/about", component: About },
 ];
 
-function CheckingBackend() {
-  return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex items-center justify-center">
-      <div className="text-sm text-neutral-400 tracking-wide">
-        Checking system status…
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
-  const [backendUp, setBackendUp] = useState("checking");
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 2000);
-
-    fetch(`${BASE_URL}/health`, { signal: controller.signal })
-      .then(() => setBackendUp("up"))
-      .catch(() => setBackendUp("down"))
-      .finally(() => clearTimeout(timeout));
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  if (backendUp === "checking") {
-    return <CheckingBackend />;
-  }
-
-  if (backendUp === "down") {
-    return <SleepMode />;
-  }
-
   return (
-    <Router>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/auth/success" element={<AuthSuccess />} />
+    <BackendGate>
+      <Router>
+        <ScrollToTop />
 
-        {publicRoutes.map(({ path, component: Component }) => (
-          <Route key={path} path={path} element={<Component />} />
-        ))}
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/success" element={<AuthSuccess />} />
 
-        {protectedRoutes.map(({ path, component: Component }) => (
-          <Route
-            key={path}
-            path={path}
-            element={
-              <ProtectedRoutes>
-                <Component />
-              </ProtectedRoutes>
-            }
-          />
-        ))}
+          {publicRoutes.map(({ path, component: Component }) => (
+            <Route key={path} path={path} element={<Component />} />
+          ))}
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+          {protectedRoutes.map(({ path, component: Component }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoutes>
+                  <Component />
+                </ProtectedRoutes>
+              }
+            />
+          ))}
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </BackendGate>
   );
 }
