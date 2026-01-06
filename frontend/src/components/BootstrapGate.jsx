@@ -21,7 +21,7 @@ function CheckingBackend() {
   );
 }
 
-export default function BackendGate({ children }) {
+export default function BootstrapGate({ children }) {
   const [backendState, setBackendState] = useState("checking");
 
   useEffect(() => {

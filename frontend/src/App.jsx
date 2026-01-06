@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ScrollToTop from "./components/ScrollToTop";
-import BackendGate from "./components/BackendGate";
+import BootstrapGate from "./components/BootstrapGate";
 
 import LandingPage from "./pages/LandingPage";
 import ApiDocs from "./pages/ApiDocs";
@@ -39,7 +39,7 @@ const publicRoutes = [
 
 export default function App() {
   return (
-    <BackendGate>
+    <BootstrapGate>
       <Router>
         <ScrollToTop />
 
@@ -67,6 +67,6 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
-    </BackendGate>
+    </BootstrapGate>
   );
 }
