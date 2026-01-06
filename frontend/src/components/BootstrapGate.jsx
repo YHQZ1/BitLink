@@ -22,9 +22,13 @@ function CheckingBackend() {
 }
 
 export default function BootstrapGate({ children }) {
-  const [backendState, setBackendState] = useState("checking");
+  const [backendState, setBackendState] = useState(() => {
+    return sessionStorage.getItem("backend-up") === "true" ? "up" : "checking";
+  });
 
   useEffect(() => {
+    if (backendState !== "checking") return;
+
     const controller = new AbortController();
 
     const timeout = setTimeout(() => {
@@ -34,6 +38,7 @@ export default function BootstrapGate({ children }) {
     fetch(`${BASE_URL}/health`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error();
+        sessionStorage.setItem("backend-up", "true");
         setBackendState("up");
       })
       .catch(() => {
@@ -42,7 +47,7 @@ export default function BootstrapGate({ children }) {
       .finally(() => clearTimeout(timeout));
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [backendState]);
 
   if (backendState === "checking") return <CheckingBackend />;
   if (backendState === "down") return <SleepMode />;
