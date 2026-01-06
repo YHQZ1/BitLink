@@ -41,8 +41,18 @@ const publicRoutes = [
   { path: "/about", component: About },
 ];
 
+function CheckingBackend() {
+  return (
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex items-center justify-center">
+      <div className="text-sm text-neutral-400 tracking-wide">
+        Checking system status…
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  const [backendUp, setBackendUp] = useState(null);
+  const [backendUp, setBackendUp] = useState("checking");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,25 +62,24 @@ export default function App() {
     }, 2000);
 
     fetch(`${BASE_URL}/health`, { signal: controller.signal })
-      .then(() => setBackendUp(true))
-      .catch(() => setBackendUp(false))
+      .then(() => setBackendUp("up"))
+      .catch(() => setBackendUp("down"))
       .finally(() => clearTimeout(timeout));
 
     return () => clearTimeout(timeout);
   }, []);
 
-  if (backendUp === false) {
-    return <SleepMode />;
+  if (backendUp === "checking") {
+    return <CheckingBackend />;
   }
 
-  if (backendUp === null) {
-    return null;
+  if (backendUp === "down") {
+    return <SleepMode />;
   }
 
   return (
     <Router>
       <ScrollToTop />
-
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<Auth />} />
