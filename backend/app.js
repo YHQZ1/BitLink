@@ -7,7 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import linkRoutes from "./routes/link.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import userRoutes from "./routes/user.routes.js";
-// import { redirectToOriginal } from "./controllers/link.controller.js";
+import { redirectToOriginal } from "./controllers/link.controller.js";
 
 export function createApp() {
   const app = express();
@@ -88,9 +88,7 @@ export function createApp() {
   app.use("/api/analytics", analyticsRoutes);
   app.use("/api/user", userRoutes);
 
-  // app.get("/r/:code", redirectToOriginal);
-
-  app.use("/", linkRoutes);
+  app.get("/r/:code", redirectToOriginal);
 
   app.use((err, req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
