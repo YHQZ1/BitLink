@@ -7,7 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import linkRoutes from "./routes/link.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import userRoutes from "./routes/user.routes.js";
-import { redirectToOriginal } from "./controllers/link.controller.js";
+// import { redirectToOriginal } from "./controllers/link.controller.js";
 
 export function createApp() {
   const app = express();
@@ -31,7 +31,7 @@ export function createApp() {
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
-    })
+    }),
   );
 
   app.use(express.json());
@@ -52,7 +52,7 @@ export function createApp() {
           route,
           status: res.statusCode,
         },
-        duration
+        duration,
       );
 
       httpRequestCount.inc({
@@ -88,7 +88,9 @@ export function createApp() {
   app.use("/api/analytics", analyticsRoutes);
   app.use("/api/user", userRoutes);
 
-  app.get("/r/:code", redirectToOriginal);
+  // app.get("/r/:code", redirectToOriginal);
+
+  app.use("/", linkRoutes);
 
   app.use((err, req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
