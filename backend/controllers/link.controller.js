@@ -80,11 +80,7 @@ export const migrateGuestLinksController = async (req, res) => {
   }
 };
 
-export const redirectToOriginal = async (req, res) => {
-  try {
-    const url = await resolveRedirect(req.params.code, req);
-    res.redirect(url);
-  } catch {
-    res.status(404).json({ error: "Link not found" });
-  }
+export const redirectToOriginal = async (req, res, next) => {
+  const url = await resolveRedirect(req.params.code, req);
+  return res.redirect(302, url);
 };
