@@ -1,4 +1,4 @@
-import { Power, Clock, ArrowRight } from "lucide-react";
+import { Power, Clock, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function SleepMode() {
@@ -15,38 +15,35 @@ export default function SleepMode() {
         <div className="border-l-2 border-neutral-900 pl-6 sm:pl-8">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
-            <Power className="w-5 h-5 text-[#76B900]" />
+            <Loader2 className="w-5 h-5 text-[#76B900] animate-spin" />
             <span className="text-xs uppercase tracking-widest text-neutral-500">
-              Instance Offline
+              Starting Server
             </span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-thin tracking-tight mb-6">
-            BitLink is currently
+            BitLink is
             <br />
-            <span className="text-[#76B900]">in sleep mode.</span>
+            <span className="text-[#76B900]">starting up.</span>
           </h1>
 
           <p className="text-neutral-500 max-w-lg text-sm sm:text-base font-light leading-relaxed mb-6">
-            BitLink runs on dedicated infrastructure that is started on demand.
-            When there is no active usage, the backend instance is intentionally
-            powered down to reduce unnecessary compute costs.
+            The backend service goes to sleep during periods of inactivity to
+            conserve resources. Your visit has triggered it to start back up.
           </p>
 
           <p className="text-neutral-500 max-w-lg text-sm sm:text-base font-light leading-relaxed mb-10">
-            This approach keeps the project sustainable while still providing
-            full functionality whenever the server is active.
+            This typically takes about a minute. The page will automatically
+            refresh once the server is ready.
           </p>
 
           {/* Status */}
           <div className="flex items-start gap-4 mb-10">
             <Clock className="w-5 h-5 text-neutral-600 mt-0.5" />
             <div className="text-sm text-neutral-600 font-light">
-              If the server was recently started, it may take a short moment to
-              become available.
+              Server initialization in progress.
               <br />
-              Otherwise, this page indicates that the backend is currently
-              offline by design.
+              You'll be redirected automatically when ready.
             </div>
           </div>
 
@@ -57,7 +54,7 @@ export default function SleepMode() {
               disabled={retrying}
               className="border-2 border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer text-xs uppercase tracking-widest font-medium disabled:opacity-50"
             >
-              {retrying ? "Retrying…" : "Retry"}
+              {retrying ? "Checking…" : "Check Now"}
             </button>
 
             <a
@@ -66,7 +63,7 @@ export default function SleepMode() {
               rel="noopener noreferrer"
               className="text-neutral-500 hover:text-white transition-colors text-sm font-light flex items-center gap-2"
             >
-              View project details
+              View on GitHub
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -75,7 +72,7 @@ export default function SleepMode() {
         {/* Footer hint */}
         <div className="mt-16 pt-6 border-t border-neutral-900 text-xs text-neutral-600 flex items-center gap-2">
           <div className="w-2 h-2 bg-[#76B900]" />
-          Intentional downtime · Cost-aware infrastructure · On-demand compute
+          On-demand infrastructure · Auto-scales to zero · Typical startup ~60s
         </div>
       </div>
     </div>

@@ -26,14 +26,12 @@ export default function BootstrapGate({ children }) {
     return sessionStorage.getItem("backend-up") === "true" ? "up" : "checking";
   });
 
-  useEffect(() => {
-    if (backendState !== "checking") return;
-
+  const checkBackend = () => {
     const controller = new AbortController();
 
     const timeout = setTimeout(() => {
       controller.abort();
-    }, 2000);
+    }, 5000);
 
     fetch(`${BASE_URL}/health`, { signal: controller.signal })
       .then((res) => {
@@ -47,6 +45,21 @@ export default function BootstrapGate({ children }) {
       .finally(() => clearTimeout(timeout));
 
     return () => clearTimeout(timeout);
+  };
+
+  useEffect(() => {
+    if (backendState !== "checking") return;
+    checkBackend();
+  }, [backendState]);
+
+  useEffect(() => {
+    if (backendState !== "down") return;
+
+    const retryInterval = setInterval(() => {
+      setBackendState("checking");
+    }, 10000);
+
+    return () => clearInterval(retryInterval);
   }, [backendState]);
 
   if (backendState === "checking") return <CheckingBackend />;
