@@ -142,14 +142,12 @@ export const migrateGuestLinks = async (userId, sessionId) => {
 export const resolveRedirect = async (code, req) => {
   const cacheKey = `link:${code}`;
 
-  // 1️⃣ Try Redis cache (ONLY if redis exists)
   if (redis) {
     try {
       const cached = await redis.get(cacheKey);
       if (cached) {
         const { originalUrl } = JSON.parse(cached);
 
-        // fire-and-forget analytics
         trackAnalyticsFromCache(code, req).catch(() => {});
 
         if (!originalUrl || typeof originalUrl !== "string") {
@@ -159,12 +157,10 @@ export const resolveRedirect = async (code, req) => {
         return originalUrl.trim();
       }
     } catch (err) {
-      // cache must NEVER break redirect
       console.warn("Redis cache read failed:", err.message);
     }
   }
 
-  // 2️⃣ Fetch from MongoDB
   const link = await Link.findOne({ shortCode: code, isActive: true });
   if (!link) {
     throw new Error("NOT_FOUND");
@@ -174,7 +170,6 @@ export const resolveRedirect = async (code, req) => {
     throw new Error("INVALID_URL");
   }
 
-  // 3️⃣ Update link stats (non-blocking correctness)
   link.clicks += 1;
   link.lastAccessed = new Date();
   link.lastActivity = new Date();
@@ -183,16 +178,17 @@ export const resolveRedirect = async (code, req) => {
 
   const cleanUrl = link.originalUrl.trim();
 
-  // 4️⃣ Store in Redis cache (best-effort)
   if (redis) {
     redis
-      .set(cacheKey, JSON.stringify({ originalUrl: cleanUrl }), {
-        EX: REDIRECT_CACHE_TTL,
-      })
+      .set(
+        cacheKey,
+        JSON.stringify({ originalUrl: cleanUrl }),
+        "EX",
+        REDIRECT_CACHE_TTL,
+      )
       .catch((err) => console.warn("Redis cache write failed:", err.message));
   }
 
-  // 5️⃣ Fire analytics asynchronously (must NOT block redirect)
   enqueueTrackAnalytics({
     linkId: link._id.toString(),
     shortCode: link.shortCode,
