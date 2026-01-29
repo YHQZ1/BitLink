@@ -42,4 +42,18 @@ async function startServer() {
     });
 }
 
-startServer();
+startServer()
+  .then(async () => {
+    if (process.env.NODE_ENV === "production") {
+      try {
+        await import("./workers/analytics.worker.js");
+        console.log("Analytics worker started (same service)");
+      } catch (err) {
+        console.error("Failed to start analytics worker", err);
+      }
+    }
+  })
+  .catch((err) => {
+    console.error("Server startup failed", err);
+    process.exit(1);
+  });
