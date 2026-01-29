@@ -1,18 +1,19 @@
-import { createClient } from "redis";
+import IORedis from "ioredis";
 
 let redis = null;
 
 if (process.env.REDIS_URL) {
-  redis = createClient({
-    url: process.env.REDIS_URL,
+  redis = new IORedis(process.env.REDIS_URL, {
+    enableReadyCheck: false,
+    maxRetriesPerRequest: null,
+  });
+
+  redis.on("connect", () => {
+    console.log("Redis cache connected");
   });
 
   redis.on("error", (err) => {
-    console.error("Redis Client Error", err);
-  });
-
-  redis.connect().catch((err) => {
-    console.error("Redis connection failed", err);
+    console.error("Redis cache error:", err.message);
   });
 }
 
