@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link not found · BitLink</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #0b0d10;
+        color: #f5f7fa;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Subtle background grid */
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(118, 185, 0, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(118, 185, 0, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      .error-code {
+        font-size: 8rem;
+        font-weight: 100;
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+        color: #76b900;
+        margin-bottom: 2rem;
+        opacity: 0.15;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .accent-line {
+        height: 2px;
+        width: 80px;
+        background: #76b900;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 200;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+      }
+
+      p {
+        color: #9ca3af;
+        font-size: 1rem;
+        font-weight: 300;
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        max-width: 480px;
+      }
+
+      .link-section {
+        border-left: 2px solid #1f2937;
+        padding-left: 1.5rem;
+        margin-top: 3rem;
+      }
+
+      .link-label {
+        color: #76b900;
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        margin-bottom: 1rem;
+        display: block;
+        font-weight: 500;
+      }
+
+      a {
+        color: #76b900;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 300;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
+      }
+
+      a:hover {
+        color: #8fd400;
+        gap: 0.75rem;
+      }
+
+      a::after {
+        content: "→";
+        font-size: 1rem;
+        transition: transform 0.2s ease;
+      }
+
+      a:hover::after {
+        transform: translateX(4px);
+      }
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(31, 41, 55, 0.5);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #76b900;
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .status-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 640px) {
+        .error-code {
+          font-size: 5rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 0.875rem;
+        }
+
+        .accent-line {
+          width: 60px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="error-code">404</div>
+      <div class="accent-line"></div>
+
+      <h1>Link not found</h1>
+
+      <p>
+        This shortened link does not exist or has been removed. The URL you're
+        looking for might have expired, been deleted, or never existed in our
+        system.
+      </p>
+
+      <div class="link-section">
+        <span class="link-label">Get Started</span>
+        <a href="{{CLIENT_URL}}/home">Create a new link</a>
+      </div>
+
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span class="status-text">All Systems Operational</span>
+      </div>
+    </div>
+  </body>
+</html>

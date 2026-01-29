@@ -1,3 +1,6 @@
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import {
   createUserLink,
   createGuestLink,
@@ -7,6 +10,9 @@ import {
   migrateGuestLinks,
   resolveRedirect,
 } from "../services/link.service.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const createLink = async (req, res) => {
   try {
@@ -80,7 +86,30 @@ export const migrateGuestLinksController = async (req, res) => {
   }
 };
 
-export const redirectToOriginal = async (req, res, next) => {
-  const url = await resolveRedirect(req.params.code, req);
-  return res.redirect(302, url);
+export const redirectToOriginal = async (req, res) => {
+  try {
+    const url = await resolveRedirect(req.params.code, req);
+    return res.redirect(302, url);
+  } catch (err) {
+    if (err.message === "NOT_FOUND") {
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "link-not-found.html",
+      );
+
+      let html = fs.readFileSync(filePath, "utf-8");
+
+      html = html.replace(
+        "{{CLIENT_URL}}",
+        process.env.CLIENT_URL || "http://localhost:3000",
+      );
+
+      return res.status(404).send(html);
+    }
+
+    console.error("Redirect failure:", err);
+    return res.status(500).send("Internal Server Error");
+  }
 };
