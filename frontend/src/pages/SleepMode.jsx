@@ -1,4 +1,4 @@
-import { Power, Clock, ArrowRight, Loader2 } from "lucide-react";
+import { Clock, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function SleepMode() {

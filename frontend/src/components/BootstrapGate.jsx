@@ -2,68 +2,48 @@ import { useEffect, useState } from "react";
 import SleepMode from "../pages/SleepMode";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
-function CheckingBackend() {
-  return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-sm uppercase tracking-widest text-gray-400 mb-4">
-          System status
-        </div>
-
-        <div className="text-2xl font-light mb-2">
-          Checking backend availability
-        </div>
-
-        <div className="text-sm text-gray-500">Please wait a moment</div>
-      </div>
-    </div>
-  );
-}
+const CHECK_INTERVAL_MS = 2000;
+const REQUEST_TIMEOUT_MS = 1500;
 
 export default function BootstrapGate({ children }) {
-  const [backendState, setBackendState] = useState(() => {
-    return sessionStorage.getItem("backend-up") === "true" ? "up" : "checking";
+  const [backendUp, setBackendUp] = useState(() => {
+    return sessionStorage.getItem("backend-up") === "true";
   });
 
-  const checkBackend = () => {
-    const controller = new AbortController();
+  useEffect(() => {
+    if (backendUp) return;
 
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 5000);
+    const checkBackend = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        REQUEST_TIMEOUT_MS,
+      );
 
-    fetch(`${BASE_URL}/health`, { signal: controller.signal })
-      .then((res) => {
+      try {
+        const res = await fetch(`${BASE_URL}/health`, {
+          signal: controller.signal,
+        });
+
         if (!res.ok) throw new Error();
+
         sessionStorage.setItem("backend-up", "true");
-        setBackendState("up");
-      })
-      .catch(() => {
-        setBackendState("down");
-      })
-      .finally(() => clearTimeout(timeout));
+        setBackendUp(true);
+      } catch {
+        // silent retry
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
 
-    return () => clearTimeout(timeout);
-  };
-
-  useEffect(() => {
-    if (backendState !== "checking") return;
     checkBackend();
-  }, [backendState]);
 
-  useEffect(() => {
-    if (backendState !== "down") return;
+    const interval = setInterval(checkBackend, CHECK_INTERVAL_MS);
 
-    const retryInterval = setInterval(() => {
-      setBackendState("checking");
-    }, 10000);
+    return () => clearInterval(interval);
+  }, [backendUp]);
 
-    return () => clearInterval(retryInterval);
-  }, [backendState]);
-
-  if (backendState === "checking") return <CheckingBackend />;
-  if (backendState === "down") return <SleepMode />;
+  if (!backendUp) return <SleepMode />;
 
   return children;
 }

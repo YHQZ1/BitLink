@@ -66,3 +66,4 @@ terraform.tfvars
 
 # CI/CD pipeline
 .github/
+.github/*
