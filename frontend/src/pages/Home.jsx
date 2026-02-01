@@ -317,7 +317,7 @@ export default function Home() {
       id: link.id,
       originalUrl: link.originalUrl,
       shortCode: link.shortCode,
-      shortUrl: link.shortUrl,
+      shortUrl: `${import.meta.env.VITE_BACKEND_URL}/r/${link.shortCode}`,
       clicks: link.clicks,
       createdAt: new Date(link.createdAt).toLocaleDateString(),
       lastAccessed: formatLastAccessed(link.lastAccessed),
@@ -325,7 +325,7 @@ export default function Home() {
       rawLastAccessed: link.lastAccessed,
       rawCreatedAt: link.createdAt,
     }),
-    []
+    [],
   );
 
   const fetchUserLinks = useCallback(async () => {
@@ -350,7 +350,8 @@ export default function Home() {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       const activeLinks = links.filter(
         (link) =>
-          link.rawLastAccessed && new Date(link.rawLastAccessed) > thirtyDaysAgo
+          link.rawLastAccessed &&
+          new Date(link.rawLastAccessed) > thirtyDaysAgo,
       ).length;
 
       setStats({

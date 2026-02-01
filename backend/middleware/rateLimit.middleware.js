@@ -3,8 +3,11 @@ import redis from "../lib/redis.js";
 export const rateLimit = ({ keyPrefix, limit, windowSec, keyGenerator }) => {
   return async (req, res, next) => {
     try {
-      const identifier = keyGenerator(req);
+      if (!redis) {
+        return next();
+      }
 
+      const identifier = keyGenerator(req);
       if (!identifier) return next();
 
       const key = `${keyPrefix}:${identifier}`;

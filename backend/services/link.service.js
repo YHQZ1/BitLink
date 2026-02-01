@@ -93,7 +93,10 @@ export const updateUserLink = async (userId, linkId, data) => {
     }
 
     link.originalUrl = originalUrl;
-    await redis.del(`link:${link.shortCode}`);
+
+    if (redis) {
+      await redis.del(`link:${link.shortCode}`);
+    }
   }
 
   if (customAlias && customAlias !== link.shortCode) {
@@ -103,14 +106,16 @@ export const updateUserLink = async (userId, linkId, data) => {
       shortCode: customAlias,
       _id: { $ne: linkId },
     });
-    if (exists) throw new Error();
+    if (exists) throw new Error("ALIAS_TAKEN");
 
     link.shortCode = customAlias;
 
     const baseUrl = process.env.BASE_URL;
     link.qrCode = await QRCode.toDataURL(`${baseUrl}/r/${customAlias}`);
 
-    await redis.del(`link:${oldShortCode}`);
+    if (redis) {
+      await redis.del(`link:${oldShortCode}`);
+    }
   }
 
   await link.save();
