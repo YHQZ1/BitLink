@@ -39,34 +39,34 @@ const publicRoutes = [
 
 export default function App() {
   return (
-    <BootstrapGate>
-      <Router>
-        <ScrollToTop />
+    <Router>
+      <ScrollToTop />
 
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/auth/success" element={<AuthSuccess />} />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/success" element={<AuthSuccess />} />
 
-          {publicRoutes.map(({ path, component: Component }) => (
-            <Route key={path} path={path} element={<Component />} />
-          ))}
+        {publicRoutes.map(({ path, component: Component }) => (
+          <Route key={path} path={path} element={<Component />} />
+        ))}
 
-          {protectedRoutes.map(({ path, component: Component }) => (
-            <Route
-              key={path}
-              path={path}
-              element={
-                <ProtectedRoutes>
+        {protectedRoutes.map(({ path, component: Component }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <ProtectedRoutes>
+                <BootstrapGate>
                   <Component />
-                </ProtectedRoutes>
-              }
-            />
-          ))}
+                </BootstrapGate>
+              </ProtectedRoutes>
+            }
+          />
+        ))}
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </BootstrapGate>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }
