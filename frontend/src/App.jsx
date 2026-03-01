@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ScrollToTop from "./components/ScrollToTop";
-import BootstrapGate from "./components/BootstrapGate";
 
 import LandingPage from "./pages/LandingPage";
 import ApiDocs from "./pages/ApiDocs";
@@ -57,9 +56,7 @@ export default function App() {
             path={path}
             element={
               <ProtectedRoutes>
-                <BootstrapGate>
-                  <Component />
-                </BootstrapGate>
+                <Component />
               </ProtectedRoutes>
             }
           />
