@@ -63,7 +63,3 @@ terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.*.backup
 terraform.tfvars
-
-# CI/CD pipeline
-.github/
-.github/*

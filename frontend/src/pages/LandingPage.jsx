@@ -369,7 +369,7 @@ export default function LandingPage() {
         <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-start">
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-thin leading-[0.95] tracking-tight mb-6 sm:mb-8">
-              Short links.
+              URL Shortener
               <br />
               Real analytics.
               <br />
@@ -377,8 +377,8 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-neutral-500 max-w-lg text-sm sm:text-base font-light leading-relaxed mb-8 sm:mb-12">
-              A fast, minimal URL shortener built for developers and teams who
-              care about clarity and control.
+              Create custom short links, track clicks in real time, and analyze
+              traffic with a clean, developer-first interface.
             </p>
 
             <div className="max-w-xl">
@@ -579,7 +579,7 @@ export default function LandingPage() {
       >
         <div className="mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-4 tracking-tight">
-            Everything you need
+            Link Creation, Tracking & Analytics
           </h2>
           <div className="flex items-baseline gap-4">
             <div className="h-px w-12 sm:w-20 bg-[#76B900]"></div>
@@ -610,7 +610,7 @@ export default function LandingPage() {
       <section className="py-16 w-full px-8 sm:px-12 lg:px-16 mx-auto border-t border-neutral-900">
         <div className="mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-4 tracking-tight">
-            Built for everyone
+            Who BitLink Is For
           </h2>
           <div className="flex items-baseline gap-4">
             <div className="h-px w-12 sm:w-20 bg-[#76B900]"></div>
@@ -649,7 +649,7 @@ export default function LandingPage() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin mb-6 tracking-tight leading-tight">
-              A clean, predictable API
+              Developer API & Integration
             </h2>
 
             <p className="text-neutral-600 mb-6 sm:mb-8 leading-relaxed font-light text-sm sm:text-base">
@@ -817,8 +817,8 @@ export default function LandingPage() {
                 {plan.name === "Free"
                   ? "Start free"
                   : plan.name === "Pro"
-                  ? "Upgrade"
-                  : "Contact sales"}
+                    ? "Upgrade"
+                    : "Contact sales"}
               </button>
             </div>
           ))}
