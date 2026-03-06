@@ -6,7 +6,7 @@ if (process.env.REDIS_URL) {
   redis = new IORedis(process.env.REDIS_URL, {
     lazyConnect: true,
     enableReadyCheck: false,
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: null,
     enableOfflineQueue: false,
 
     retryStrategy(times) {
