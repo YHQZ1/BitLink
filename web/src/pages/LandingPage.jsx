@@ -640,7 +640,7 @@ export default function LandingPage() {
             </ul>
 
             <button
-              onClick={() => navigate("/api-docs")}
+              onClick={() => navigate("/docs")}
               className="border-2 border-[#76B900] text-[#76B900] px-6 sm:px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer flex items-center gap-2 text-xs uppercase tracking-widest font-medium"
             >
               View API Docs
@@ -865,7 +865,7 @@ export default function LandingPage() {
                       onClick={() => navigate("/about")}
                       className="hover:text-white transition-colors"
                     >
-                      BitLink
+                      About
                     </button>
                   </li>
                   <li>

@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Zap, Shield, TrendingUp, BarChart3 } from "lucide-react";
+import { ArrowLeft, Zap, Shield, TrendingUp, ArrowRight } from "lucide-react";
 
 export default function About() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-      {/* Header */}
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] overflow-x-hidden">
+      {/* Nav */}
       <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 sm:gap-3 text-neutral-400 hover:text-white transition-colors cursor-pointer"
@@ -20,240 +20,238 @@ export default function About() {
                 alt="BitLink"
                 className="w-7 h-7 sm:w-8 sm:h-8"
               />
-              <span className="text-base sm:text-[20px] font-medium tracking-tight">
+              <span className="text-base sm:text-lg font-extralight tracking-tight text-white">
                 BitLink
               </span>
             </div>
           </button>
+          <span className="text-xs uppercase tracking-[0.3em] text-neutral-600">
+            About
+          </span>
         </div>
       </nav>
 
-      {/* Content */}
-      <main className="pt-32 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto pb-12 lg:pb-20">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light mb-4 sm:mb-6">
-          About BitLink
-        </h1>
-        <p className="text-base sm:text-xl text-neutral-400 mb-8 sm:mb-12 leading-relaxed">
-          A production-oriented URL shortening platform built with a strong
-          emphasis on backend architecture, scalability, and clean code
-          separation.
-        </p>
+      {/* Hero — full width, two-column */}
+      <section className="pt-32 pb-16 px-4 sm:px-8 lg:px-16 border-b border-neutral-900">
+        <div className="grid lg:grid-cols-[1fr_1px_1fr] gap-0 items-start">
+          {/* Left: big statement */}
+          <div className="lg:pr-16 pb-10 lg:pb-0">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-6">
+              Our Story
+            </p>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-thin leading-[0.95] tracking-tight mb-8">
+              Built from
+              <br />
+              a frustration
+              <br />
+              <span className="text-[#76B900]">with shortcuts.</span>
+            </h1>
+            <p className="text-neutral-500 font-light leading-relaxed max-w-md">
+              Most link shorteners treat URLs like disposable objects. We built
+              BitLink because we believed every link deserves to be tracked,
+              understood, and owned.
+            </p>
+          </div>
 
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Our Mission
-          </h2>
-          <p className="text-neutral-400 leading-relaxed mb-4">
-            BitLink was built to apply real system-design principles to a
-            production-ready product. We're not just another link
-            shortener—we're a platform designed from the ground up with
-            scalability, analytics, and developer experience in mind.
-          </p>
-          <p className="text-neutral-400 leading-relaxed">
-            We believe in clarity over complexity, performance over bloat, and
-            real analytics over vanity metrics. Every decision, from our
-            stateless backend architecture to our event-based analytics
-            pipeline, reflects a commitment to building software that scales.
-          </p>
-        </section>
+          {/* Divider */}
+          <div className="hidden lg:block w-px bg-neutral-800 self-stretch" />
 
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light mb-6 lg:mb-8">
-            Core Principles
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="border border-neutral-800 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-[#76B900]" />
-                <h3 className="text-base sm:text-lg font-medium">
-                  Performance First
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Sub-100ms API responses, Redis-backed caching for hot redirects,
-                and asynchronous analytics that never block redirects.
+          {/* Right: founder note */}
+          <div className="lg:pl-16 pt-8 lg:pt-2">
+            <div className="border-l-2 border-[#76B900] pl-6 mb-8">
+              <p className="text-neutral-400 font-light leading-relaxed text-sm sm:text-base italic">
+                "I wanted to build something that wasn't just functional — I
+                wanted it to reflect how I think about software: clean,
+                intentional, and built to last. BitLink started as a side
+                project and became a study in doing things properly."
+              </p>
+              <p className="text-neutral-600 text-xs mt-4 uppercase tracking-wider">
+                — Uttkarsh Ruparel, Founder
               </p>
             </div>
 
-            <div className="border border-neutral-800 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#76B900]" />
-                <h3 className="text-base sm:text-lg font-medium">
-                  Security by Design
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                JWT authentication, bcrypt password hashing, strict CORS
-                configuration, and rate limiting at every layer.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-[#76B900]" />
-                <h3 className="text-base sm:text-lg font-medium">
-                  Built to Scale
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Stateless backend instances, horizontal scaling readiness,
-                MongoDB aggregation optimization, and clear upgrade paths.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-[#76B900]" />
-                <h3 className="text-base sm:text-lg font-medium">
-                  Real Analytics
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Event-based tracking with device detection, geo-resolution,
-                referrer categorization, and peak-hour analysis.
-              </p>
+            {/* Quick stats */}
+            <div className="grid grid-cols-3 gap-4 sm:gap-6">
+              {[
+                { value: "50B+", label: "Possible IDs" },
+                { value: "<100ms", label: "Redirect Time" },
+                { value: "100%", label: "Stateless API" },
+              ].map((s, i) => (
+                <div key={i} className="border-t border-neutral-800 pt-4">
+                  <div className="text-2xl sm:text-3xl font-thin text-[#76B900] mb-1 tracking-tight">
+                    {s.value}
+                  </div>
+                  <div className="text-xs text-neutral-600 uppercase tracking-wider leading-tight">
+                    {s.label}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Technology Stack
-          </h2>
-          <div className="border border-neutral-800 p-4 sm:p-6 bg-[#0D0F13]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-              <div>
-                <h3 className="text-sm font-medium mb-3 text-neutral-300">
-                  Frontend
-                </h3>
-                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
-                  <li>• React with Vite</li>
-                  <li>• Tailwind CSS</li>
-                  <li>• Deployed on Vercel</li>
-                  <li>• Responsive design</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium mb-3 text-neutral-300">
-                  Backend
-                </h3>
-                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
-                  <li>• Node.js + Express</li>
-                  <li>• MongoDB with Mongoose</li>
-                  <li>• JWT authentication</li>
-                  <li>• Deployed on Render</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium mb-3 text-neutral-300">
-                  Analytics
-                </h3>
-                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
-                  <li>• UA-Parser for device detection</li>
-                  <li>• geoip-lite for location</li>
-                  <li>• Event-based tracking</li>
-                  <li>• Async processing</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium mb-3 text-neutral-300">
-                  Features
-                </h3>
-                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
-                  <li>• OAuth 2.0 (GitHub, Google)</li>
-                  <li>• QR code generation</li>
-                  <li>• Custom aliases</li>
-                  <li>• Link expiration</li>
-                </ul>
-              </div>
-            </div>
+      {/* Mission — full bleed with side accent */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900">
+        <div className="grid lg:grid-cols-[200px_1fr] gap-8 lg:gap-16 items-start">
+          <div>
+            <div className="h-px w-12 bg-[#76B900] mb-4" />
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-600">
+              Mission
+            </p>
           </div>
-        </section>
+          <div className="grid sm:grid-cols-2 gap-8 sm:gap-12">
+            <p className="text-neutral-400 font-light leading-relaxed text-sm sm:text-base">
+              BitLink exists to prove that even a "simple" product is an
+              opportunity to apply real engineering principles. Not just making
+              links shorter — but making them smarter, safer, and more
+              insightful.
+            </p>
+            <p className="text-neutral-400 font-light leading-relaxed text-sm sm:text-base">
+              Clarity over complexity. Performance over bloat. Real analytics
+              over vanity metrics. Every decision made at BitLink — from backend
+              architecture to UI — reflects a commitment to software that
+              actually scales.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Architecture Highlights
-          </h2>
-          <div className="space-y-4">
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">
-                Service-Driven Architecture
+      {/* Core Principles — horizontal cards, full width */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900">
+        <div className="flex items-center gap-4 mb-12">
+          <div>
+            <div className="h-px w-12 bg-[#76B900] mb-4" />
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-600">
+              Core Principles
+            </p>
+          </div>
+          <div className="h-px flex-1 bg-neutral-900" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:divide-x sm:divide-neutral-900">
+          {[
+            {
+              icon: <Zap className="w-5 h-5" />,
+              title: "Speed is non-negotiable",
+              body: "Redirects happen in under 100ms. Analytics are captured asynchronously so they never slow down your users. Performance isn't a feature — it's the baseline.",
+            },
+            {
+              icon: <Shield className="w-5 h-5" />,
+              title: "Security baked in",
+              body: "JWT auth, bcrypt hashing, strict CORS, and rate limiting at every layer. Not bolted on at the end — designed in from day one.",
+            },
+            {
+              icon: <TrendingUp className="w-5 h-5" />,
+              title: "Built to grow with you",
+              body: "Stateless architecture. Horizontal scaling ready. Clean service boundaries that make every future feature straightforward to add, not a nightmare to untangle.",
+            },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="sm:px-8 lg:px-12 py-6 sm:py-0 border-b sm:border-b-0 border-neutral-900 first:pl-0 last:pr-0"
+            >
+              <div className="text-[#76B900] mb-5">{p.icon}</div>
+              <h3 className="text-base sm:text-lg font-light text-white mb-3 leading-snug">
+                {p.title}
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Strict separation of concerns with controllers handling HTTP
-                lifecycle, services managing business logic, and utilities
-                providing stateless helpers. Originally monolithic controller
-                (~1000 lines) decomposed into focused services.
+              <p className="text-xs sm:text-sm text-neutral-500 font-light leading-relaxed">
+                {p.body}
               </p>
             </div>
+          ))}
+        </div>
+      </section>
 
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">Analytics Pipeline</h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Write-optimized event model that never blocks redirects.
-                Analytics are recorded asynchronously with device, browser, OS
-                detection, geo-resolution, and referrer categorization.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">OAuth Implementation</h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Single logical user mapped across providers via email
-                unification. Supports GitHub and Google with JWT-based stateless
-                auth.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">
-                Guest-to-User Migration
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Limited guest usage with post-signup migration. Guest links are
-                automatically transferred to authenticated accounts, preserving
-                analytics history.
-              </p>
-            </div>
+      {/* Architecture — numbered list, asymmetric layout */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900">
+        <div className="grid lg:grid-cols-[200px_1fr] gap-8 lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-24">
+            <div className="h-px w-12 bg-[#76B900] mb-4" />
+            <p className="text-xs uppercase tracking-[0.3em] text-neutral-600 mb-2">
+              Under the Hood
+            </p>
+            <p className="text-neutral-700 text-xs font-light leading-relaxed hidden lg:block">
+              The decisions that make BitLink different from a weekend CRUD
+              project.
+            </p>
           </div>
-        </section>
 
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            For Developers
-          </h2>
-          <p className="text-neutral-400 leading-relaxed mb-6">
-            BitLink exposes a clean REST API designed for integration into any
-            workflow. Whether you're building a marketing automation tool, a
-            content management system, or a custom analytics dashboard, our API
-            provides the flexibility you need.
-          </p>
-          <button
-            onClick={() => navigate("/api-docs")}
-            className="border border-[#76B900] text-[#76B900] px-4 sm:px-6 py-2 sm:py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer text-sm sm:text-base"
-          >
-            View API Documentation
-          </button>
-        </section>
+          <div className="space-y-0 divide-y divide-neutral-900">
+            {[
+              {
+                num: "01",
+                title: "Everything has its place",
+                body: "Controllers handle HTTP. Services own the logic. Utilities stay stateless. What started as a 1,000-line monolith was refactored into focused, testable layers — because clean architecture isn't optional when you're building to scale.",
+              },
+              {
+                num: "02",
+                title: "Analytics that never slow you down",
+                body: "Every click is captured asynchronously — device, browser, location, referrer — without adding a single millisecond to your redirect. The pipeline writes events in the background while your user is already on their way.",
+              },
+              {
+                num: "03",
+                title: "One account, any provider",
+                body: "Sign in with Google, GitHub, or email — it all maps to the same user. OAuth accounts are unified by email so you're never locked into one login method, and your data follows you everywhere.",
+              },
+              {
+                num: "04",
+                title: "Your guest links come with you",
+                body: "Try BitLink without signing up. When you eventually do, every link you created as a guest — including its analytics history — is automatically migrated to your account. Nothing gets left behind.",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="grid sm:grid-cols-[80px_1fr] gap-4 sm:gap-8 py-8"
+              >
+                <div className="text-3xl sm:text-4xl font-thin text-neutral-800 tabular-nums">
+                  {item.num}
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-light text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 font-light leading-relaxed">
+                    {item.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        <section className="border-t border-neutral-800 pt-8 sm:pt-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Built With Purpose
-          </h2>
-          <p className="text-neutral-400 leading-relaxed mb-4">
-            BitLink was created to demonstrate that link shortening is more than
-            a simple CRUD application. It's an opportunity to implement real
-            system-design principles: caching strategies, analytics pipelines,
-            horizontal scaling, OAuth integration, and backend refactoring at
-            scale.
-          </p>
-          <p className="text-neutral-400 leading-relaxed">
-            Every line of code reflects a commitment to thinking in terms of
-            traffic, failure modes, and growth. This is software built to learn
-            from, extend, and scale.
-          </p>
-        </section>
-      </main>
+      {/* CTA — full width, centered */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-24">
+        <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+          <div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-thin tracking-tight mb-4">
+              Want to see how it works
+              <br />
+              <span className="text-[#76B900]">under the hood?</span>
+            </h2>
+            <p className="text-neutral-600 text-sm font-light max-w-lg">
+              The API is clean, well-documented, and built for real
+              integrations. Whether you're a developer or just curious, it's
+              worth a look.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+            <button
+              onClick={() => navigate("/docs")}
+              className="border-2 border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer flex items-center gap-2 text-xs uppercase tracking-widest font-medium whitespace-nowrap"
+            >
+              View API Docs <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => navigate("/auth")}
+              className="border border-neutral-800 text-neutral-500 hover:text-white hover:border-neutral-600 px-6 py-3 transition-all cursor-pointer text-xs uppercase tracking-widest font-medium whitespace-nowrap"
+            >
+              Try BitLink Free
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

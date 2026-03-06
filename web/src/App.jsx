@@ -5,7 +5,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import ScrollToTop from "./components/ScrollToTop";
 
 import LandingPage from "./pages/LandingPage";
-import ApiDocs from "./pages/ApiDocs";
+import ApiDocs from "./pages/Docs";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import QRCode from "./pages/QRCode";
@@ -29,7 +29,7 @@ const protectedRoutes = [
 ];
 
 const publicRoutes = [
-  { path: "/api-docs", component: ApiDocs },
+  { path: "/docs", component: ApiDocs },
   { path: "/terms", component: Terms },
   { path: "/privacy", component: Privacy },
   { path: "/security", component: Security },

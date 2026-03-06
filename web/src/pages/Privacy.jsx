@@ -1,14 +1,25 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Shield, Eye, Database, Lock } from "lucide-react";
+import {
+  ArrowLeft,
+  Shield,
+  Eye,
+  Database,
+  Lock,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function Privacy() {
   const navigate = useNavigate();
 
+  const scrollTo = (id) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-      {/* Header */}
+    <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] overflow-x-hidden">
+      {/* Nav */}
       <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 sm:gap-3 text-neutral-400 hover:text-white transition-colors cursor-pointer"
@@ -20,390 +31,626 @@ export default function Privacy() {
                 alt="BitLink"
                 className="w-7 h-7 sm:w-8 sm:h-8"
               />
-              <span className="text-base sm:text-[20px] font-medium tracking-tight">
+              <span className="text-base sm:text-lg font-extralight tracking-tight text-white">
                 BitLink
               </span>
             </div>
           </button>
+          <span className="text-xs uppercase tracking-[0.3em] text-neutral-600">
+            Privacy Policy
+          </span>
         </div>
       </nav>
 
-      {/* Content */}
-      <main className="pt-32 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto pb-12 lg:pb-20">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light mb-4">
-          Privacy Policy
-        </h1>
-        <p className="text-neutral-400 mb-8 sm:mb-12">
-          Last updated: December 31, 2025
-        </p>
+      {/* ── Hero ── */}
+      <section className="pt-32 pb-20 px-4 sm:px-8 lg:px-16 border-b border-neutral-900">
+        <div className="grid lg:grid-cols-[1.1fr_1px_0.9fr] items-stretch gap-0">
+          <div className="lg:pr-20 pb-12 lg:pb-0">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-6">
+              Privacy
+            </p>
+            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-thin leading-[0.9] tracking-tight mb-8">
+              Your data,
+              <br />
+              <span className="text-[#76B900]">your business.</span>
+            </h1>
+            <p className="text-neutral-500 font-light leading-relaxed text-sm sm:text-base max-w-lg mb-10">
+              We built BitLink to be a tool, not a data pipeline. This policy is
+              written to be read — not buried. Here's exactly what we collect,
+              why, and what we never do with it.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "collect", label: "What we collect" },
+                { id: "use", label: "How we use it" },
+                { id: "security", label: "Security" },
+                { id: "retention", label: "Data retention" },
+                { id: "rights", label: "Your rights" },
+                { id: "third-party", label: "Third parties" },
+                { id: "cookies", label: "Cookies" },
+                { id: "contact", label: "Contact" },
+              ].map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => scrollTo(s.id)}
+                  className="text-xs text-neutral-600 hover:text-[#76B900] transition-colors uppercase tracking-wider border border-neutral-900 hover:border-neutral-700 px-3 py-1.5"
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <div className="border border-neutral-800 p-4 sm:p-6 bg-[#0D0F13] mb-8 sm:mb-12">
-          <p className="text-sm text-neutral-400 leading-relaxed">
-            At BitLink, we take your privacy seriously. This policy explains
-            what data we collect, how we use it, and your rights regarding your
-            personal information.
+          <div className="hidden lg:block w-px bg-neutral-800" />
+
+          <div className="lg:pl-20 flex flex-col justify-between gap-10 pt-2">
+            {/* our commitment box */}
+            <div className="border border-neutral-800 bg-[#0D0F13] p-6 sm:p-8">
+              <div className="flex items-center gap-3 mb-5">
+                <Shield className="w-4 h-4 text-[#76B900]" />
+                <span className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+                  Our commitment
+                </span>
+              </div>
+              <div className="space-y-3">
+                {[
+                  "We never sell your personal data to third parties",
+                  "We never use your links for advertising targeting",
+                  "Analytics data belongs to you, not us",
+                  "You can delete your account and data at any time",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#76B900] flex-shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-neutral-400 font-light">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { num: "0", label: "Ad networks" },
+                { num: "0", label: "Data brokers" },
+                { num: "100%", label: "Your ownership" },
+              ].map((s, i) => (
+                <div key={i} className="border-t border-neutral-800 pt-4">
+                  <div className="text-2xl sm:text-3xl font-thin text-[#76B900] mb-1">
+                    {s.num}
+                  </div>
+                  <div className="text-xs text-neutral-600 uppercase tracking-wider leading-tight">
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-neutral-700 uppercase tracking-wider">
+              Last updated: December 31, 2025
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 01 What we collect ── */}
+      <section
+        id="collect"
+        className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900"
+      >
+        <div className="grid lg:grid-cols-[300px_1fr] gap-8 lg:gap-20 items-start">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              01
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-thin tracking-tight mb-4">
+              What we
+              <br />
+              collect
+            </h2>
+            <p className="text-neutral-600 text-sm font-light leading-relaxed">
+              Only what's genuinely needed to run the service. Nothing more.
+            </p>
+          </div>
+
+          <div className="space-y-0 divide-y divide-neutral-900">
+            {[
+              {
+                icon: <Lock className="w-4 h-4 text-[#76B900]" />,
+                title: "Account information",
+                sub: "When you sign up",
+                items: [
+                  "Email address — to identify your account",
+                  "Password, hashed with bcrypt — we never store it in plain text",
+                  "OAuth profile info (name, email) if you sign in via Google or GitHub",
+                  "Account creation date",
+                ],
+              },
+              {
+                icon: <Database className="w-4 h-4 text-[#76B900]" />,
+                title: "Link data",
+                sub: "When you create a short link",
+                items: [
+                  "The original URL you're shortening",
+                  "Your custom alias, if you set one",
+                  "The generated short code",
+                  "Creation and modification timestamps",
+                  "Expiration date, if you set one",
+                ],
+              },
+              {
+                icon: <Eye className="w-4 h-4 text-[#76B900]" />,
+                title: "Analytics data",
+                sub: "When someone clicks your link",
+                items: [
+                  "IP address — used only to derive approximate location, then discarded",
+                  "User agent — to detect device type, browser, and OS",
+                  "Referrer URL — to show where your traffic comes from",
+                  "Click timestamp",
+                  "Country and city, resolved from IP via geoip-lite",
+                ],
+                note: "This data powers your analytics dashboard. It is never used for advertising and is never sold.",
+              },
+              {
+                icon: <Shield className="w-4 h-4 text-neutral-600]" />,
+                title: "Guest session data",
+                sub: "If you use BitLink without an account",
+                items: [
+                  "A randomly generated session ID, stored in your browser's localStorage",
+                  "Guest users can create 1 link per session",
+                  "Your guest links can be migrated to a full account if you sign up later",
+                ],
+              },
+            ].map((block, i) => (
+              <div
+                key={i}
+                className="py-8 grid sm:grid-cols-[220px_1fr] gap-6 sm:gap-10"
+              >
+                <div>
+                  <div className="flex items-center gap-2.5 mb-1">
+                    {block.icon}
+                    <h3 className="text-sm font-medium text-white">
+                      {block.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-neutral-600 uppercase tracking-wider">
+                    {block.sub}
+                  </p>
+                </div>
+                <div>
+                  <ul className="space-y-2 mb-3">
+                    {block.items.map((item, j) => (
+                      <li
+                        key={j}
+                        className="flex items-start gap-3 text-sm text-neutral-500 font-light"
+                      >
+                        <span className="w-1.5 h-1.5 bg-[#76B900] rounded-full flex-shrink-0 mt-1.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  {block.note && (
+                    <p className="text-xs text-neutral-600 font-light leading-relaxed border-l-2 border-neutral-800 pl-3 mt-4">
+                      {block.note}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 02 How we use it ── */}
+      <section
+        id="use"
+        className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900 bg-[#0D0F13]/40"
+      >
+        <div className="mb-10 sm:mb-12">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+            02
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-thin tracking-tight mb-3">
+            How we use your information
+          </h2>
+          <p className="text-neutral-600 text-sm font-light max-w-xl">
+            Every piece of data we collect has a specific, limited purpose. We
+            don't profile you, we don't retarget you, and we don't make
+            inferences beyond what's needed to run BitLink.
           </p>
         </div>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6 flex items-center gap-3">
-            <Database className="w-5 h-5 sm:w-7 sm:h-7 text-[#76B900]" />
-            Information We Collect
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg sm:text-xl font-medium mb-3">
-                Account Information
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-900">
+          {[
+            {
+              title: "Service delivery",
+              body: "Your email and account details let us provide link shortening, QR generation, and analytics. Without them, the service doesn't work.",
+              accent: true,
+            },
+            {
+              title: "Authentication",
+              body: "We use your credentials to verify it's you. OAuth tokens confirm your identity with GitHub or Google — we never store those tokens beyond what's needed.",
+              accent: false,
+            },
+            {
+              title: "Your analytics",
+              body: "Click data is processed solely to populate your dashboard with insights — traffic sources, devices, geography. It's your data, shown to you.",
+              accent: false,
+            },
+            {
+              title: "Abuse prevention",
+              body: "We monitor usage patterns to enforce rate limits, catch malicious links, and keep the platform safe for everyone.",
+              accent: false,
+            },
+          ].map((item, i) => (
+            <div key={i} className="bg-[#0B0D10] p-6 sm:p-8">
+              <div
+                className={`w-8 h-0.5 mb-5 ${item.accent ? "bg-[#76B900]" : "bg-neutral-800"}`}
+              />
+              <h3 className="text-base font-medium text-white mb-3">
+                {item.title}
               </h3>
-              <p className="text-neutral-400 mb-3">
-                When you create an account, we collect:
-              </p>
-              <ul className="space-y-2 text-neutral-400 ml-4 sm:ml-6">
-                <li>• Email address</li>
-                <li>• Password (hashed using bcrypt)</li>
-                <li>
-                  • OAuth provider information (if using GitHub or Google login)
-                </li>
-                <li>• Account creation date</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-lg sm:text-xl font-medium mb-3">Link Data</h3>
-              <p className="text-neutral-400 mb-3">
-                When you create short links, we store:
-              </p>
-              <ul className="space-y-2 text-neutral-400 ml-4 sm:ml-6">
-                <li>• Original URL</li>
-                <li>• Custom alias (if provided)</li>
-                <li>• Generated short code</li>
-                <li>• Creation and modification timestamps</li>
-                <li>• Link expiration date (if set)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-lg sm:text-xl font-medium mb-3">
-                Analytics Data
-              </h3>
-              <p className="text-neutral-400 mb-3">
-                When someone clicks your short link, we automatically collect:
-              </p>
-              <ul className="space-y-2 text-neutral-400 ml-4 sm:ml-6">
-                <li>• IP address (for geographic analysis)</li>
-                <li>• User agent (browser, device type, operating system)</li>
-                <li>• Referrer URL (where the click came from)</li>
-                <li>• Timestamp of the click</li>
-                <li>
-                  • Country and city (derived from IP address using geoip-lite)
-                </li>
-              </ul>
-              <p className="text-neutral-400 mt-3 text-xs sm:text-sm">
-                This data is used to provide you with click analytics and
-                insights. We do not use this data for advertising or sell it to
-                third parties.
+              <p className="text-sm text-neutral-500 font-light leading-relaxed">
+                {item.body}
               </p>
             </div>
+          ))}
+        </div>
+      </section>
 
-            <div>
-              <h3 className="text-lg sm:text-xl font-medium mb-3">
-                Guest Session Data
-              </h3>
-              <p className="text-neutral-400 mb-3">
-                If you use BitLink without an account:
-              </p>
-              <ul className="space-y-2 text-neutral-400 ml-4 sm:ml-6">
-                <li>
-                  • We generate a session ID stored in your browser's
-                  localStorage
-                </li>
-                <li>• Guest users are limited to 1 link per session</li>
-                <li>
-                  • Guest links can be migrated to your account if you sign up
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6 flex items-center gap-3">
-            <Eye className="w-5 h-5 sm:w-7 sm:h-7 text-[#76B900]" />
-            How We Use Your Information
-          </h2>
-
-          <div className="space-y-4">
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">Service Delivery</h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                We use your information to provide, maintain, and improve
-                BitLink's services, including link shortening, QR code
-                generation, and analytics.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">Authentication</h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Email and password are used for account authentication. OAuth
-                tokens are used to verify your identity with GitHub or Google.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">Analytics & Insights</h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                Click data is processed to provide you with analytics about your
-                links, including geographic distribution, device types, and
-                traffic sources.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#76B900] pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-2">
-                Security & Fraud Prevention
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-400">
-                We monitor usage patterns to prevent abuse, implement rate
-                limiting, and maintain the security of our platform.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6 flex items-center gap-3">
-            <Lock className="w-5 h-5 sm:w-7 sm:h-7 text-[#76B900]" />
-            Data Security
-          </h2>
-
-          <p className="text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
-            We implement industry-standard security measures to protect your
-            data:
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Encryption</h3>
-              <p className="text-xs text-neutral-400">
-                All data transmitted between your browser and our servers is
-                encrypted using TLS.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Password Hashing</h3>
-              <p className="text-xs text-neutral-400">
-                Passwords are hashed using bcrypt with strong salting before
-                storage.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">JWT Tokens</h3>
-              <p className="text-xs text-neutral-400">
-                Authentication tokens are signed and verified, with 7-day
-                expiration.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Access Controls</h3>
-              <p className="text-xs text-neutral-400">
-                Strict authorization on all protected routes ensures users can
-                only access their own data.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Data Retention
-          </h2>
-
-          <div className="space-y-3 sm:space-y-4 text-neutral-400 text-sm sm:text-base">
-            <p>
-              <strong className="text-neutral-300">Account Data:</strong>{" "}
-              Retained for as long as your account is active. You can delete
-              your account at any time.
+      {/* ── 03 Security ── */}
+      <section
+        id="security"
+        className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900"
+      >
+        <div className="grid lg:grid-cols-[300px_1fr] gap-8 lg:gap-20 items-start">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              03
             </p>
-            <p>
-              <strong className="text-neutral-300">Link Data:</strong> Retained
-              indefinitely unless you manually delete links. Expired links are
-              marked inactive but not automatically deleted.
-            </p>
-            <p>
-              <strong className="text-neutral-300">Analytics Data:</strong>{" "}
-              Retained according to your plan tier. Free accounts: 7 days. Pro
-              accounts: unlimited retention.
-            </p>
-            <p>
-              <strong className="text-neutral-300">Guest Links:</strong> Not
-              automatically deleted but can be removed by clearing your
-              browser's localStorage.
+            <h2 className="text-3xl sm:text-4xl font-thin tracking-tight mb-4">
+              Data security
+            </h2>
+            <p className="text-neutral-600 text-sm font-light leading-relaxed">
+              Security isn't a checkbox for us. It's designed in from the start
+              — not bolted on.
             </p>
           </div>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Your Rights
-          </h2>
-
-          <div className="space-y-3">
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Access & Export</h3>
-              <p className="text-xs text-neutral-400">
-                You can view and export all your link data and analytics through
-                your dashboard.
-              </p>
+          <div>
+            <div className="grid sm:grid-cols-2 gap-px bg-neutral-900 mb-8">
+              {[
+                {
+                  title: "TLS encryption",
+                  body: "All data in transit between your browser and our servers is encrypted. Unencrypted connections are not accepted.",
+                },
+                {
+                  title: "bcrypt password hashing",
+                  body: "We never store your password in plain text. bcrypt with strong salting means even we can't read it.",
+                },
+                {
+                  title: "Signed JWT tokens",
+                  body: "Authentication tokens are cryptographically signed, verified on every request, and expire after 7 days.",
+                },
+                {
+                  title: "Strict access controls",
+                  body: "Every protected route enforces authorization. You can only access your own links, analytics, and account data — no exceptions.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#0B0D10] p-5 sm:p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-0.5 self-stretch bg-[#76B900] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-medium text-white mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-neutral-500 font-light leading-relaxed">
+                        {item.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Correction</h3>
-              <p className="text-xs text-neutral-400">
-                You can update your account information and modify or delete
-                your links at any time.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Deletion</h3>
-              <p className="text-xs text-neutral-400">
-                You can request account deletion by contacting
-                support@bitlink.xyz. This will permanently delete your account
-                and associated data.
-              </p>
-            </div>
-
-            <div className="border border-neutral-800 p-3 sm:p-4">
-              <h3 className="text-sm font-medium mb-2">Opt-Out</h3>
-              <p className="text-xs text-neutral-400">
-                You can choose not to create an account and use guest mode with
-                limited features.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Third-Party Services
-          </h2>
-
-          <p className="text-neutral-400 mb-3 sm:mb-4 leading-relaxed">
-            BitLink integrates with the following third-party services:
-          </p>
-
-          <div className="space-y-3">
-            <div className="border-l-2 border-neutral-800 pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-1">OAuth Providers</h3>
-              <p className="text-xs text-neutral-400">
-                GitHub and Google OAuth for authentication. We receive basic
-                profile information (email, name) but never access your
-                repositories or private data.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-neutral-800 pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-1">Database Hosting</h3>
-              <p className="text-xs text-neutral-400">
-                MongoDB Atlas for secure, encrypted data storage.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-neutral-800 pl-4 sm:pl-6 py-2">
-              <h3 className="text-sm font-medium mb-1">Application Hosting</h3>
-              <p className="text-xs text-neutral-400">
-                Vercel (frontend) and Render (backend) for application
-                deployment.
+            <div className="border border-neutral-800 bg-[#0D0F13] p-5 sm:p-6">
+              <p className="text-sm text-neutral-400 font-light leading-relaxed">
+                <span className="text-white font-medium">Important:</span> No
+                system is 100% secure. If you ever suspect your account has been
+                compromised, change your password immediately and contact us at{" "}
+                <a
+                  href="https://mail.google.com/mail/?view=cm&to=rupareluttkarsh2309@gmail.com"
+                  className="text-[#76B900] hover:text-[#8FD400]"
+                >
+                  rupareluttkarsh2309@gmail.com
+                </a>
+                .
               </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Cookies & Tracking
-          </h2>
+      {/* ── 04 Retention + 05 Rights side by side ── */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900 bg-[#0D0F13]/40">
+        <div className="grid lg:grid-cols-2 gap-px bg-neutral-900">
+          <div id="retention" className="bg-[#0B0D10] p-6 sm:p-8 lg:p-10">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              04
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-thin tracking-tight mb-8">
+              Data retention
+            </h2>
+            <div className="divide-y divide-neutral-900">
+              {[
+                {
+                  label: "Account data",
+                  body: "Kept for as long as your account is active. Delete your account and it's gone — no dark patterns, no waiting period.",
+                },
+                {
+                  label: "Link data",
+                  body: "Kept until you choose to delete it. Expired links are marked inactive in your dashboard but not wiped automatically.",
+                },
+                {
+                  label: "Analytics data",
+                  body: "Free accounts: 7-day rolling retention. Pro accounts: unlimited. You see what you pay for, nothing less.",
+                },
+                {
+                  label: "Guest links",
+                  body: "Not auto-deleted. You can clear them anytime by clearing your browser's localStorage, or migrating them to an account.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="py-5 grid grid-cols-[140px_1fr] gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-px self-stretch bg-[#76B900] flex-shrink-0" />
+                    <span className="text-xs font-medium text-white leading-relaxed">
+                      {item.label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-500 font-light leading-relaxed">
+                    {item.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          <p className="text-neutral-400 mb-3 sm:mb-4 leading-relaxed">
-            BitLink uses minimal tracking:
+          <div id="rights" className="bg-[#0B0D10] p-6 sm:p-8 lg:p-10">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              05
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-thin tracking-tight mb-4">
+              Your rights
+            </h2>
+            <p className="text-neutral-600 text-sm font-light leading-relaxed mb-8">
+              These aren't legal obligations we reluctantly honour. They're
+              features we built because we believe you should be in control.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  title: "Access & export",
+                  body: "View and export all your link data and analytics from your dashboard at any time.",
+                },
+                {
+                  title: "Correction",
+                  body: "Update your account info, modify link aliases, and manage your data freely.",
+                },
+                {
+                  title: "Deletion",
+                  body: "Request full account deletion via rupareluttkarsh2309@gmail.com. Everything associated with you gets permanently removed.",
+                },
+                {
+                  title: "Opt-out",
+                  body: "Use guest mode with no account required. You're never forced to hand over data to try the service.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="border border-neutral-800 p-4">
+                  <h3 className="text-xs font-medium text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-neutral-500 font-light leading-relaxed">
+                    {item.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 06 Third parties ── */}
+      <section
+        id="third-party"
+        className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900"
+      >
+        <div className="grid lg:grid-cols-[300px_1fr] gap-8 lg:gap-20 items-start">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              06
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-thin tracking-tight mb-4">
+              Third-party
+              <br />
+              services
+            </h2>
+            <p className="text-neutral-600 text-sm font-light leading-relaxed">
+              BitLink relies on a small number of trusted infrastructure
+              providers. Here's who they are and what they see.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-px bg-neutral-900">
+            {[
+              {
+                name: "GitHub & Google OAuth",
+                role: "Authentication only",
+                body: "We receive your name and email to create your account. We never access your repositories, private data, or anything beyond what you explicitly grant during login.",
+                accent: false,
+              },
+              {
+                name: "MongoDB Atlas",
+                role: "Data storage",
+                body: "Your account and link data is stored securely in MongoDB Atlas with encryption at rest. They host the data; they don't process or access it for their own purposes.",
+                accent: false,
+              },
+              {
+                name: "Vercel & Render",
+                role: "Hosting",
+                body: "Our frontend runs on Vercel, our backend on Render. These are infrastructure providers — they run our code, not our data practices.",
+                accent: false,
+              },
+            ].map((item, i) => (
+              <div key={i} className="bg-[#0B0D10] p-6 sm:p-8">
+                <div className="w-6 h-px bg-neutral-800 mb-5" />
+                <h3 className="text-sm font-medium text-white mb-1">
+                  {item.name}
+                </h3>
+                <p className="text-xs text-[#76B900] uppercase tracking-wider mb-4">
+                  {item.role}
+                </p>
+                <p className="text-xs sm:text-sm text-neutral-500 font-light leading-relaxed">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 07 Cookies ── */}
+      <section
+        id="cookies"
+        className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900 bg-[#0D0F13]/40"
+      >
+        <div className="mb-10">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+            07
           </p>
-
-          <ul className="space-y-2 text-neutral-400 ml-4 sm:ml-6 text-sm sm:text-base">
-            <li>
-              • <strong className="text-neutral-300">localStorage:</strong> Used
-              to store guest session IDs and authentication tokens
-            </li>
-            <li>
-              •{" "}
-              <strong className="text-neutral-300">
-                No third-party cookies:
-              </strong>{" "}
-              We do not use advertising or tracking pixels
-            </li>
-            <li>
-              •{" "}
-              <strong className="text-neutral-300">
-                No analytics services:
-              </strong>{" "}
-              We don't use Google Analytics or similar services
-            </li>
-          </ul>
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Children's Privacy
+          <h2 className="text-3xl sm:text-4xl font-thin tracking-tight mb-3">
+            Cookies & local tracking
           </h2>
-
-          <p className="text-neutral-400 leading-relaxed">
-            BitLink is not intended for users under the age of 13. We do not
-            knowingly collect personal information from children. If you believe
-            a child has provided us with personal information, please contact us
-            at support@bitlink.xyz.
+          <p className="text-neutral-600 text-sm font-light max-w-xl">
+            We use the bare minimum. No ad networks, no tracking pixels, no
+            third-party scripts that follow you around the web.
           </p>
-        </section>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-px bg-neutral-900">
+          {[
+            {
+              label: "localStorage",
+              status: "Used",
+              statusColor: "text-[#76B900]",
+              body: "We store your guest session ID and authentication JWT token in localStorage. This is purely functional — it's how you stay logged in.",
+            },
+            {
+              label: "Third-party cookies",
+              status: "None",
+              statusColor: "text-neutral-500",
+              body: "We do not use advertising cookies, retargeting pixels, or any third-party tracking scripts. Your browsing behaviour is not tracked across sites.",
+            },
+            {
+              label: "Analytics services",
+              status: "None",
+              statusColor: "text-neutral-500",
+              body: "No Google Analytics, no Mixpanel, no Hotjar. We don't send your usage data to external analytics platforms. BitLink's analytics are entirely self-contained.",
+            },
+          ].map((item, i) => (
+            <div key={i} className="bg-[#0B0D10] p-6 sm:p-8">
+              <div className="mb-5 pb-4 border-b border-neutral-900 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-white">{item.label}</h3>
+                <span
+                  className={`text-xs uppercase tracking-wider ${item.statusColor}`}
+                >
+                  {item.status}
+                </span>
+              </div>
+              <p className="text-sm text-neutral-500 font-light leading-relaxed">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Changes to This Policy
-          </h2>
-
-          <p className="text-neutral-400 leading-relaxed">
-            We may update this Privacy Policy from time to time. We will notify
-            you of any changes by updating the "Last updated" date at the top of
-            this policy. Continued use of BitLink after changes constitutes
-            acceptance of the updated policy.
-          </p>
-        </section>
-
-        <section className="border-t border-neutral-800 pt-8 sm:pt-12">
-          <h2 className="text-2xl sm:text-3xl font-light mb-4 sm:mb-6">
-            Contact Us
-          </h2>
-
-          <p className="text-neutral-400 leading-relaxed mb-4 sm:mb-6">
-            If you have questions about this Privacy Policy or how we handle
-            your data, please contact us:
-          </p>
-
-          <div className="border border-neutral-800 p-4 sm:p-6 bg-[#0D0F13]">
-            <p className="text-sm text-neutral-400">
-              Email:{" "}
+      {/* ── 08 Children + Changes ── inline, compact */}
+      <section className="px-4 sm:px-8 lg:px-16 py-16 sm:py-20 border-b border-neutral-900">
+        <div className="grid sm:grid-cols-2 gap-px bg-neutral-900">
+          <div className="bg-[#0B0D10] p-6 sm:p-8 lg:p-10">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              08
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-thin tracking-tight mb-5">
+              Children's privacy
+            </h2>
+            <p className="text-sm text-neutral-500 font-light leading-relaxed">
+              BitLink is not intended for users under 13. We do not knowingly
+              collect personal information from children. If you believe a child
+              has created an account, please contact us at{" "}
               <a
-                href="mailto:support@bitlink.xyz"
+                href="https://mail.google.com/mail/?view=cm&to=rupareluttkarsh2309@gmail.com"
                 className="text-[#76B900] hover:text-[#8FD400]"
               >
-                support@bitlink.xyz
-              </a>
+                rupareluttkarsh2309@gmail.com
+              </a>{" "}
+              and we will take immediate action.
             </p>
           </div>
-        </section>
-      </main>
+          <div className="bg-[#0B0D10] p-6 sm:p-8 lg:p-10">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-3">
+              09
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-thin tracking-tight mb-5">
+              Policy updates
+            </h2>
+            <p className="text-sm text-neutral-500 font-light leading-relaxed">
+              We may update this policy as BitLink evolves. When something
+              material changes, we'll update the date at the top and communicate
+              it clearly. Continuing to use BitLink after updates means you
+              accept the revised policy. We'll never bury important changes in
+              fine print.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contact ── */}
+      <section id="contact" className="px-4 sm:px-8 lg:px-16 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#76B900] mb-6">
+              10
+            </p>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-thin tracking-tight leading-[0.95] mb-6">
+              Privacy questions
+              <br />
+              <span className="text-[#76B900]">welcome.</span>
+            </h2>
+            <p className="text-neutral-500 font-light leading-relaxed text-sm sm:text-base max-w-md">
+              If anything here is unclear, or you'd like to exercise any of your
+              rights — access, correction, deletion — reach out directly. We
+              respond personally, not with a template.
+            </p>
+          </div>
+          <div className="border border-neutral-800 bg-[#0D0F13] p-8 sm:p-10">
+            <div className="flex items-center gap-3 mb-6">
+              <Mail className="w-4 h-4 text-[#76B900]" />
+              <span className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+                Reach us directly
+              </span>
+            </div>
+            <p className="text-2xl sm:text-3xl font-thin text-white mb-2">
+              rupareluttkarsh2309@gmail.com
+            </p>
+            <p className="text-neutral-600 text-xs font-light mb-8">
+              We typically respond within 24 hours on business days. No
+              ticketing systems, no bots.
+            </p>
+            <a
+              href="https://mail.google.com/mail/?view=cm&to=rupareluttkarsh2309@gmail.com"
+              className="inline-flex items-center gap-2 border-2 border-[#76B900] text-[#76B900] hover:bg-[#76B900] hover:text-black px-6 py-3 text-xs uppercase tracking-widest font-medium transition-all"
+            >
+              Send us an email
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
