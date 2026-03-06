@@ -20,6 +20,6 @@ const userLimiter = rateLimit({
 
 router.get("/stats", userLimiter, getUserStatsController);
 router.get("/global", userLimiter, getGlobalAnalyticsController);
-router.get("/links/:id", userLimiter, getLinkAnalyticsController);
+router.get("/link/:id", userLimiter, getLinkAnalyticsController);
 
 export default router;

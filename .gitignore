@@ -5,14 +5,11 @@ boot.txt
 # Environment Variables
 .env
 .env.*
-.env.local
-.env.*.local
-.env.production
-.env.*.production
-.env.development
-.env.*development
+backend/.env*
+!.env.example
+!backend/.env.example
 
-# Logs & Debug Files
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -21,29 +18,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Build Artifacts & Coverage
+# Node / Build Artifacts
 node_modules/
 dist/
 build/
 dist-ssr/
 coverage/
 
-# Frontend Artifacts
-frontend/node_modules/
+# Frontend Build Artifacts
 frontend/dist/
 frontend/build/
 frontend/dist-ssr/
 frontend/.env*
 
-# Backend Artifacts
-backend/node_modules/
+# Backend Build Artifacts
 backend/dist/
 backend/build/
 backend/logs/
 backend/.env*
 backend/server-start.txt
 
-# OS & Editor Junk
+# OS / Editor Junk
 .DS_Store
 Thumbs.db
 .vscode/
@@ -54,10 +49,10 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Runtime / Local Data
+# Runtime Files
 dump.rdb
 
-# Terraform (Critical)
+# Terraform
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
