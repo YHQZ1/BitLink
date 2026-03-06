@@ -387,7 +387,9 @@ export default function LandingPage() {
                 </button>
               </div>
               {error && (
-                <p className="text-xs text-red-400 mt-2 font-light">{error}</p>
+                <p className="text-xs text-[#e05c5c] mt-2 font-light">
+                  {error}
+                </p>
               )}
 
               {shortenedUrl && (
@@ -505,9 +507,9 @@ export default function LandingPage() {
         100,78
       "
                     fill="none"
-                    stroke="#9B1C1C"
+                    stroke="#e05c5c"
+                    strokeOpacity="0.35"
                     strokeWidth="0.8"
-                    strokeOpacity="0.6"
                     strokeLinejoin="miter"
                     strokeLinecap="square"
                   />

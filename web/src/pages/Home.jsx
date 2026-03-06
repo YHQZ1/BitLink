@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Link2,
@@ -50,28 +50,58 @@ const normalizeAndValidateUrl = (input) => {
   }
 };
 
-const Toast = ({ isVisible, type, message, onClose }) => {
+const Toast = ({ isVisible, type, message, onClose, action }) => {
+  const [exiting, setExiting] = useState(false);
+  const timerRef = useRef(null);
+
+  const triggerClose = useCallback(() => {
+    setExiting(true);
+    setTimeout(() => {
+      setExiting(false);
+      onClose();
+    }, 280);
+  }, [onClose]);
+
   useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(onClose, 3000);
-      return () => clearTimeout(timer);
+    if (isVisible && !action) {
+      timerRef.current = setTimeout(triggerClose, 3000);
+      return () => clearTimeout(timerRef.current);
     }
-  }, [isVisible, onClose]);
+  }, [isVisible, action, triggerClose]);
 
   if (!isVisible) return null;
 
-  const Icon = type === "success" ? CheckCircle : AlertCircle;
-  const bgColor = type === "success" ? "bg-[#76B900]" : "bg-red-500";
+  const configs = {
+    success: {
+      icon: CheckCircle,
+      accent: "text-[#76B900]",
+      bar: "bg-[#76B900]",
+    },
+    error: { icon: AlertCircle, accent: "text-[#e05c5c]", bar: "bg-[#e05c5c]" },
+    warning: {
+      icon: AlertCircle,
+      accent: "text-[#e0a85c]",
+      bar: "bg-[#e0a85c]",
+    },
+  };
+
+  const { icon: Icon, accent, bar } = configs[type] || configs.success;
 
   return (
-    <div className="fixed top-20 right-4 sm:right-5 z-50 animate-slide-in">
-      <div
-        className={`${bgColor} text-black px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md shadow-lg`}
-      >
-        <Icon className="w-4 h-4 flex-shrink-0" />
-        <span className="text-sm font-medium flex-1">{message}</span>
-        <button onClick={onClose} className="hover:opacity-70 cursor-pointer">
-          <X className="w-4 h-4" />
+    <div
+      className={`fixed top-20 right-4 sm:right-5 z-50 ${exiting ? "animate-slide-out" : "animate-slide-in"}`}
+    >
+      <div className="bg-[#111316] border border-neutral-800 text-white px-4 py-3.5 flex items-start gap-3 min-w-[300px] max-w-sm shadow-2xl relative overflow-hidden">
+        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${bar}`} />
+        <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${accent}`} />
+        <div className="flex-1">
+          <span className="text-sm font-light text-neutral-200">{message}</span>
+        </div>
+        <button
+          onClick={triggerClose}
+          className="text-neutral-600 hover:text-neutral-300 transition-colors cursor-pointer mt-0.5"
+        >
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
@@ -83,20 +113,20 @@ const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel, linkUrl }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0D0F13] border border-neutral-800 max-w-md w-full">
+      <div className="bg-[#111316] border border-neutral-800 max-w-md w-full shadow-2xl">
         <div className="p-6">
           <div className="flex items-start gap-4 mb-6">
-            <div className="p-2 border border-red-500/30 bg-red-500/10">
-              <AlertCircle className="w-5 h-5 text-red-400" />
+            <div className="p-2 border border-[#e05c5c]/20 bg-[#e05c5c]/5 flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-[#e05c5c]" />
             </div>
             <div className="flex-1">
-              <h3 className="text-white font-medium mb-2">Delete Link</h3>
-              <p className="text-neutral-400 text-sm mb-3">
+              <h3 className="text-white font-light mb-2">Delete Link</h3>
+              <p className="text-neutral-500 text-sm mb-3 font-light">
                 Are you sure you want to delete this link? This action cannot be
                 undone.
               </p>
               {linkUrl && (
-                <p className="text-xs text-neutral-500 break-all border-l-2 border-neutral-800 pl-3 py-1">
+                <p className="text-xs text-neutral-600 break-all border-l-2 border-neutral-800 pl-3 py-1 font-mono">
                   {linkUrl}
                 </p>
               )}
@@ -105,13 +135,13 @@ const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel, linkUrl }) => {
           <div className="flex gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 bg-transparent border border-neutral-800 text-neutral-300 py-2.5 font-medium hover:border-neutral-700 transition-colors cursor-pointer"
+              className="flex-1 bg-transparent border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-neutral-300 py-2.5 text-xs uppercase tracking-wider font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 bg-red-500 text-white py-2.5 font-medium hover:bg-red-600 transition-colors cursor-pointer"
+              className="flex-1 bg-[#1e1010] hover:bg-[#2a1010] border border-[#e05c5c]/30 hover:border-[#e05c5c]/60 text-[#e05c5c] py-2.5 text-xs uppercase tracking-wider font-medium transition-colors cursor-pointer"
             >
               Delete
             </button>
@@ -217,14 +247,14 @@ const LinkItem = ({
           <>
             <button
               onClick={() => onSaveEdit(link.id)}
-              className="p-2 text-[#76B900] hover:text-white transition-colors cursor-pointer"
+              className="p-2 text-neutral-500 hover:text-[#76B900] transition-colors cursor-pointer"
               title="Save"
             >
               <Save className="w-4 h-4" />
             </button>
             <button
               onClick={onCancelEdit}
-              className="p-2 text-neutral-500 hover:text-red-500 transition-colors cursor-pointer"
+              className="p-2 text-neutral-500 hover:text-[#e05c5c] transition-colors cursor-pointer"
               title="Cancel"
             >
               <X className="w-4 h-4" />
@@ -241,7 +271,7 @@ const LinkItem = ({
         )}
         <button
           onClick={() => onDelete(link.id)}
-          className="p-2 text-neutral-500 hover:text-red-500 transition-colors cursor-pointer"
+          className="p-2 text-neutral-500 hover:text-[#e05c5c] transition-colors cursor-pointer"
           title="Delete"
         >
           <Trash2 className="w-4 h-4" />
@@ -295,6 +325,7 @@ export default function Home() {
     isVisible: false,
     type: "success",
     message: "",
+    action: null,
   });
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
@@ -382,11 +413,11 @@ export default function Home() {
     }
   }, [links, fetchUserStats]);
 
-  const showToast = (type, message) => {
-    setToast({ isVisible: true, type, message });
-  };
+  const showToast = (type, message, action = null) =>
+    setToast({ isVisible: true, type, message, action });
 
-  const closeToast = () => setToast((prev) => ({ ...prev, isVisible: false }));
+  const closeToast = () =>
+    setToast((prev) => ({ ...prev, isVisible: false, action: null }));
 
   const handleShorten = async () => {
     if (!url) {
@@ -741,7 +772,7 @@ export default function Home() {
       <style jsx>{`
         @keyframes slide-in {
           from {
-            transform: translateX(100%);
+            transform: translateX(110%);
             opacity: 0;
           }
           to {
@@ -749,8 +780,21 @@ export default function Home() {
             opacity: 1;
           }
         }
+        @keyframes slide-out {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(110%);
+            opacity: 0;
+          }
+        }
         .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
+          animation: slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .animate-slide-out {
+          animation: slide-out 0.28s cubic-bezier(0.4, 0, 1, 1);
         }
       `}</style>
     </div>

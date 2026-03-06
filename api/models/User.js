@@ -24,8 +24,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+
     name: String,
     avatar: String,
+
     authProviders: {
       type: [authProviderSchema],
       required: true,
@@ -34,9 +36,21 @@ const userSchema = new mongoose.Schema(
         message: "At least one auth provider required",
       },
     },
+
     passwordHash: {
       type: String,
       select: false,
+    },
+
+    preferences: {
+      emailSecurityAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      emailProductUpdates: {
+        type: Boolean,
+        default: true,
+      },
     },
   },
   { timestamps: true },

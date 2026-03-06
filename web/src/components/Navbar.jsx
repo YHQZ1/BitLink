@@ -136,7 +136,7 @@ export default function Navbar({
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-400 hover:text-red-500 text-left cursor-pointer hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-400 hover:text-[#e05c5c] text-left cursor-pointer hover:bg-white/5 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
@@ -192,7 +192,7 @@ export default function Navbar({
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-neutral-400 hover:text-red-500 transition-colors cursor-pointer font-light text-left hover:bg-white/5"
+                      className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-neutral-400 hover:text-[#e05c5c] transition-colors cursor-pointer font-light text-left hover:bg-white/5"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>

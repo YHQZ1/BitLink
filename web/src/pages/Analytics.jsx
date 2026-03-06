@@ -161,9 +161,9 @@ export default function Analytics() {
         />
         <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
-            <div className="border border-red-500/30 bg-red-500/10 p-6 text-center">
-              <Activity className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
-              <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
+            <div className="border border-[#e05c5c]/20 bg-[#e05c5c]/5 p-6 text-center">
+              <Activity className="w-10 h-10 sm:w-12 sm:h-12 text-[#e05c5c] mx-auto mb-4" />
+              <p className="text-[#e05c5c] mb-6 text-sm sm:text-lg">{error}</p>
               <button
                 onClick={handleBack}
                 className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
@@ -185,7 +185,7 @@ export default function Analytics() {
           userEmail={currentUser.email}
           userAvatar={currentUser.avatar}
         />
-        <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
+        <div className="w-full max-w-7xl px-6 sm:px-10 lg:px-16 mx-auto pt-20">
           <div className="text-center py-12 lg:py-16">
             <p className="text-neutral-400">No analytics data available</p>
           </div>

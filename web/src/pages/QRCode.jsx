@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,27 +14,52 @@ import Navbar from "../components/Navbar";
 import PageLoader from "../components/PageLoader";
 
 const Toast = ({ isVisible, type, message, onClose }) => {
+  const [exiting, setExiting] = useState(false);
+  const timerRef = useRef(null);
+
+  const triggerClose = useCallback(() => {
+    setExiting(true);
+    setTimeout(() => {
+      setExiting(false);
+      onClose();
+    }, 280);
+  }, [onClose]);
+
   useEffect(() => {
     if (isVisible) {
-      const timer = setTimeout(onClose, 3000);
-      return () => clearTimeout(timer);
+      timerRef.current = setTimeout(triggerClose, 3000);
+      return () => clearTimeout(timerRef.current);
     }
-  }, [isVisible, onClose]);
+  }, [isVisible, triggerClose]);
 
   if (!isVisible) return null;
 
-  const Icon = type === "success" ? CheckCircle : AlertCircle;
-  const bgColor = type === "success" ? "bg-[#76B900]" : "bg-red-500";
+  const configs = {
+    success: {
+      icon: CheckCircle,
+      accent: "text-[#76B900]",
+      bar: "bg-[#76B900]",
+    },
+    error: { icon: AlertCircle, accent: "text-[#e05c5c]", bar: "bg-[#e05c5c]" },
+  };
+
+  const { icon: Icon, accent, bar } = configs[type] || configs.success;
 
   return (
-    <div className="fixed top-20 right-4 sm:right-5 z-50 animate-slide-in">
-      <div
-        className={`${bgColor} text-black px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-md shadow-lg`}
-      >
-        <Icon className="w-4 h-4 flex-shrink-0" />
-        <span className="text-sm font-medium flex-1">{message}</span>
-        <button onClick={onClose} className="hover:opacity-70 cursor-pointer">
-          <X className="w-4 h-4" />
+    <div
+      className={`fixed top-20 right-4 sm:right-5 z-50 ${exiting ? "animate-slide-out" : "animate-slide-in"}`}
+    >
+      <div className="bg-[#111316] border border-neutral-800 text-white px-4 py-3.5 flex items-start gap-3 min-w-[300px] max-w-sm shadow-2xl relative overflow-hidden">
+        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${bar}`} />
+        <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${accent}`} />
+        <span className="text-sm font-light text-neutral-200 flex-1">
+          {message}
+        </span>
+        <button
+          onClick={triggerClose}
+          className="text-neutral-600 hover:text-neutral-300 transition-colors cursor-pointer mt-0.5"
+        >
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
@@ -168,9 +193,9 @@ export default function QRCode() {
         />
         <div className="flex-1 flex items-center justify-center px-8">
           <div className="max-w-md w-full">
-            <div className="border border-red-500/30 bg-red-500/10 p-6 sm:p-8 text-center">
-              <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
-              <p className="text-red-400 mb-6 text-sm sm:text-lg">{error}</p>
+            <div className="border border-[#e05c5c]/20 bg-[#e05c5c]/5 p-6 sm:p-8 text-center">
+              <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-[#e05c5c] mx-auto mb-4" />
+              <p className="text-[#e05c5c] mb-6 text-sm sm:text-lg">{error}</p>
               <button
                 onClick={handleBack}
                 className="border border-[#76B900] text-[#76B900] px-6 py-3 hover:bg-[#76B900] hover:text-black transition-colors cursor-pointer font-medium text-sm"
@@ -352,7 +377,7 @@ export default function QRCode() {
       <style jsx>{`
         @keyframes slide-in {
           from {
-            transform: translateX(100%);
+            transform: translateX(110%);
             opacity: 0;
           }
           to {
@@ -360,8 +385,21 @@ export default function QRCode() {
             opacity: 1;
           }
         }
+        @keyframes slide-out {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(110%);
+            opacity: 0;
+          }
+        }
         .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
+          animation: slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .animate-slide-out {
+          animation: slide-out 0.28s cubic-bezier(0.4, 0, 1, 1);
         }
       `}</style>
     </div>

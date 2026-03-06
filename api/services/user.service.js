@@ -4,12 +4,18 @@ import AppError from "../utils/AppError.js";
 
 export const getUserById = async (userId) => {
   const user = await User.findById(userId).select(
-    "_id email name avatar createdAt",
+    "_id email name avatar createdAt authProviders preferences",
   );
 
   if (!user) {
     throw new AppError("Your account could not be found.", 404);
   }
+
+  const providers = {
+    google: user.authProviders.some((p) => p.provider === "google"),
+    github: user.authProviders.some((p) => p.provider === "github"),
+    password: user.authProviders.some((p) => p.provider === "local"),
+  };
 
   return {
     id: user._id,
@@ -17,6 +23,8 @@ export const getUserById = async (userId) => {
     name: user.name,
     avatar: user.avatar,
     createdAt: user.createdAt,
+    providers,
+    preferences: user.preferences,
   };
 };
 
@@ -29,7 +37,7 @@ export const updateUser = async (userId, data) => {
     throw new AppError("Your account could not be found.", 404);
   }
 
-  const { email, name, currentPassword, newPassword } = data;
+  const { email, name, currentPassword, newPassword, preferences } = data;
 
   if (email && email !== user.email) {
     const normalizedEmail = email.toLowerCase();
@@ -77,6 +85,13 @@ export const updateUser = async (userId, data) => {
     user.passwordHash = await hashPassword(newPassword);
   }
 
+  if (preferences) {
+    user.preferences = {
+      ...user.preferences,
+      ...preferences,
+    };
+  }
+
   if (user.isModified()) {
     try {
       await user.save();
@@ -94,4 +109,14 @@ export const updateUser = async (userId, data) => {
     name: user.name,
     createdAt: user.createdAt,
   };
+};
+
+export const deleteUser = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError("Your account could not be found.", 404);
+  }
+
+  await User.deleteOne({ _id: userId });
 };
