@@ -277,7 +277,7 @@ export default function LandingPage() {
             </div>
 
             {/* Mobile-only horizontal scroll */}
-            <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide md:hidden">
+            <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide md:hidden text-base font-light">
               <button
                 onClick={() => scrollToSection("features")}
                 className="text-md text-neutral-500 hover:text-white"

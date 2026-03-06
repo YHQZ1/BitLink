@@ -114,7 +114,7 @@ export const oauthLogin = async ({
         user.authProviders.push({ provider, providerId });
       }
 
-      if (avatar && user.avatar !== avatar) {
+      if (!user.avatar && avatar) {
         user.avatar = avatar;
       }
 
