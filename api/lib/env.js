@@ -12,17 +12,18 @@ const envPath = path.resolve(
     : "../.env.development",
 );
 
-if (!fs.existsSync(envPath)) {
-  console.error(`Environment file not found at ${envPath}`);
-  process.exit(1);
-}
+if (fs.existsSync(envPath)) {
+  const result = dotenv.config({ path: envPath });
 
-const result = dotenv.config({ path: envPath });
-
-if (result.error) {
-  console.error(
-    "Failed to load environment configuration:",
-    result.error.message,
+  if (result.error) {
+    console.error(
+      "Failed to load environment configuration:",
+      result.error.message,
+    );
+    process.exit(1);
+  }
+} else {
+  console.warn(
+    `Environment file not found at ${envPath}, using system environment variables`,
   );
-  process.exit(1);
 }
