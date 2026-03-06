@@ -3,7 +3,7 @@ import redis from "../lib/redis.js";
 
 let analyticsQueue = null;
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "test" && redis) {
   analyticsQueue = new Queue("analytics", {
     connection: redis,
     defaultJobOptions: {
@@ -15,17 +15,14 @@ if (process.env.NODE_ENV !== "test") {
       removeOnComplete: true,
       removeOnFail: false,
     },
-    limiter: {
-      max: 5000,
-      duration: 1000,
-    },
   });
 }
 
-export const enqueueTrackAnalytics = async (payload) => {
-  if (!analyticsQueue) return;
+export const enqueueTrackAnalyticsBatch = async (events) => {
+  if (!analyticsQueue || !events?.length) return;
 
-  await analyticsQueue.add("track_click", payload, {
-    jobId: `${payload.linkId}:${payload.timestamp}`,
+  await analyticsQueue.add("track_click_batch", events, {
+    removeOnComplete: true,
+    removeOnFail: false,
   });
 };

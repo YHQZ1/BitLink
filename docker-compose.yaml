@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+
   nginx:
     image: nginx:alpine
     container_name: bitlink-nginx
@@ -14,25 +15,37 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - bitlink-network
 
 
   backend:
     image: ghcr.io/yhqz1/bitlink-backend:prod
+    container_name: bitlink-backend
     env_file:
       - ./backend.env
     expose:
       - "3000"
       - "9100"
     restart: unless-stopped
+    networks:
+      - bitlink-network
+
 
   queue-worker:
     image: ghcr.io/yhqz1/bitlink-backend:prod
+    container_name: bitlink-worker
     env_file:
       - ./backend.env
     command: ["node", "workers/analytics.worker.js"]
+    depends_on:
+      - backend
     expose:
       - "9101"
     restart: unless-stopped
+    networks:
+      - bitlink-network
+
 
   prometheus:
     image: prom/prometheus:latest
@@ -44,6 +57,9 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
+    networks:
+      - bitlink-network
+
 
   grafana:
     image: grafana/grafana:latest
@@ -51,3 +67,10 @@ services:
     ports:
       - "3001:3000"
     restart: unless-stopped
+    networks:
+      - bitlink-network
+
+
+networks:
+  bitlink-network:
+    driver: bridge

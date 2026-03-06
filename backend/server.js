@@ -1,15 +1,8 @@
-import dotenv from "dotenv";
+import "./lib/env.js";
 import http from "http";
 import { createApp } from "./app.js";
 import connectDB from "./lib/db.js";
 import { register } from "./lib/metrics.js";
-
-dotenv.config({
-  path:
-    process.env.NODE_ENV === "production"
-      ? ".env.production"
-      : ".env.development",
-});
 
 if (!process.env.BASE_URL || !process.env.CLIENT_URL) {
   throw new Error("Missing required environment variables");

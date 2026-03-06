@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import mongoose from "mongoose";
 import { isValidUrl } from "../utils/validateUrl.js";
 import redis from "../lib/redis.js";
-import { enqueueTrackAnalytics } from "../queues/analytics.queue.js";
+import { addAnalyticsEvent } from "../lib/analyticsBuffer.js";
 
 const REDIRECT_CACHE_TTL = 60 * 60 * 24;
 
@@ -29,9 +29,7 @@ export const createUserLink = async (userId, data) => {
   try {
     await link.save();
   } catch (err) {
-    if (err.code === 11000) {
-      throw new Error("ALIAS_TAKEN");
-    }
+    if (err.code === 11000) throw new Error("ALIAS_TAKEN");
     throw err;
   }
 
@@ -69,9 +67,7 @@ export const createGuestLink = async (data) => {
   try {
     await link.save();
   } catch (err) {
-    if (err.code === 11000) {
-      throw new Error("ALIAS_TAKEN");
-    }
+    if (err.code === 11000) throw new Error("ALIAS_TAKEN");
     throw err;
   }
 
@@ -128,9 +124,7 @@ export const updateUserLink = async (userId, linkId, data) => {
   try {
     await link.save();
   } catch (err) {
-    if (err.code === 11000) {
-      throw new Error("ALIAS_TAKEN");
-    }
+    if (err.code === 11000) throw new Error("ALIAS_TAKEN");
     throw err;
   }
 
@@ -187,9 +181,26 @@ export const resolveRedirect = async (code, req) => {
       const cached = await redis.get(cacheKey);
 
       if (cached) {
-        const { originalUrl } = JSON.parse(cached);
+        const { originalUrl, linkId } = JSON.parse(cached);
 
-        trackAnalytics(code, req).catch(() => {});
+        await Link.updateOne(
+          { _id: linkId },
+          {
+            $inc: { clicks: 1 },
+            $set: {
+              lastAccessed: new Date(),
+              lastActivity: new Date(),
+            },
+          },
+        );
+
+        addAnalyticsEvent({
+          linkId,
+          ip: req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null,
+          userAgent: req.headers["user-agent"] || null,
+          referrer: req.get("Referer") || "Direct",
+          timestamp: Date.now(),
+        });
 
         return originalUrl.trim();
       }
@@ -222,48 +233,26 @@ export const resolveRedirect = async (code, req) => {
     redis
       .set(
         cacheKey,
-        JSON.stringify({ originalUrl: cleanUrl }),
+        JSON.stringify({
+          originalUrl: cleanUrl,
+          linkId: link._id.toString(),
+        }),
         "EX",
         REDIRECT_CACHE_TTL,
+        "NX",
       )
       .catch((err) => console.warn("Redis write failed:", err.message));
   }
 
-  enqueueTrackAnalytics({
+  addAnalyticsEvent({
     linkId: link._id.toString(),
-    shortCode: link.shortCode,
     ip: req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null,
     userAgent: req.headers["user-agent"] || null,
     referrer: req.get("Referer") || "Direct",
     timestamp: Date.now(),
-  }).catch(() => {});
+  });
 
   return cleanUrl;
-};
-
-/*
-TRACK ANALYTICS FOR CACHE HITS
-*/
-const trackAnalytics = async (shortCode, req) => {
-  await Link.updateOne(
-    { shortCode },
-    {
-      $inc: { clicks: 1 },
-      $set: {
-        lastAccessed: new Date(),
-        lastActivity: new Date(),
-      },
-    },
-  );
-
-  enqueueTrackAnalytics({
-    linkId: null,
-    shortCode,
-    ip: req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null,
-    userAgent: req.headers["user-agent"] || null,
-    referrer: req.get("Referer") || "Direct",
-    timestamp: Date.now(),
-  }).catch(() => {});
 };
 
 /*

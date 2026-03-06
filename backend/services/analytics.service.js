@@ -13,21 +13,18 @@ export const getLinkAnalytics = async (
   timeZone = "UTC",
 ) => {
   if (!mongoose.Types.ObjectId.isValid(linkId)) {
-    throw new Error("INVALID_LINK_ID");
+    throw new Error("Invalid link ID");
   }
 
-  const link = await Link.findOne({
-    _id: linkId,
-    user: userId,
-  }).lean();
+  const link = await Link.findById(linkId).lean();
 
   if (!link) {
-    throw new Error("LINK_NOT_FOUND");
+    throw new Error("Link not found");
   }
 
   const { startDate, endDate } = getDateRange(range);
 
-  const query = { link: linkId };
+  const query = { link: new mongoose.Types.ObjectId(linkId) };
 
   if (startDate) {
     query.timestamp = { $gte: startDate, $lte: endDate };
@@ -36,7 +33,7 @@ export const getLinkAnalytics = async (
   const data = await Analytics.find(query).lean();
 
   return {
-    totalClicks: data.length,
+    totalClicks: link.clicks,
     clicksOverTime: getClicksOverTime(data, range, timeZone),
     referrers: getTrafficSources(data),
     countries: getGeographicData(data),

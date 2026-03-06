@@ -1,22 +1,26 @@
+# Use lightweight Node image
 FROM node:18-alpine
 
-# Set working directory inside the container
+# Set environment for production
+ENV NODE_ENV=production
+
+# Set working directory
 WORKDIR /app
 
-# Copy dependency manifests first (enables layer caching)
+# Copy dependency manifests first (better Docker layer caching)
 COPY package.json package-lock.json ./
 
-# Install only production dependencies, deterministically
-RUN npm ci --omit=dev && npm cache clean --force
+# Install production dependencies only
+RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 
-# Copy application source code
+# Copy application source
 COPY . .
 
-# Safety net: ensure secrets are never baked into the image
+# Ensure no secrets accidentally ship with the image
 RUN rm -f bitlink-key.pem || true
 
-# Expose backend port
+# Expose API port
 EXPOSE 3000
 
-# Start the application
+# Start the API (which also starts the worker in production)
 CMD ["node", "server.js"]

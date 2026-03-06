@@ -1,31 +1,13 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({
-    path: path.resolve(__dirname, "../.env.development"),
-  });
-}
-
-if (process.env.NODE_ENV === "test") {
-  console.log("Worker disabled in test environment");
-  process.exit(0);
-}
+import "../lib/env.js";
 
 import { Worker } from "bullmq";
 import { UAParser } from "ua-parser-js";
-import geoip from "geoip-lite";
 import Analytics from "../models/Analytics.js";
 import connectDB from "../lib/db.js";
 import redis from "../lib/redis.js";
 import http from "http";
 import { register } from "../lib/metrics.js";
 import client from "prom-client";
-import mongoose from "mongoose";
 
 if (!process.env.MONGODB_URI) {
   throw new Error("MONGODB_URI is not defined");
@@ -56,60 +38,37 @@ export const analyticsJobDuration = new client.Histogram({
       const start = process.hrtime();
 
       try {
-        const { linkId, ip, userAgent, referrer } = job.data;
+        if (job.name !== "track_click_batch") return;
 
-        const parser = new UAParser(userAgent || "");
-        const ua = parser.getResult();
+        const events = job.data;
 
-        let cleanIp = ip;
+        if (!events || events.length === 0) return;
 
-        if (cleanIp?.startsWith("::ffff:")) {
-          cleanIp = cleanIp.substring(7);
-        }
+        const docs = events.map((e) => {
+          const ua = new UAParser(e.userAgent || "").getResult();
 
-        if (cleanIp === "::1") cleanIp = "127.0.0.1";
-
-        let country = "Unknown";
-        let city = "Unknown";
-
-        const isPrivateIP =
-          !cleanIp ||
-          cleanIp === "127.0.0.1" ||
-          cleanIp.startsWith("192.168.") ||
-          cleanIp.startsWith("10.");
-
-        if (isPrivateIP) {
-          country = "Local";
-          city = "Local";
-        } else {
-          const geo = geoip.lookup(cleanIp);
-          if (geo) {
-            country = geo.country || "Unknown";
-            city = geo.city || "Unknown";
-          }
-        }
-
-        const deviceType =
-          ua.device.type === "mobile"
-            ? "Mobile"
-            : ua.device.type === "tablet"
-              ? "Tablet"
-              : "Desktop";
-
-        await Analytics.create({
-          link: new mongoose.Types.ObjectId(linkId),
-          ipAddress: cleanIp,
-          userAgent,
-          referrer,
-          country,
-          city,
-          deviceType,
-          browser: ua.browser.name || "Unknown",
-          operatingSystem: ua.os.name || "Unknown",
-          timestamp: new Date(),
+          return {
+            link: e.linkId,
+            ipAddress: e.ip,
+            userAgent: e.userAgent,
+            referrer: e.referrer,
+            country: "Unknown",
+            city: "Unknown",
+            deviceType:
+              ua.device.type === "mobile"
+                ? "Mobile"
+                : ua.device.type === "tablet"
+                  ? "Tablet"
+                  : "Desktop",
+            browser: ua.browser.name || "Unknown",
+            operatingSystem: ua.os.name || "Unknown",
+            timestamp: new Date(e.timestamp),
+          };
         });
 
-        analyticsJobsProcessed.inc({ status: "success" });
+        await Analytics.insertMany(docs, { ordered: false });
+
+        analyticsJobsProcessed.inc({ status: "success" }, docs.length);
       } catch (err) {
         analyticsJobsProcessed.inc({ status: "failed" });
         throw err;
