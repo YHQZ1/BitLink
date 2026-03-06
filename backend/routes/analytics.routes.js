@@ -1,5 +1,6 @@
 import { Router } from "express";
 import protect from "../middleware/auth.middleware.js";
+import { rateLimit } from "../middleware/rateLimit.middleware.js";
 import {
   getLinkAnalyticsController,
   getGlobalAnalyticsController,
@@ -10,8 +11,15 @@ const router = Router();
 
 router.use(protect);
 
-router.get("/stats", getUserStatsController);
-router.get("/global", getGlobalAnalyticsController);
-router.get("/link/:id", getLinkAnalyticsController);
+const userLimiter = rateLimit({
+  keyPrefix: "rl:user",
+  limit: 60,
+  windowSec: 60,
+  keyGenerator: (req) => req.user.id,
+});
+
+router.get("/stats", userLimiter, getUserStatsController);
+router.get("/global", userLimiter, getGlobalAnalyticsController);
+router.get("/links/:id", userLimiter, getLinkAnalyticsController);
 
 export default router;

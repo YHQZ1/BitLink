@@ -1,78 +1,39 @@
 /* eslint-disable no-unused-vars */
 import Analytics from "../models/Analytics.js";
 import Link from "../models/Link.js";
-import { UAParser } from "ua-parser-js";
-import geoip from "geoip-lite";
 import mongoose from "mongoose";
 
-export const trackAnalytics = async (link, req) => {
-  const parser = new UAParser(req.headers["user-agent"]);
-  const ua = parser.getResult();
-
-  let ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || null;
-
-  if (ip?.includes("::ffff:")) ip = ip.split(":").pop();
-  if (ip === "::1") ip = "127.0.0.1";
-
-  let country = "Unknown";
-  let city = "Unknown";
-
-  const isPrivateIP =
-    !ip ||
-    ip === "127.0.0.1" ||
-    ip.startsWith("192.168.") ||
-    ip.startsWith("10.");
-
-  if (isPrivateIP) {
-    country = "Local";
-    city = "Local";
-  } else {
-    const geo = geoip.lookup(ip);
-    if (geo && geo.country) {
-      country = geo.country;
-      city = geo.city || "Unknown";
-    }
-  }
-
-  const deviceType =
-    ua.device.type === "mobile"
-      ? "Mobile"
-      : ua.device.type === "tablet"
-      ? "Tablet"
-      : "Desktop";
-
-  const referrer = req.get("Referer") || "Direct";
-
-  await Analytics.create({
-    link: link._id,
-    ipAddress: ip,
-    userAgent: req.headers["user-agent"],
-    referrer,
-    country,
-    city,
-    deviceType,
-    browser: ua.browser.name || "Unknown",
-    operatingSystem: ua.os.name || "Unknown",
-  });
-};
-
+/*
+GET ANALYTICS FOR A SINGLE LINK
+*/
 export const getLinkAnalytics = async (
   userId,
   linkId,
   range = "all",
-  timeZone = "UTC"
+  timeZone = "UTC",
 ) => {
-  if (!mongoose.Types.ObjectId.isValid(linkId)) throw new Error();
+  if (!mongoose.Types.ObjectId.isValid(linkId)) {
+    throw new Error("INVALID_LINK_ID");
+  }
 
-  const link = await Link.findOne({ _id: linkId, user: userId });
-  if (!link) throw new Error();
+  const link = await Link.findOne({
+    _id: linkId,
+    user: userId,
+  }).lean();
+
+  if (!link) {
+    throw new Error("LINK_NOT_FOUND");
+  }
 
   const { startDate, endDate } = getDateRange(range);
 
   const query = { link: linkId };
-  if (startDate) query.timestamp = { $gte: startDate, $lte: endDate };
 
-  const data = await Analytics.find(query);
+  if (startDate) {
+    query.timestamp = { $gte: startDate, $lte: endDate };
+  }
+
+  const data = await Analytics.find(query).lean();
 
   return {
     totalClicks: data.length,
@@ -86,33 +47,50 @@ export const getLinkAnalytics = async (
   };
 };
 
+/*
+GLOBAL ANALYTICS (ALL USER LINKS)
+*/
 export const getGlobalAnalytics = async (
   userId,
   range = "30d",
-  timeZone = "UTC"
+  timeZone = "UTC",
 ) => {
   const { startDate, endDate } = getDateRange(range);
 
-  const links = await Link.find({ user: userId });
+  const links = await Link.find({ user: userId })
+    .select("_id clicks lastActivity shortCode originalUrl createdAt")
+    .lean();
+
   const linkIds = links.map((l) => l._id);
 
   const query = { link: { $in: linkIds } };
-  if (range !== "all") query.timestamp = { $gte: startDate, $lte: endDate };
 
-  const analytics = await Analytics.find(query);
+  if (range !== "all") {
+    query.timestamp = { $gte: startDate, $lte: endDate };
+  }
+
+  const analytics = await Analytics.find(query).lean();
 
   const totalLinks = links.length;
-  const totalClicks = links.reduce((s, l) => s + l.clicks, 0);
-  const avgClicks = totalLinks ? Math.round(totalClicks / totalLinks) : 0;
+
+  const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
+
+  const avgClicks = totalLinks > 0 ? Math.round(totalClicks / totalLinks) : 0;
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
   const activeLinks = links.filter(
-    (l) => l.lastActivity && l.lastActivity > thirtyDaysAgo
+    (l) => l.lastActivity && l.lastActivity > thirtyDaysAgo,
   ).length;
 
   const geographicData = getGeographicData(analytics);
-  if (geographicData.length === 0 && totalClicks > 0)
-    geographicData.push({ country: "Local", count: totalClicks });
+
+  if (geographicData.length === 0 && totalClicks > 0) {
+    geographicData.push({
+      country: "Local",
+      count: totalClicks,
+    });
+  }
 
   return {
     totalLinks,
@@ -120,6 +98,7 @@ export const getGlobalAnalytics = async (
     avgClicks,
     activeLinks,
     topLinks: links
+      .slice()
       .sort((a, b) => b.clicks - a.clicks)
       .slice(0, 5)
       .map(sanitizeLink),
@@ -129,6 +108,9 @@ export const getGlobalAnalytics = async (
   };
 };
 
+/*
+USER DASHBOARD STATS
+*/
 export const getUserStats = async (userId) => {
   const stats = await Link.aggregate([
     { $match: { user: new mongoose.Types.ObjectId(userId) } },
@@ -160,13 +142,21 @@ export const getUserStats = async (userId) => {
     },
   ]);
 
-  const s = stats[0] || { totalLinks: 0, totalClicks: 0, activeLinks: 0 };
+  const s = stats[0] || {
+    totalLinks: 0,
+    totalClicks: 0,
+    activeLinks: 0,
+  };
+
   return {
     ...s,
-    avgClicks: s.totalLinks ? Math.round(s.totalClicks / s.totalLinks) : 0,
+    avgClicks: s.totalLinks > 0 ? Math.round(s.totalClicks / s.totalLinks) : 0,
   };
 };
 
+/*
+DATE RANGE HELPER
+*/
 const getDateRange = (range) => {
   const endDate = new Date();
   let startDate = null;
@@ -178,15 +168,26 @@ const getDateRange = (range) => {
   return { startDate, endDate };
 };
 
-const sanitizeLink = (link) => ({
-  id: link._id,
-  shortCode: link.shortCode,
-  shortUrl: link.shortUrl,
-  originalUrl: link.originalUrl,
-  clicks: link.clicks,
-  createdAt: link.createdAt,
-  lastAccessed: link.lastAccessed,
-});
+/*
+SANITIZE LINK OUTPUT
+*/
+const sanitizeLink = (link) => {
+  const baseUrl = process.env.BASE_URL;
+
+  return {
+    id: link._id,
+    shortCode: link.shortCode,
+    shortUrl: `${baseUrl}/r/${link.shortCode}`,
+    originalUrl: link.originalUrl,
+    clicks: link.clicks,
+    createdAt: link.createdAt,
+    lastAccessed: link.lastAccessed,
+  };
+};
+
+/*
+ANALYTICS HELPERS
+*/
 
 const getClicksOverTime = (data, range, timeZone) => {
   const grouped = {};
@@ -214,15 +215,20 @@ const getClicksOverTime = (data, range, timeZone) => {
     grouped[dateKey] = (grouped[dateKey] || 0) + 1;
   });
 
-  return Object.entries(grouped).map(([date, clicks]) => ({ date, clicks }));
+  return Object.entries(grouped).map(([date, clicks]) => ({
+    date,
+    clicks,
+  }));
 };
 
 const getTrafficSources = (data) => {
   const sources = {};
+
   data.forEach((e) => {
     const source = categorizeReferrer(e.referrer);
     sources[source] = (sources[source] || 0) + 1;
   });
+
   return Object.entries(sources)
     .map(([source, count]) => ({ source, count }))
     .sort((a, b) => b.count - a.count)
@@ -231,29 +237,41 @@ const getTrafficSources = (data) => {
 
 const categorizeReferrer = (r = "") => {
   const s = r.toLowerCase();
+
   if (!r || r === "Direct") return "Direct";
+
   if (
     s.includes("facebook") ||
     s.includes("twitter") ||
     s.includes("instagram") ||
     s.includes("linkedin")
-  )
+  ) {
     return "Social";
-  if (s.includes("mail") || s.includes("gmail") || s.includes("outlook"))
+  }
+
+  if (s.includes("mail") || s.includes("gmail") || s.includes("outlook")) {
     return "Email";
-  if (s.includes("google") || s.includes("bing") || s.includes("yahoo"))
+  }
+
+  if (s.includes("google") || s.includes("bing") || s.includes("yahoo")) {
     return "Search";
+  }
+
   return "Other";
 };
 
 const getGeographicData = (data) => {
   const countries = {};
+
   data.forEach((e) => {
     let country = e.country || "Unknown";
+
     if (country === "Local Network") country = "Local";
     if (!country || country.trim() === "") country = "Unknown";
+
     countries[country] = (countries[country] || 0) + 1;
   });
+
   return Object.entries(countries)
     .map(([country, count]) => ({ country, count }))
     .sort((a, b) => b.count - a.count)
@@ -262,10 +280,12 @@ const getGeographicData = (data) => {
 
 const getDeviceDistribution = (data) => {
   const devices = {};
+
   data.forEach((e) => {
     const device = e.deviceType || "Desktop";
     devices[device] = (devices[device] || 0) + 1;
   });
+
   return Object.entries(devices)
     .map(([device, count]) => ({ device, count }))
     .sort((a, b) => b.count - a.count);
@@ -273,10 +293,12 @@ const getDeviceDistribution = (data) => {
 
 const getBrowsers = (data) => {
   const browsers = {};
+
   data.forEach((e) => {
     const browser = e.browser || "Unknown";
     browsers[browser] = (browsers[browser] || 0) + 1;
   });
+
   return Object.entries(browsers).map(([browser, count]) => ({
     browser,
     count,
@@ -284,7 +306,7 @@ const getBrowsers = (data) => {
 };
 
 const getPeakHours = (data, timeZone) => {
-  const h = {};
+  const hours = {};
 
   data.forEach((e) => {
     const d = new Date(e.timestamp);
@@ -294,13 +316,13 @@ const getPeakHours = (data, timeZone) => {
         hour: "numeric",
         hour12: false,
         timeZone,
-      }).format(d)
+      }).format(d),
     );
 
-    h[hour] = (h[hour] || 0) + 1;
+    hours[hour] = (hours[hour] || 0) + 1;
   });
 
-  return Object.entries(h)
+  return Object.entries(hours)
     .map(([hour, clicks]) => ({
       hour: Number(hour),
       clicks,

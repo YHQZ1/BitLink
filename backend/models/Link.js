@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import shortid from "shortid";
+import { nanoid } from "nanoid";
 
 const linkSchema = new mongoose.Schema(
   {
@@ -11,13 +11,13 @@ const linkSchema = new mongoose.Schema(
     shortCode: {
       type: String,
       unique: true,
-      default: shortid.generate,
+      default: () => nanoid(7),
       index: true,
     },
-    shortUrl: String,
     clicks: {
       type: Number,
       default: 0,
+      min: 0,
     },
     lastAccessed: {
       type: Date,
@@ -49,16 +49,11 @@ const linkSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-linkSchema.pre("save", function (next) {
-  if (!this.shortUrl) {
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    this.shortUrl = `${baseUrl}/r/${this.shortCode}`;
-  }
-  next();
-});
+linkSchema.index({ shortCode: 1, isActive: 1 });
+linkSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 linkSchema.methods.toJSON = function () {
   const obj = this.toObject();

@@ -3,43 +3,62 @@ import User from "../models/User.js";
 import { hashPassword, verifyPassword } from "./password.service.js";
 
 const signToken = (userId) =>
-  jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES || "7d",
+  });
 
 export const signupUser = async ({ email, password, name }) => {
-  if (!email || !password) throw new Error();
+  if (!email || !password) {
+    throw new Error("INVALID_INPUT");
+  }
 
   const normalizedEmail = email.toLowerCase();
-  const existing = await User.findOne({ email: normalizedEmail });
-  if (existing) throw new Error();
 
   const passwordHash = await hashPassword(password);
 
-  const user = await User.create({
-    email: normalizedEmail,
-    name,
-    passwordHash,
-    authProviders: [{ provider: "local", providerId: normalizedEmail }],
-  });
+  try {
+    const user = await User.create({
+      email: normalizedEmail,
+      name,
+      passwordHash,
+      authProviders: [{ provider: "local", providerId: normalizedEmail }],
+    });
 
-  return {
-    token: signToken(user._id),
-    user: {
-      id: user._id,
-      email: user.email,
-      name: user.name,
-    },
-  };
+    return {
+      token: signToken(user._id),
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+    };
+  } catch (err) {
+    if (err.code === 11000) {
+      throw new Error("EMAIL_EXISTS");
+    }
+    throw err;
+  }
 };
 
 export const loginUser = async ({ email, password }) => {
-  if (!email || !password) throw new Error();
+  if (!email || !password) {
+    throw new Error("INVALID_INPUT");
+  }
 
   const normalizedEmail = email.toLowerCase();
-  const user = await User.findOne({ email: normalizedEmail });
-  if (!user || !user.passwordHash) throw new Error();
+
+  const user = await User.findOne({ email: normalizedEmail }).select(
+    "_id email name passwordHash",
+  );
+
+  if (!user || !user.passwordHash) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
 
   const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) throw new Error();
+  if (!valid) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
 
   return {
     token: signToken(user._id),
@@ -72,13 +91,16 @@ export const oauthLogin = async ({
     if (user) {
       if (
         !user.authProviders.some(
-          (p) => p.provider === provider && p.providerId === providerId
+          (p) => p.provider === provider && p.providerId === providerId,
         )
       ) {
         user.authProviders.push({ provider, providerId });
       }
 
-      if (avatar) user.avatar = avatar;
+      if (avatar && user.avatar !== avatar) {
+        user.avatar = avatar;
+      }
+
       await user.save();
     }
   }
@@ -90,6 +112,7 @@ export const oauthLogin = async ({
       avatar,
       authProviders: [{ provider, providerId }],
     });
+
     isNewUser = true;
   }
 

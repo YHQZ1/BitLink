@@ -1,17 +1,24 @@
+/* eslint-disable no-unused-vars */
 import express from "express";
 import cors from "cors";
 import os from "os";
+import helmet from "helmet";
+
 import { httpRequestDuration, httpRequestCount } from "./lib/metrics.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import linkRoutes from "./routes/link.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import userRoutes from "./routes/user.routes.js";
+
 import { redirectToOriginal } from "./controllers/link.controller.js";
 
 export function createApp() {
   const app = express();
+
   app.set("trust proxy", true);
+
+  app.use(helmet());
 
   const allowedOrigins = new Set([
     "http://localhost:5173",
@@ -23,9 +30,7 @@ export function createApp() {
     cors({
       origin: (origin, callback) => {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.has(origin)) {
-          return callback(null, true);
-        }
+        if (allowedOrigins.has(origin)) return callback(null, true);
         return callback(new Error("Not allowed by CORS"));
       },
       credentials: true,
@@ -34,7 +39,7 @@ export function createApp() {
     }),
   );
 
-  app.use(express.json());
+  app.use(express.json({ limit: "100kb" }));
   app.use(express.urlencoded({ extended: false }));
 
   app.use((req, res, next) => {
@@ -44,7 +49,7 @@ export function createApp() {
       const [sec, nano] = process.hrtime(start);
       const duration = sec + nano / 1e9;
 
-      const route = req.route?.path || req.path || "unknown";
+      const route = req.baseUrl + (req.route?.path || req.path || "");
 
       httpRequestDuration.observe(
         {
@@ -76,12 +81,14 @@ export function createApp() {
     res.status(200).json({ status: "ok" });
   });
 
-  app.get("/_debug/instance", (req, res) => {
-    res.json({
-      hostname: os.hostname(),
-      pid: process.pid,
+  if (process.env.NODE_ENV !== "production") {
+    app.get("/_debug/instance", (req, res) => {
+      res.json({
+        hostname: os.hostname(),
+        pid: process.pid,
+      });
     });
-  });
+  }
 
   app.use("/api/auth", authRoutes);
   app.use("/api/links", linkRoutes);
@@ -90,7 +97,8 @@ export function createApp() {
 
   app.get("/r/:code", redirectToOriginal);
 
-  app.use((err, req, res) => {
+  app.use((err, req, res, next) => {
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   });
 

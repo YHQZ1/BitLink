@@ -26,7 +26,7 @@ export const githubLogin = (req, res) => {
   const url =
     "https://github.com/login/oauth/authorize" +
     `?client_id=${process.env.GITHUB_CLIENT_ID}` +
-    `&redirect_uri=${redirectUri}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&scope=user:email`;
 
   res.redirect(url);
@@ -43,17 +43,22 @@ export const githubCallback = async (req, res) => {
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
       },
-      { headers: { Accept: "application/json" } }
+      {
+        headers: { Accept: "application/json" },
+        timeout: 5000,
+      },
     );
 
     const accessToken = tokenRes.data.access_token;
 
     const userRes = await axios.get("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${accessToken}` },
+      timeout: 5000,
     });
 
     const emailRes = await axios.get("https://api.github.com/user/emails", {
       headers: { Authorization: `Bearer ${accessToken}` },
+      timeout: 5000,
     });
 
     const email =
@@ -73,9 +78,10 @@ export const githubCallback = async (req, res) => {
     });
 
     res.redirect(
-      `${process.env.CLIENT_URL}/auth/success?token=${token}&isNewUser=${isNewUser}`
+      `${process.env.CLIENT_URL}/auth/success?token=${token}&isNewUser=${isNewUser}`,
     );
-  } catch {
+  } catch (err) {
+    console.error("GitHub OAuth error:", err.message);
     res.redirect(`${process.env.CLIENT_URL}/auth?error=oauth_failed`);
   }
 };
@@ -85,7 +91,7 @@ export const googleLogin = (req, res) => {
   const url =
     "https://accounts.google.com/o/oauth2/v2/auth" +
     `?client_id=${process.env.GOOGLE_CLIENT_ID}` +
-    `&redirect_uri=${redirectUri}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&response_type=code` +
     `&scope=openid%20email%20profile`;
 
@@ -96,19 +102,26 @@ export const googleCallback = async (req, res) => {
   try {
     const { code } = req.query;
 
-    const tokenRes = await axios.post("https://oauth2.googleapis.com/token", {
-      code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${process.env.BASE_URL}/api/auth/google/callback`,
-      grant_type: "authorization_code",
-    });
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      {
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${process.env.BASE_URL}/api/auth/google/callback`,
+        grant_type: "authorization_code",
+      },
+      {
+        timeout: 5000,
+      },
+    );
 
     const userRes = await axios.get(
       "https://www.googleapis.com/oauth2/v3/userinfo",
       {
         headers: { Authorization: `Bearer ${tokenRes.data.access_token}` },
-      }
+        timeout: 5000,
+      },
     );
 
     const { email, sub, name, picture } = userRes.data;
@@ -125,9 +138,10 @@ export const googleCallback = async (req, res) => {
     });
 
     res.redirect(
-      `${process.env.CLIENT_URL}/auth/success?token=${token}&isNewUser=${isNewUser}`
+      `${process.env.CLIENT_URL}/auth/success?token=${token}&isNewUser=${isNewUser}`,
     );
-  } catch {
+  } catch (err) {
+    console.error("Google OAuth error:", err.message);
     res.redirect(`${process.env.CLIENT_URL}/auth?error=oauth_failed`);
   }
 };

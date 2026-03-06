@@ -8,7 +8,7 @@ export const httpRequestDuration = new client.Histogram({
   name: "bitlink_http_request_duration_seconds",
   help: "HTTP request latency",
   labelNames: ["method", "route", "status"],
-  buckets: [0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+  buckets: [0.05, 0.1, 0.3, 0.5, 1, 2, 5, 10],
 });
 
 export const httpRequestCount = new client.Counter({

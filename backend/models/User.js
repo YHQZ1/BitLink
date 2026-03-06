@@ -12,7 +12,7 @@ const authProviderSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const userSchema = new mongoose.Schema(
@@ -22,22 +22,38 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
-      index: true,
+      trim: true,
     },
     name: String,
     avatar: String,
     authProviders: {
       type: [authProviderSchema],
       required: true,
+      validate: {
+        validator: (v) => v.length > 0,
+        message: "At least one auth provider required",
+      },
     },
-    passwordHash: String,
+    passwordHash: {
+      type: String,
+      select: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.index(
-  { "authProviders.provider": 1, "authProviders.providerId": 1 },
-  { unique: true }
+  {
+    "authProviders.provider": 1,
+    "authProviders.providerId": 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "authProviders.provider": { $exists: true },
+      "authProviders.providerId": { $exists: true },
+    },
+  },
 );
 
 export default mongoose.model("User", userSchema);

@@ -20,8 +20,8 @@ import { Worker } from "bullmq";
 import { UAParser } from "ua-parser-js";
 import geoip from "geoip-lite";
 import Analytics from "../models/Analytics.js";
-import Link from "../models/Link.js";
 import connectDB from "../lib/db.js";
+import redis from "../lib/redis.js";
 import http from "http";
 import { register } from "../lib/metrics.js";
 import client from "prom-client";
@@ -57,14 +57,15 @@ export const analyticsJobDuration = new client.Histogram({
       try {
         const { linkId, ip, userAgent, referrer } = job.data;
 
-        const link = await Link.findById(linkId);
-        if (!link) return;
-
         const parser = new UAParser(userAgent || "");
         const ua = parser.getResult();
 
         let cleanIp = ip;
-        if (cleanIp?.includes("::ffff:")) cleanIp = cleanIp.split(":").pop();
+
+        if (cleanIp?.startsWith("::ffff:")) {
+          cleanIp = cleanIp.substring(7);
+        }
+
         if (cleanIp === "::1") cleanIp = "127.0.0.1";
 
         let country = "Unknown";
@@ -81,8 +82,8 @@ export const analyticsJobDuration = new client.Histogram({
           city = "Local";
         } else {
           const geo = geoip.lookup(cleanIp);
-          if (geo && geo.country) {
-            country = geo.country;
+          if (geo) {
+            country = geo.country || "Unknown";
             city = geo.city || "Unknown";
           }
         }
@@ -91,11 +92,11 @@ export const analyticsJobDuration = new client.Histogram({
           ua.device.type === "mobile"
             ? "Mobile"
             : ua.device.type === "tablet"
-            ? "Tablet"
-            : "Desktop";
+              ? "Tablet"
+              : "Desktop";
 
         await Analytics.create({
-          link: link._id,
+          link: linkId,
           ipAddress: cleanIp,
           userAgent,
           referrer,
@@ -117,14 +118,10 @@ export const analyticsJobDuration = new client.Histogram({
       }
     },
     {
-      connection: { url: process.env.REDIS_URL },
-      concurrency: 5,
-    }
+      connection: redis,
+      concurrency: 25,
+    },
   );
-
-  worker.on("completed", (job) => {
-    console.log(`Analytics job ${job.id} completed`);
-  });
 
   worker.on("failed", (job, err) => {
     console.error(`Analytics job ${job?.id} failed`, err);
