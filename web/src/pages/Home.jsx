@@ -412,11 +412,7 @@ export default function Home() {
       setCustomAlias("");
       showToast("success", "Link shortened successfully");
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to create short link";
-      showToast("error", errorMessage);
+      showToast("error", error.message || "Failed to create short link");
     } finally {
       setLinksLoading(false);
     }
@@ -451,11 +447,7 @@ export default function Home() {
       setEditCustomAlias("");
       showToast("success", "Link updated successfully");
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to update link";
-      showToast("error", errorMessage);
+      showToast("error", error.message || "Failed to update link");
     }
   };
 
@@ -488,11 +480,7 @@ export default function Home() {
       setLinks(links.filter((link) => link.id !== linkId));
       showToast("success", "Link deleted successfully");
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to delete link";
-      showToast("error", errorMessage);
+      showToast("error", error.message || "Failed to delete link");
     }
   };
 

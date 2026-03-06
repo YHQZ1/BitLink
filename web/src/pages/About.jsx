@@ -1,14 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Zap,
-  Shield,
-  TrendingUp,
-  Users,
-  Code,
-  BarChart3,
-  Globe,
-} from "lucide-react";
+import { ArrowLeft, Zap, Shield, TrendingUp, BarChart3 } from "lucide-react";
 
 export default function About() {
   const navigate = useNavigate();

@@ -107,7 +107,7 @@ export default function QRCode() {
         createdAt: new Date(foundLink.createdAt).toLocaleDateString(),
       });
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      setError(err.message || "Failed to load QR code");
     } finally {
       setIsLoading(false);
     }

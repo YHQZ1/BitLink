@@ -149,10 +149,7 @@ export default function Profile() {
 
       showToast("success", "Profile updated successfully");
     } catch (err) {
-      showToast(
-        "error",
-        err.response?.data?.error || "Failed to update profile",
-      );
+      showToast("error", err.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -188,10 +185,7 @@ export default function Profile() {
 
       showToast("success", "Password updated successfully");
     } catch (err) {
-      showToast(
-        "error",
-        err.response?.data?.error || "Failed to update password",
-      );
+      showToast("error", err.message || "Failed to update password");
     } finally {
       setIsSaving(false);
     }

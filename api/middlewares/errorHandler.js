@@ -4,13 +4,13 @@ export const errorHandler = (err, req, res, next) => {
 
   if (err.isOperational) {
     return res.status(statusCode).json({
-      error: err.message,
+      message: err.message,
     });
   }
 
   console.error(err);
 
   res.status(500).json({
-    error: "An unexpected error occurred. Please try again later.",
+    message: "An unexpected error occurred. Please try again later.",
   });
 };

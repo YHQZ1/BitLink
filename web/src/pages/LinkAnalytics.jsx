@@ -160,7 +160,7 @@ export default function LinkAnalytics() {
 
       setAnalyticsData(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      setError(err.message || "Failed to load analytics");
     } finally {
       setIsLoading(false);
     }

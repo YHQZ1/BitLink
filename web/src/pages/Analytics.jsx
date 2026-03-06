@@ -125,9 +125,7 @@ export default function Analytics() {
 
       setTopLinks(Array.isArray(data.topLinks) ? data.topLinks : []);
     } catch (err) {
-      setError(
-        err.response?.data?.error || err.message || "Failed to load analytics",
-      );
+      setError(err.message || "Failed to load analytics");
     } finally {
       setIsLoading(false);
     }

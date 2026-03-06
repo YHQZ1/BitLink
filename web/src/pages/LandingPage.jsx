@@ -5,16 +5,11 @@ import {
   BarChart3,
   QrCode,
   Shield,
-  Menu,
-  X,
   Copy,
   ExternalLink,
   Calendar,
   MousePointerClick,
-  Zap,
   Users,
-  Lock,
-  Globe,
   Code,
   TrendingUp,
   CheckCircle2,
@@ -214,11 +209,6 @@ export default function LandingPage() {
       return;
     }
 
-    if (attempts >= 3) {
-      setError("Too many attempts. Please sign in to continue.");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -236,27 +226,19 @@ export default function LandingPage() {
       if (!res.ok) {
         setAttempts((a) => a + 1);
 
-        switch (data.code) {
-          case "NO_URL":
-            setError("Please enter a URL.");
-            break;
-          case "INVALID_URL":
-            setError("Invalid URL format.");
-            break;
-          case "GUEST_LIMIT":
-            setAuthRequired(true);
-            setError(null);
-            break;
-          case "ALIAS_TAKEN":
-            setError("This custom alias is already taken.");
-            break;
-          default:
-            setError("Something went wrong. Try again.");
+        const message = data?.message || "Something went wrong. Try again.";
+
+        if (message.includes("Guest users can create only one")) {
+          setAuthRequired(true);
+          setError(null);
+        } else {
+          setError(message);
         }
+
         return;
       }
 
-      const link = data.data;
+      const link = data;
 
       setShortenedUrl({
         shortUrl: link.shortUrl,
@@ -956,7 +938,7 @@ export default function LandingPage() {
           <div className="mt-12 sm:mt-16 pt-6 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="BitLink" className="w-6 h-6" />
-              <span>© 2025 BitLink</span>
+              <span>© {new Date().getFullYear()} BitLink</span>
             </div>
             <span className="text-center sm:text-left">
               Built for speed. Designed for scale.

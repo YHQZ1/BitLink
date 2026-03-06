@@ -35,7 +35,7 @@ export const createGuestLinkController = async (req, res, next) => {
   try {
     const link = await createGuestLink(req.body);
 
-    res.status(201).json({ data: link });
+    res.status(201).json(link);
   } catch (err) {
     console.error("Error creating guest link:", err.message);
     next(err);
