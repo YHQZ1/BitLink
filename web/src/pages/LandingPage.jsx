@@ -206,7 +206,7 @@ export default function LandingPage() {
 
     const normalizedUrl = normalizeAndValidateUrl(url);
     if (!normalizedUrl) {
-      setError("That doesn’t look like a valid URL.");
+      setError("That doesn't look like a valid URL.");
       return;
     }
 
@@ -280,19 +280,19 @@ export default function LandingPage() {
             <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide md:hidden">
               <button
                 onClick={() => scrollToSection("features")}
-                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
+                className="text-md text-neutral-500 hover:text-white"
               >
                 Features
               </button>
               <button
                 onClick={() => scrollToSection("docs")}
-                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
+                className="text-md text-neutral-500 hover:text-white"
               >
                 Docs
               </button>
               <button
                 onClick={() => navigate("/auth")}
-                className="text-sm text-[#76B900] hover:text-[#8FD400] whitespace-nowrap px-2 py-2"
+                className="text-md text-[#76B900] hover:text-[#8FD400]"
               >
                 Sign In
               </button>
@@ -324,23 +324,23 @@ export default function LandingPage() {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-40">
-          <div className="px-4 py-6 flex flex-col gap-3">
+        <div className="md:hidden fixed top-16 left-0 right-0 border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-40 text-base font-light">
+          <div className="px-4 py-6 flex flex-col gap-3 text-base font-light">
             <button
               onClick={() => scrollToSection("features")}
-              className="text-neutral-400 hover:text-white text-left transition-colors py-2"
+              className="text-neutral-500 hover:text-white py-2"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("docs")}
-              className="text-neutral-400 hover:text-white text-left transition-colors py-2"
+              className="text-neutral-500 hover:text-white py-2"
             >
               Docs
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="text-[#76B900] text-left hover:text-[#8FD400] transition-colors py-2"
+              className="text-neutral-500 hover:text-white py-2"
             >
               Sign In
             </button>
@@ -431,7 +431,6 @@ export default function LandingPage() {
                   preserveAspectRatio="none"
                   className="w-full h-full"
                 >
-                  {/* subtle grid */}
                   {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((x) => (
                     <line
                       key={`v-${x}`}
@@ -456,18 +455,8 @@ export default function LandingPage() {
                     />
                   ))}
 
-                  {/* primary — clicks */}
                   <polyline
-                    points="
-        0,82
-        14,60
-        28,66
-        42,48
-        56,54
-        70,36
-        84,42
-        100,28
-      "
+                    points="0,82 14,60 28,66 42,48 56,54 70,36 84,42 100,28"
                     fill="none"
                     stroke="#76B900"
                     strokeWidth="1.2"
@@ -475,18 +464,8 @@ export default function LandingPage() {
                     strokeLinecap="square"
                   />
 
-                  {/* secondary — unique users */}
                   <polyline
-                    points="
-        0,40
-        14,26
-        28,44
-        42,58
-        56,46
-        70,64
-        84,52
-        100,66
-      "
+                    points="0,40 14,26 28,44 42,58 56,46 70,64 84,52 100,66"
                     fill="none"
                     stroke="#76B900"
                     strokeWidth="0.9"
@@ -495,18 +474,8 @@ export default function LandingPage() {
                     strokeLinecap="square"
                   />
 
-                  {/* tertiary — errors / drops (subtle red) */}
                   <polyline
-                    points="
-        0,50
-        14,42
-        28,54
-        42,60
-        56,62
-        70,70
-        84,74
-        100,78
-      "
+                    points="0,50 14,42 28,54 42,60 56,62 70,70 84,74 100,78"
                     fill="none"
                     stroke="#e05c5c"
                     strokeOpacity="0.35"
@@ -813,14 +782,18 @@ export default function LandingPage() {
       <footer className="mt-32 border-t border-neutral-800">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="flex items-center justify-center">
+            {/* Gradient lines — hidden on mobile, visible on lg */}
             <div className="hidden lg:block flex-1">
               <div className="h-px bg-gradient-to-r from-transparent via-transparent to-neutral-800"></div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 px-4 sm:px-8">
+            {/* 4-col on all sizes */}
+            <div className="grid grid-cols-4 gap-5 sm:gap-12 px-0 sm:px-8">
               <div className="text-center">
-                <h4 className="text-sm font-medium mb-3 sm:mb-4">Product</h4>
-                <ul className="space-y-2 text-sm text-neutral-400">
+                <h4 className="text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                  Product
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
                   <li>
                     <button
                       onClick={() => scrollToSection("features")}
@@ -857,8 +830,10 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center">
-                <h4 className="text-sm font-medium mb-3 sm:mb-4">Developers</h4>
-                <ul className="space-y-2 text-sm text-neutral-400">
+                <h4 className="text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                  Developers
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
                   <li>
                     <button
                       onClick={() => scrollToSection("docs")}
@@ -881,8 +856,10 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center">
-                <h4 className="text-sm font-medium mb-3 sm:mb-4">Company</h4>
-                <ul className="space-y-2 text-sm text-neutral-400">
+                <h4 className="text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                  Company
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
                   <li>
                     <button
                       onClick={() => navigate("/about")}
@@ -915,8 +892,10 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center">
-                <h4 className="text-sm font-medium mb-3 sm:mb-4">Legal</h4>
-                <ul className="space-y-2 text-sm text-neutral-400">
+                <h4 className="text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                  Legal
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400">
                   <li>
                     <button
                       onClick={() => navigate("/privacy")}

@@ -583,7 +583,7 @@ export default function Home() {
             <div className="flex items-baseline gap-4 mt-4">
               <div className="h-px w-12 lg:w-16 bg-[#76B900]"></div>
               <p className="text-neutral-600 text-xs uppercase tracking-widest">
-                Dashboard
+                Home
               </p>
             </div>
           </div>

@@ -13,7 +13,7 @@ export default function NotFound() {
             <div className="flex items-baseline gap-3 mb-4">
               <div className="h-px w-16 bg-neutral-800"></div>
               <p className="text-neutral-600 text-xs uppercase tracking-[0.3em]">
-                Error 404
+                Error
               </p>
             </div>
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-thin text-white leading-[0.9] tracking-tight mb-3">
@@ -28,9 +28,8 @@ export default function NotFound() {
               This page doesn't exist
             </p>
             <p className="text-neutral-500 text-sm sm:text-base max-w-xl">
-              The page you're looking for doesn't exist or the link may have
-              expired. Try going back or visit the homepage to find what you
-              need.
+              The page you're looking for doesn't exist. Try going back or visit
+              the homepage to find what you need.
             </p>
           </div>
 
@@ -42,10 +41,6 @@ export default function NotFound() {
             <div>
               <div className="text-sm text-neutral-600 uppercase tracking-wider mb-1">
                 Lost Link
-              </div>
-              <div className="text-xs text-neutral-700">
-                The short link you're trying to access may have been removed or
-                never existed
               </div>
             </div>
           </div>
@@ -59,16 +54,11 @@ export default function NotFound() {
               <ArrowLeft className="w-4 h-4" />
               <span>Go Back</span>
             </button>
-          </div>
-
-          {/* Help Text */}
-          <div className="text-xs text-neutral-600">
-            Need help?{" "}
             <button
               onClick={() => navigate("/home")}
-              className="text-[#76B900] hover:text-[#8FD400] transition-colors cursor-pointer"
+              className="border-2 border-neutral-800 text-neutral-400 px-8 py-3 font-medium hover:border-neutral-700 hover:text-white transition-all text-xs uppercase tracking-widest cursor-pointer flex items-center justify-center gap-2"
             >
-              Visit your dashboard
+              <span>Go to Homepage</span>
             </button>
           </div>
         </div>

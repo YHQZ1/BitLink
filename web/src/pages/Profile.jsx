@@ -67,7 +67,7 @@ const Toast = ({ isVisible, type, message, onClose, action }) => {
     <div
       className={`fixed top-20 right-4 sm:right-5 z-50 ${exiting ? "animate-slide-out" : "animate-slide-in"}`}
     >
-      <div className="bg-[#111316] border border-neutral-800 text-white px-4 py-3.5 flex items-start gap-3 min-w-[300px] max-w-sm shadow-2xl relative overflow-hidden">
+      <div className="bg-[#111316] border border-neutral-800 text-white px-4 py-3.5 flex items-start gap-3 min-w-[280px] max-w-[calc(100vw-2rem)] sm:min-w-[300px] sm:max-w-sm shadow-2xl relative overflow-hidden">
         {/* accent bar */}
         <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${bar}`} />
 
@@ -112,7 +112,7 @@ const Toast = ({ isVisible, type, message, onClose, action }) => {
 const SectionDivider = ({ title, danger }) => (
   <div className="flex items-center gap-4 mb-8">
     <h2
-      className={`text-3xl font-extralight tracking-tight whitespace-nowrap ${danger ? "text-[#e05c5c]" : "text-white"}`}
+      className={`text-2xl sm:text-3xl font-extralight tracking-tight whitespace-nowrap ${danger ? "text-[#e05c5c]" : "text-white"}`}
     >
       {title}
     </h2>
@@ -395,10 +395,11 @@ export default function Profile() {
       />
       <Toast {...toast} onClose={closeToast} />
 
-      <div className="flex-1 w-full px-20 sm:px-20 lg:px-20 py-8 pt-24">
+      {/* Outer padding: tight on mobile, original on desktop */}
+      <div className="flex-1 w-full px-4 sm:px-8 lg:px-20 py-8 pt-20 sm:pt-24">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-5xl sm:text-6xl font-extralight text-white mb-2 tracking-tight">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extralight text-white mb-2 tracking-tight">
             Account Settings
           </h1>
           <p className="text-neutral-600 text-sm">
@@ -406,11 +407,16 @@ export default function Profile() {
           </p>
         </div>
 
+        {/* 
+          Mobile: single column, left panel on top then right panel below
+          Desktop: original side-by-side grid
+        */}
         <div className="grid lg:grid-cols-[500px_1fr] gap-10 lg:gap-16">
-          {/* Left Column */}
+          {/* Left Column — profile card */}
           <div>
-            <div className="text-center pb-8 border-b border-neutral-800/60">
-              <div className="w-30 h-30 mx-auto mb-4">
+            {/* Avatar + name — centered on mobile, stays centered on desktop */}
+            <div className="text-center pb-6 sm:pb-8 border-b border-neutral-800/60">
+              <div className="w-24 h-24 sm:w-30 sm:h-30 mx-auto mb-4">
                 {currentUser.avatar ? (
                   <img
                     src={currentUser.avatar}
@@ -435,7 +441,8 @@ export default function Profile() {
               <p className="text-neutral-600 text-xs">{currentUser.email}</p>
             </div>
 
-            <div className="py-8 border-b border-neutral-800/60 space-y-6">
+            {/* Meta info — 2-col grid on mobile for compactness, stacked on desktop */}
+            <div className="py-6 sm:py-8 border-b border-neutral-800/60 grid grid-cols-2 gap-5 sm:grid-cols-1 sm:space-y-6 sm:gap-0">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
                   <Calendar className="w-3 h-3 text-neutral-600" />
@@ -462,14 +469,14 @@ export default function Profile() {
                 </p>
               </div>
 
-              <div>
+              <div className="col-span-2 sm:col-span-1">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Shield className="w-3 h-3 text-[#76B900]" />
+                  <Shield className="w-3 h-3 text-neutral-600" />
                   <span className="text-xs text-neutral-600 uppercase tracking-wider">
                     Security
                   </span>
                 </div>
-                <p className="text-neutral-600 text-xs font-light leading-relaxed">
+                <p className="text-neutral-500 text-xs font-light leading-relaxed">
                   {currentUser.providers.password
                     ? "Password authentication enabled"
                     : currentUser.providers.google
@@ -481,7 +488,8 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="py-8">
+            {/* Connected accounts */}
+            <div className="py-6 sm:py-8">
               <span className="text-sm text-neutral-600 uppercase tracking-wider">
                 Connected Accounts
               </span>
@@ -526,8 +534,9 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="space-y-12 lg:space-y-14">
+          {/* Right Column — forms */}
+          <div className="space-y-10 sm:space-y-12 lg:space-y-14">
+            {/* Profile Information */}
             <div>
               <SectionDivider title="Profile Information" />
               <form
@@ -567,7 +576,8 @@ export default function Profile() {
               </form>
             </div>
 
-            <div className="border-t border-neutral-800/60 pt-12 lg:pt-14">
+            {/* Email Preferences */}
+            <div className="border-t border-neutral-800/60 pt-10 sm:pt-12 lg:pt-14">
               <SectionDivider title="Email Preferences" />
               <div className="space-y-4 max-w-lg">
                 {[
@@ -592,8 +602,9 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Change Password */}
             {!isOAuthUser && (
-              <div className="border-t border-neutral-800/60 pt-12 lg:pt-14">
+              <div className="border-t border-neutral-800/60 pt-10 sm:pt-12 lg:pt-14">
                 <SectionDivider title="Change Password" />
                 <form
                   onSubmit={handleUpdatePassword}
@@ -683,7 +694,8 @@ export default function Profile() {
               </div>
             )}
 
-            <div className="border-t border-neutral-800/60 pt-12 lg:pt-14">
+            {/* Danger Zone */}
+            <div className="border-t border-neutral-800/60 pt-10 sm:pt-12 lg:pt-14">
               <SectionDivider title="Account Actions" danger />
               <p className="text-neutral-600 text-sm mb-6 max-w-lg leading-relaxed">
                 Permanently delete your account and all associated data. This

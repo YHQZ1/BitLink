@@ -175,20 +175,14 @@ export default function Auth() {
       <nav className="lg:hidden fixed top-0 w-full border-b border-neutral-900/50 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-3"
+              onClick={() => navigate("/")}
+            >
               <img src="/logo.png" alt="BitLink" className="w-8 h-8" />
               <span className="text-lg font-extralight text-white">
                 BitLink
               </span>
-            </div>
-
-            <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => navigate("/")}
-                className="text-sm text-neutral-400 hover:text-white whitespace-nowrap px-2 py-2"
-              >
-                Home
-              </button>
             </div>
           </div>
         </div>
@@ -215,7 +209,7 @@ export default function Auth() {
             <p className="text-neutral-400 text-sm lg:text-base">
               {isSignUp
                 ? "Start shortening and tracking your links"
-                : "Sign in to access your dashboard"}
+                : "Sign in to access your continue"}
             </p>
           </div>
 

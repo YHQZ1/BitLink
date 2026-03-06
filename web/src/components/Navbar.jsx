@@ -5,7 +5,7 @@ import { LogOut, User } from "lucide-react";
 const NavLink = ({ onClick, children, isActive }) => (
   <button
     onClick={onClick}
-    className={`text-sm transition-colors cursor-pointer font-light tracking-wide ${
+    className={`text-md transition-colors cursor-pointer font-light tracking-wide ${
       isActive ? "text-[#76B900]" : "text-neutral-500 hover:text-white"
     }`}
   >
@@ -118,7 +118,7 @@ export default function Navbar({
                     onClick={() => handleNavigation("/home")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-400 hover:text-white text-left cursor-pointer hover:bg-white/5 transition-colors"
                   >
-                    Dashboard
+                    Home
                   </button>
                   <button
                     onClick={() => handleNavigation("/analytics")}
@@ -160,7 +160,7 @@ export default function Navbar({
                 <span className="text-sm font-light hidden lg:block">
                   {userName}
                 </span>
-                <div className="w-7 h-7 bg-neutral-900 flex items-center justify-center text-white font-light text-xs overflow-hidden">
+                <div className="w-8 h-8 bg-neutral-900 flex items-center justify-center text-[#76B900] text-md overflow-hidden">
                   {userAvatar ? (
                     <img
                       src={userAvatar}
