@@ -25,6 +25,7 @@ import redis from "../lib/redis.js";
 import http from "http";
 import { register } from "../lib/metrics.js";
 import client from "prom-client";
+import mongoose from "mongoose";
 
 if (!process.env.MONGODB_URI) {
   throw new Error("MONGODB_URI is not defined");
@@ -96,7 +97,7 @@ export const analyticsJobDuration = new client.Histogram({
               : "Desktop";
 
         await Analytics.create({
-          link: linkId,
+          link: new mongoose.Types.ObjectId(linkId),
           ipAddress: cleanIp,
           userAgent,
           referrer,
@@ -105,6 +106,7 @@ export const analyticsJobDuration = new client.Histogram({
           deviceType,
           browser: ua.browser.name || "Unknown",
           operatingSystem: ua.os.name || "Unknown",
+          timestamp: new Date(),
         });
 
         analyticsJobsProcessed.inc({ status: "success" });
