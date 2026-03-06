@@ -112,7 +112,7 @@ const Toast = ({ isVisible, type, message, onClose, action }) => {
 const SectionDivider = ({ title, danger }) => (
   <div className="flex items-center gap-4 mb-8">
     <h2
-      className={`text-xl font-extralight tracking-tight whitespace-nowrap ${danger ? "text-[#e05c5c]" : "text-white"}`}
+      className={`text-3xl font-extralight tracking-tight whitespace-nowrap ${danger ? "text-[#e05c5c]" : "text-white"}`}
     >
       {title}
     </h2>
@@ -395,10 +395,10 @@ export default function Profile() {
       />
       <Toast {...toast} onClose={closeToast} />
 
-      <div className="flex-1 w-full max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-8 pt-24">
+      <div className="flex-1 w-full px-20 sm:px-20 lg:px-20 py-8 pt-24">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl sm:text-5xl font-extralight text-white mb-2 tracking-tight">
+          <h1 className="text-5xl sm:text-6xl font-extralight text-white mb-2 tracking-tight">
             Account Settings
           </h1>
           <p className="text-neutral-600 text-sm">
@@ -406,11 +406,11 @@ export default function Profile() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-[260px_1fr] gap-10 lg:gap-16">
+        <div className="grid lg:grid-cols-[500px_1fr] gap-10 lg:gap-16">
           {/* Left Column */}
           <div>
             <div className="text-center pb-8 border-b border-neutral-800/60">
-              <div className="w-20 h-20 mx-auto mb-4">
+              <div className="w-30 h-30 mx-auto mb-4">
                 {currentUser.avatar ? (
                   <img
                     src={currentUser.avatar}
@@ -532,7 +532,7 @@ export default function Profile() {
               <SectionDivider title="Profile Information" />
               <form
                 onSubmit={handleUpdateProfile}
-                className="space-y-6 max-w-lg"
+                className="space-y-6 max-w-xl"
               >
                 <InputField
                   label="Full Name"
