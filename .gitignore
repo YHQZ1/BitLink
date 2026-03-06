@@ -4,7 +4,6 @@ boot.txt
 
 # Environment Variables
 .env
-.env.*
 !.env.example
 !api/.env.example
 !web/.env.example
