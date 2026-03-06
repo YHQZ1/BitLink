@@ -888,7 +888,7 @@ export default function LandingPage() {
                       onClick={() => navigate("/about")}
                       className="hover:text-white transition-colors"
                     >
-                      About BitLink
+                      BitLink
                     </button>
                   </li>
                   <li>
@@ -908,7 +908,7 @@ export default function LandingPage() {
                       rel="noopener noreferrer"
                       className="hover:text-white transition-colors"
                     >
-                      About The <br /> Founder
+                      The Founder
                     </a>
                   </li>
                 </ul>

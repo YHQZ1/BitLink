@@ -16,7 +16,7 @@ export default function Terms() {
       <nav className="fixed top-0 w-full border-b border-neutral-800 bg-[#0B0D10]/95 backdrop-blur-sm z-50">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 sm:gap-3 text-neutral-400 hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />

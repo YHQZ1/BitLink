@@ -132,9 +132,9 @@ export default function Auth() {
       if (response.ok) {
         localStorage.setItem("jwtToken", data.token);
         setMessage(
-          isSignUp ? "Account created successfully!" : "Login successful!"
+          isSignUp ? "Account created successfully!" : "Login successful!",
         );
-        setTimeout(() => navigate("/"), 1000);
+        setTimeout(() => navigate("/home"), 500);
       } else {
         setMessage(data.error || "Something went wrong!");
       }
@@ -303,8 +303,8 @@ export default function Auth() {
                 {loading
                   ? "Processing..."
                   : isSignUp
-                  ? "Create Account"
-                  : "Sign In"}
+                    ? "Create Account"
+                    : "Sign In"}
               </span>
               {!loading && <ArrowRight className="w-5 h-5" />}
             </button>
@@ -328,15 +328,15 @@ export default function Auth() {
             <p className="mt-6 text-xs text-center text-neutral-500">
               By creating an account, you agree to our{" "}
               <a
-                href="#"
-                className="text-neutral-400 hover:text-white transition-colors underline"
+                onClick={() => navigate("/terms")}
+                className="text-neutral-400 hover:text-white transition-colors underline cursor-pointer"
               >
                 Terms
               </a>{" "}
               and{" "}
               <a
-                href="#"
-                className="text-neutral-400 hover:text-white transition-colors underline"
+                onClick={() => navigate("/privacy")}
+                className="text-neutral-400 hover:text-white transition-colors underline cursor-pointer"
               >
                 Privacy Policy
               </a>
