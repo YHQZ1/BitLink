@@ -482,7 +482,7 @@ export default function Profile() {
             </div>
 
             <div className="py-8">
-              <span className="text-xs text-neutral-600 uppercase tracking-wider">
+              <span className="text-sm text-neutral-600 uppercase tracking-wider">
                 Connected Accounts
               </span>
               <div className="mt-4 space-y-3">
@@ -510,7 +510,7 @@ export default function Profile() {
                     >
                       <div className="flex items-center gap-2.5 text-neutral-500">
                         <Icon className="w-3.5 h-3.5" />
-                        <span className="text-sm font-light">{label}</span>
+                        <span className="text-md font-light">{label}</span>
                       </div>
                       <span
                         className={`text-xs font-light ${currentUser.providers[key] ? "text-[#76B900]" : "text-neutral-700"}`}
@@ -684,7 +684,7 @@ export default function Profile() {
             )}
 
             <div className="border-t border-neutral-800/60 pt-12 lg:pt-14">
-              <SectionDivider title="Danger Zone" danger />
+              <SectionDivider title="Account Actions" danger />
               <p className="text-neutral-600 text-sm mb-6 max-w-lg leading-relaxed">
                 Permanently delete your account and all associated data. This
                 action cannot be undone.

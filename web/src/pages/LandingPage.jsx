@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -383,7 +384,7 @@ export default function LandingPage() {
                   disabled={isLoading}
                   className="border-2 border-[#76B900] text-[#76B900] px-6 sm:px-8 py-3 hover:bg-[#76B900] hover:text-black transition-all cursor-pointer disabled:opacity-50 text-xs uppercase tracking-widest font-medium"
                 >
-                  {isLoading ? "..." : "Go"}
+                  {isLoading ? "..." : "Shorten"}
                 </button>
               </div>
               {error && (
@@ -408,7 +409,7 @@ export default function LandingPage() {
                     onClick={() => navigate("/auth")}
                     className="cursor-pointer text-[#76B900] hover:text-[#8FD400] transition-colors whitespace-nowrap flex items-center gap-2"
                   >
-                    Login <ArrowRight className="w-3 h-3" />
+                    Sign In <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               )}
@@ -817,7 +818,7 @@ export default function LandingPage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 px-4 sm:px-8">
-              <div className="text-center sm:text-left">
+              <div className="text-center">
                 <h4 className="text-sm font-medium mb-3 sm:mb-4">Product</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
@@ -855,7 +856,7 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              <div className="text-center sm:text-left">
+              <div className="text-center">
                 <h4 className="text-sm font-medium mb-3 sm:mb-4">Developers</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
@@ -879,7 +880,7 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              <div className="text-center sm:text-left">
+              <div className="text-center">
                 <h4 className="text-sm font-medium mb-3 sm:mb-4">Company</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
@@ -887,21 +888,33 @@ export default function LandingPage() {
                       onClick={() => navigate("/about")}
                       className="hover:text-white transition-colors"
                     >
-                      About
+                      About BitLink
                     </button>
                   </li>
                   <li>
                     <a
-                      href="mailto:support@bitlink.xyz"
+                      href="https://mail.google.com/mail/?view=cm&to=rupareluttkarsh2309@gmail.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="hover:text-white transition-colors"
                     >
                       Contact
                     </a>
                   </li>
+                  <li>
+                    <a
+                      href="https://uttkarsh-ruparel.vercel.app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      About The <br /> Founder
+                    </a>
+                  </li>
                 </ul>
               </div>
 
-              <div className="text-center sm:text-left">
+              <div className="text-center">
                 <h4 className="text-sm font-medium mb-3 sm:mb-4">Legal</h4>
                 <ul className="space-y-2 text-sm text-neutral-400">
                   <li>
