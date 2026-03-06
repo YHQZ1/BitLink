@@ -1,254 +1,325 @@
 # BitLink
 
-BitLink is a **production-grade URL shortening and analytics platform** built with a **system-design-first approach**. It is engineered to handle high-throughput redirect traffic, provide deep analytics, and remain resilient under failure — prioritizing correctness, performance, and scalability over CRUD simplicity.
+**BitLink** is a **production-grade URL shortening and analytics platform** built with a **system-design-first approach**.
 
-This project is intentionally designed as a real-world backend system, not a tutorial demo.
+The system is designed to handle **high-throughput redirect traffic** while collecting rich analytics without impacting redirect latency. Critical workloads such as analytics processing are **decoupled from the redirect path** using an asynchronous queue architecture.
 
----
-
-## Why BitLink Exists
-
-Most URL shorteners stop at:
-
-- storing links
-- incrementing counters
-- serving redirects
-
-BitLink goes further.
-
-It treats URL shortening as a **high-volume, latency-sensitive system problem**, where:
-
-- redirects must be fast and reliable
-- analytics must not block critical paths
-- infrastructure must scale horizontally
-- failures must be isolated, not catastrophic
+The goal of the project is to simulate the architecture of a **real SaaS backend system**, emphasizing scalability, failure isolation, and performance.
 
 ---
 
-## Core Capabilities
+# Core Features
 
-### Authentication & Identity
+## Authentication & Identity
 
-- Email and password authentication
-- OAuth 2.0 integration with Google and GitHub
-- Unified user identity across providers (email-based merging)
+- Email/password authentication
+- OAuth 2.0 login (Google, GitHub)
 - Stateless JWT-based authentication
-- Controlled guest access with upgrade-to-user link migration
+- Unified user identity across providers
+- Guest link creation with automatic ownership migration after login
 
 ---
 
-### Link Management
+## Link Management
 
-- URL shortening with optional custom aliases
-- Collision detection and alias validation
-- QR code generation per short link
-- Link activation, expiration, and status control
-- Ownership migration for guest-created links after authentication
-
----
-
-### Analytics Engine
-
-Analytics are designed as **events**, not counters.
-
-- Event-based click tracking
-- Device, browser, and OS detection via user-agent parsing
-- Geo-location resolution (country and city)
-- Referrer and traffic source classification
-- Per-link analytics and account-wide aggregation
-- Time-range filtering and peak activity analysis
-
-Analytics processing is intentionally **decoupled from redirects** to guarantee availability and performance.
+- Short URL generation
+- Custom aliases
+- Collision detection
+- QR code generation
+- Link activation and expiration controls
+- Ownership migration for guest-created links
 
 ---
 
-### Dashboards
+## Analytics System
 
-- Centralized analytics dashboard
-- Per-link performance breakdowns
-- Traffic trends and usage insights
-- Efficient aggregation queries designed for large datasets
-- Optimized reads using indexed collections
+BitLink records **click events instead of simple counters**, enabling richer traffic insights.
+
+Tracked metadata includes:
+
+- device type
+- browser
+- operating system
+- geographic location
+- referrer source
+- timestamp
+
+Analytics capabilities:
+
+- per-link analytics
+- account-wide analytics
+- time-range filtering
+- peak traffic analysis
+
+Analytics processing is **asynchronous** to ensure redirects remain fast and reliable.
 
 ---
 
-## High-Level Architecture
+# System Architecture
 
 ```
-Client
-  ↓
-CDN (Edge Caching)
-  ↓
-Reverse Proxy / Load Balancer
-  ↓
-Stateless Backend API (Dockerized)
-  ↓
-Cache Layer (Hot Redirects)
-  ↓
-MongoDB Atlas
+                Client
+                   │
+                   ▼
+              CDN / Edge
+                   │
+                   ▼
+                 Nginx
+                   │
+                   ▼
+            Stateless API
+                   │
+        ┌──────────┴──────────┐
+        ▼                     ▼
+    Redis Cache           BullMQ Queue
+        │                     │
+        ▼                     ▼
+     MongoDB            Worker Process
+                            │
+                            ▼
+                         MongoDB
 ```
 
-### Key Architectural Decisions
-
-- Redirects are optimized for **low latency and high availability**
-- Analytics writes are processed asynchronously
-- Backend services are stateless to allow horizontal scaling
-- Cache-first reads minimize database load
-- Infrastructure is designed to tolerate partial failures
+The architecture separates **latency-critical redirect operations** from **analytics processing workloads**.
 
 ---
 
-## Redirect & Analytics Flow
+# Redirect Pipeline
 
-1. Incoming short-link request hits the CDN
-2. Reverse proxy forwards the request to the backend
-3. Cache is checked for redirect metadata
-4. Redirect is validated and executed immediately
-5. Analytics event is queued asynchronously
-6. Redirect response is returned without waiting on analytics
+```
+User Request
+      │
+      ▼
+CDN / Edge
+      │
+      ▼
+Nginx Reverse Proxy
+      │
+      ▼
+Backend API
+      │
+      ├── Redis Cache Lookup
+      │
+      ├── MongoDB Fallback (cache miss)
+      │
+      ├── Enqueue analytics event
+      │
+      ▼
+Immediate Redirect Response
+```
 
-**Analytics failures never block redirects.**
+Key design principle:
+
+**Redirect responses never wait for analytics processing.**
 
 ---
 
-## Tech Stack
+# Asynchronous Analytics Processing
 
-### Frontend
+Analytics events are processed using **BullMQ workers backed by Redis**.
 
-- React (Vite)
-- Deployed on Vercel
-- Custom domain with HTTPS
-- Optimized for fast interaction with analytics dashboards
+Workflow:
+
+```
+Redirect request
+      │
+      ▼
+Analytics job added to queue
+      │
+      ▼
+BullMQ Worker consumes job
+      │
+      ▼
+Event processed and stored
+```
+
+Benefits:
+
+- redirect latency remains minimal
+- analytics processing scales independently
+- worker failures do not affect redirect availability
 
 ---
 
-### Backend
+# Tech Stack
 
-- Node.js with Express
+## Frontend
+
+- React
+- Vite
+- TailwindCSS
+
+Responsibilities:
+
+- link management UI
+- analytics dashboards
+- authentication flows
+
+Deployment:
+
+- Vercel (global CDN and automatic deployments)
+
+---
+
+## Backend
+
+- Node.js runtime
+- Express framework
+- Stateless API architecture
 - Dockerized services
-- Stateless API design
-- Deployed on AWS
-- Horizontally scalable behind a load balancer
+
+Responsibilities:
+
+- redirect handling
+- link management APIs
+- authentication
+- analytics event generation
+
+Testing:
+
+- Jest
+
+Code quality:
+
+- ESLint
 
 ---
 
-### Database
+## Caching, Queues, and Rate Limiting
 
-- MongoDB Atlas
-- Indexed collections for redirects and analytics
-- Aggregation pipelines for reporting and dashboards
-- Optimized schema design for read-heavy workloads
+**Redis**
 
----
+Used for:
 
-### Infrastructure & System Design
+- hot redirect caching
+- API rate limiting
+- queue backend
 
-- CDN for edge caching and reduced redirect latency
-- Reverse proxy and load balancing
-- Redis-backed caching for hot paths
-- API-level and redirect-level rate limiting
-- Asynchronous job processing via queues
-- Environment-driven configuration across services
+**BullMQ**
 
----
+Used for:
 
-### Observability & Infrastructure as Code (Planned)
-
-- Metrics collection and visualization with Prometheus and Grafana
-- Kubernetes-based orchestration and service scaling
-- Terraform for infrastructure provisioning
-- Centralized logging and monitoring
+- asynchronous analytics processing
+- background job handling
 
 ---
 
-## Backend Design Principles
+## Database
 
-The backend follows strict separation of responsibilities:
+**MongoDB Atlas**
 
-- **Controllers**
-  Handle HTTP concerns only (request validation, response shaping)
+Responsibilities:
 
-- **Services**
-  Encapsulate business logic, invariants, and workflows
+- link metadata storage
+- analytics event storage
+- aggregation queries for dashboards
 
-- **Models**
-  Define schemas, indexes, and database constraints
+Indexes are optimized for:
 
-- **Utilities**
-  Stateless helpers (user-agent parsing, geo lookups, formatting)
-
-A previously monolithic controller-heavy design was fully refactored into this structure to improve:
-
-- maintainability
-- testability
-- long-term scalability
+- short code lookups
+- analytics queries
 
 ---
 
-## Scalability & Performance Strategy
+# Reverse Proxy & Traffic Management
 
-BitLink is built for **bursty, read-heavy traffic**, typical of redirect systems:
+**Nginx**
 
-- CDN-friendly redirect endpoints
-- Cache-first redirect resolution
-- Stateless backend instances for horizontal scaling
-- Rate limiting to protect downstream services
-- Optimized MongoDB indexes and aggregations
-- Clear migration path to Kubernetes-based scaling
+Used as a reverse proxy to:
 
-The system prioritizes **availability and latency** over strict real-time analytics consistency.
+- route traffic to backend services
+- buffer incoming requests
+- optimize redirect handling
 
----
-
-## Failure Handling & Resilience
-
-- Redirects continue functioning even if analytics processing fails
-- Cache misses gracefully fall back to database reads
-- Rate limits prevent abuse and traffic spikes from overwhelming services
-- Stateless services allow fast recovery and redeployment
-- Partial failures are isolated rather than cascading
+CDN functionality is provided via **Vercel edge infrastructure**.
 
 ---
 
-## Security
+# Deployment Architecture
 
-- Bcrypt-based password hashing
-- Signed and verified JWTs
-- OAuth tokens never exposed to the client
-- Strict CORS and request validation
-- Authorization enforced across all protected routes
-- Controlled guest access with server-side constraints
+| Component     | Platform      |
+| ------------- | ------------- |
+| Frontend      | Vercel        |
+| Backend API   | Render        |
+| Database      | MongoDB Atlas |
+| Cache         | Redis         |
+| Queue Workers | BullMQ        |
 
----
-
-## Deployment Overview
-
-- **Frontend:** Vercel (custom domain, HTTPS)
-- **Backend:** AWS (Dockerized services)
-- **Database:** MongoDB Atlas
-- **Caching:** Redis
-- **Traffic Management:** CDN + reverse proxy + load balancing
-- **Configuration:** Environment-driven across all services
+The system previously ran on **AWS infrastructure with Cloudflare CDN**, but was migrated to **Vercel and Render** to optimize operational costs while maintaining global availability.
 
 ---
 
-## Design Tradeoffs
+# CI/CD Pipeline
+
+Deployment automation is handled using:
+
+- GitHub Actions
+- Docker
+
+Typical pipeline:
+
+```
+Code Push
+   │
+   ▼
+Run Tests (Jest)
+   │
+   ▼
+Build Docker Image
+   │
+   ▼
+Deploy to Render / Vercel
+```
+
+---
+
+# Observability
+
+Monitoring and visualization are implemented using:
+
+- Prometheus
+- Grafana
+
+Metrics tracked include:
+
+- redirect latency
+- queue backlog
+- cache hit rate
+- API error rates
+
+---
+
+# Infrastructure as Code
+
+Infrastructure provisioning is managed using **Terraform**, allowing consistent environment configuration across:
+
+- development
+- staging
+- production
+
+This ensures reproducible deployments and simplified infrastructure management.
+
+---
+
+# Design Tradeoffs
+
+Several deliberate tradeoffs were made:
 
 - Redirect availability is prioritized over analytics completeness
-- Analytics are eventually consistent by design
-- The system favors horizontal scaling over vertical optimization
-- Some workloads are intentionally decoupled to tolerate failure
+- Analytics are eventually consistent
+- Asynchronous processing introduces slight analytics delays
+- Managed platforms were chosen to reduce infrastructure overhead
 
-These tradeoffs are deliberate and reflect real-world system constraints.
+These decisions prioritize **reliability, scalability, and operational simplicity**.
 
 ---
 
-## Purpose
+# Future Improvements
 
-BitLink was built to:
+Potential improvements include:
 
-- Apply real system-design principles to a real product
-- Design analytics beyond simple counters
-- Build a production-ready redirect pipeline
-- Practice scalable backend and infrastructure architecture
-- Think in terms of traffic, latency, failures, and growth
+- Kafka-based event streaming for analytics
+- ClickHouse or time-series database for analytics workloads
+- Kubernetes-based orchestration
+- Global edge redirect optimization
+- Advanced abuse detection and bot filtering
