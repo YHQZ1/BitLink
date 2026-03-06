@@ -111,7 +111,11 @@ export default function LinkAnalytics() {
   const { linkId } = useParams();
   const navigate = useNavigate();
   const [analyticsData, setAnalyticsData] = useState(null);
-  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    email: "",
+    avatar: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("7d");
@@ -133,6 +137,7 @@ export default function LinkAnalytics() {
       setCurrentUser({
         name: response.data.name || "User",
         email: response.data.email,
+        avatar: response.data.avatar || null,
       });
     } catch {
       localStorage.removeItem("jwtToken");
@@ -176,7 +181,11 @@ export default function LinkAnalytics() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <PageLoader label="Loading Link Analytics..." />
       </div>
     );
@@ -185,7 +194,11 @@ export default function LinkAnalytics() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
             <div className="border border-red-500/30 bg-red-500/10 p-6 text-center">
@@ -207,7 +220,11 @@ export default function LinkAnalytics() {
   if (!analyticsData) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <div className="flex-1 w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
             <div className="border border-neutral-800 bg-[#0D0F13] p-6 text-center">
@@ -256,7 +273,11 @@ export default function LinkAnalytics() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+      <Navbar
+        userName={currentUser.name}
+        userEmail={currentUser.email}
+        userAvatar={currentUser.avatar}
+      />
       <Toast {...toast} onClose={closeToast} />
 
       <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">

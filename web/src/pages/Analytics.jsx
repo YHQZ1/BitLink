@@ -2,7 +2,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   TrendingUp,
   BarChart3,
   Link2,
@@ -63,7 +62,11 @@ export default function Analytics() {
   const navigate = useNavigate();
   const [globalStats, setGlobalStats] = useState(null);
   const [topLinks, setTopLinks] = useState([]);
-  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    email: "",
+    avatar: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("30d");
@@ -74,6 +77,7 @@ export default function Analytics() {
       setCurrentUser({
         name: response.data.name || "User",
         email: response.data.email,
+        avatar: response.data.avatar || null,
       });
     } catch {
       localStorage.removeItem("jwtToken");
@@ -122,7 +126,7 @@ export default function Analytics() {
       setTopLinks(Array.isArray(data.topLinks) ? data.topLinks : []);
     } catch (err) {
       setError(
-        err.response?.data?.error || err.message || "Failed to load analytics"
+        err.response?.data?.error || err.message || "Failed to load analytics",
       );
     } finally {
       setIsLoading(false);
@@ -139,7 +143,11 @@ export default function Analytics() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <PageLoader label="Loading Analytics..." />
       </div>
     );
@@ -148,7 +156,11 @@ export default function Analytics() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="max-w-md mx-auto">
             <div className="border border-red-500/30 bg-red-500/10 p-6 text-center">
@@ -170,7 +182,11 @@ export default function Analytics() {
   if (!globalStats) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
           <div className="text-center py-12 lg:py-16">
             <p className="text-neutral-400">No analytics data available</p>
@@ -182,7 +198,11 @@ export default function Analytics() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA]">
-      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+      <Navbar
+        userName={currentUser.name}
+        userEmail={currentUser.email}
+        userAvatar={currentUser.avatar}
+      />
 
       <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto pt-20">
         <div className="mb-10 lg:mb-12">

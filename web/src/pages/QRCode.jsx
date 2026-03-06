@@ -56,7 +56,11 @@ export default function QRCode() {
   const { linkId } = useParams();
   const navigate = useNavigate();
   const [link, setLink] = useState(null);
-  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    email: "",
+    avatar: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({
@@ -77,6 +81,7 @@ export default function QRCode() {
       setCurrentUser({
         name: response.data.name || "User",
         email: response.data.email,
+        avatar: response.data.avatar || null,
       });
     } catch {
       localStorage.removeItem("jwtToken");
@@ -143,7 +148,11 @@ export default function QRCode() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <PageLoader label="Loading QR..." />
       </div>
     );
@@ -152,7 +161,11 @@ export default function QRCode() {
   if (error) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <div className="flex-1 flex items-center justify-center px-8">
           <div className="max-w-md w-full">
             <div className="border border-red-500/30 bg-red-500/10 p-6 sm:p-8 text-center">
@@ -173,7 +186,11 @@ export default function QRCode() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+      <Navbar
+        userName={currentUser.name}
+        userEmail={currentUser.email}
+        userAvatar={currentUser.avatar}
+      />
       <Toast {...toast} onClose={closeToast} />
 
       <div className="w-full px-8 sm:px-12 lg:px-16 mx-auto py-8 pt-24">

@@ -13,7 +13,11 @@ const NavLink = ({ onClick, children, isActive }) => (
   </button>
 );
 
-export default function Navbar({ userName = "User", userEmail = "" }) {
+export default function Navbar({
+  userName = "User",
+  userEmail = "",
+  userAvatar = null,
+}) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -39,7 +43,7 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
       navigate(path);
       setMobileDropdownOpen(false);
     },
-    [navigate]
+    [navigate],
   );
 
   useEffect(() => {
@@ -90,7 +94,15 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
               onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
               className="w-7 h-7 bg-neutral-900 flex items-center justify-center text-white text-xs font-light cursor-pointer"
             >
-              {userName.charAt(0).toUpperCase()}
+              {userAvatar ? (
+                <img
+                  src={userAvatar}
+                  alt={userName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                userName.charAt(0).toUpperCase()
+              )}
             </button>
 
             {mobileDropdownOpen && (
@@ -148,8 +160,16 @@ export default function Navbar({ userName = "User", userEmail = "" }) {
                 <span className="text-sm font-light hidden lg:block">
                   {userName}
                 </span>
-                <div className="w-7 h-7 bg-neutral-900 flex items-center justify-center text-white font-light text-xs">
-                  {userName.charAt(0).toUpperCase()}
+                <div className="w-7 h-7 bg-neutral-900 flex items-center justify-center text-white font-light text-xs overflow-hidden">
+                  {userAvatar ? (
+                    <img
+                      src={userAvatar}
+                      alt={userName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    userName.charAt(0).toUpperCase()
+                  )}
                 </div>
               </button>
               {userDropdownOpen && (

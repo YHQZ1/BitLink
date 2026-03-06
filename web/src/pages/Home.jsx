@@ -274,7 +274,11 @@ export default function Home() {
   const [customAlias, setCustomAlias] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBy, setFilterBy] = useState("all");
-  const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    email: "",
+    avatar: null,
+  });
   const [stats, setStats] = useState({
     totalLinks: 0,
     totalClicks: 0,
@@ -304,7 +308,11 @@ export default function Home() {
       setIsLoading(true);
       const response = await api.get("/api/user/profile");
       const userData = response.data;
-      setCurrentUser({ name: userData.name || "User", email: userData.email });
+      setCurrentUser({
+        name: userData.name || "User",
+        email: userData.email,
+        avatar: userData.avatar || null,
+      });
       setIsLoading(false);
     } catch {
       localStorage.removeItem("jwtToken");
@@ -518,7 +526,11 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-        <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+        <Navbar
+          userName={currentUser.name}
+          userEmail={currentUser.email}
+          userAvatar={currentUser.avatar}
+        />
         <PageLoader label="Loading Homepage..." />
       </div>
     );
@@ -526,7 +538,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#F5F7FA] flex flex-col">
-      <Navbar userName={currentUser.name} userEmail={currentUser.email} />
+      <Navbar
+        userName={currentUser.name}
+        userEmail={currentUser.email}
+        userAvatar={currentUser.avatar}
+      />
       <Toast {...toast} onClose={closeToast} />
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}

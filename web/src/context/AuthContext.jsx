@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       await loadUser();
     },
-    [loadUser]
+    [loadUser],
   );
 
   const logout = useCallback(() => {
