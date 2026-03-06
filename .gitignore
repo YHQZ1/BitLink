@@ -5,9 +5,11 @@ boot.txt
 # Environment Variables
 .env
 .env.*
-backend/.env*
 !.env.example
-!backend/.env.example
+!api/.env.example
+!web/.env.example
+api/.env*
+web/.env*
 
 # Logs
 logs
@@ -25,18 +27,29 @@ build/
 dist-ssr/
 coverage/
 
-# Frontend Build Artifacts
-frontend/dist/
-frontend/build/
-frontend/dist-ssr/
-frontend/.env*
+# Web Build Artifacts
+web/dist/
+web/build/
+web/dist-ssr/
 
-# Backend Build Artifacts
-backend/dist/
-backend/build/
-backend/logs/
-backend/.env*
-backend/server-start.txt
+# API Build Artifacts
+api/dist/
+api/build/
+api/logs/
+api/server-start.txt
+
+# Worker
+worker/logs/
+
+# Runtime / Cache
+dump.rdb
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.*
+terraform.tfvars
 
 # OS / Editor Junk
 .DS_Store
@@ -48,13 +61,3 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
-
-# Runtime Files
-dump.rdb
-
-# Terraform
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
-terraform.tfstate.*.backup
-terraform.tfvars
