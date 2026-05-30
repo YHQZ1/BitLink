@@ -880,7 +880,7 @@ export default function LandingPage() {
                   </li>
                   <li>
                     <a
-                      href="https://uttkarsh-ruparel.vercel.app"
+                      href="https://uttkarsh.dev"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-white transition-colors"
